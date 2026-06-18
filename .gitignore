@@ -1,0 +1,29 @@
+# Node
+node_modules/
+npm-debug.log*
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editor
+.vscode/
+.idea/
+*.suo
+*.user
+
+# Build / temp
+dist/
+build/
+*.tmp
+*.bak
+
+# Env / secrets
+.env
+.env.*
+*.pem
+*.key
+
+# Claude internal
+../.claude/
