@@ -968,6 +968,11 @@ canvas{max-width:100%}
     <span class="nav-label">Reports</span>
     <span class="nav-tooltip">Reports</span>
   </div>
+  <div class="nav-item" onclick="nav('automation',this)">
+    <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" stroke-linecap="round" d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+    <span class="nav-label">Automation</span>
+    <span class="nav-tooltip">Automation</span>
+  </div>
   <div class="nav-item" onclick="nav('integrations',this)">
     <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="18" cy="5" r="3" stroke-width="2"/><circle cx="6" cy="12" r="3" stroke-width="2"/><circle cx="18" cy="19" r="3" stroke-width="2"/><path d="M8.59 13.51l6.83 3.98M15.41 6.51l-6.82 3.98" stroke-width="2"/></svg>
     <span class="nav-label">Integrations</span>
@@ -1107,6 +1112,7 @@ canvas{max-width:100%}
     <div id="page-pacing" class="page"></div>
     <div id="page-attribution" class="page"></div>
     <div id="page-integrations" class="page"></div>
+    <div id="page-automation" class="page"></div>
     <div id="page-settings" class="page"></div>
   </div>
 </div>
@@ -1769,7 +1775,7 @@ function nav(page,el){
 }
 function renderPage(page){
   const c=CS.active,el=$('page-'+page);if(!el)return;
-  const R={dashboard:renderDashboard,campaigns:renderCampaigns,cpc:renderCPC,cpa:renderCPA,offer:renderOffer,anomaly:renderAnomaly,benchmarks:renderBenchmarks,simulator:renderSimulator,copilot:renderCopilot,forecasting:renderForecasting,scaling:renderScaling,reports:renderReports,integrations:renderIntegrations,settings:renderSettings,geo:renderGeo,creative:renderCreative,audience:renderAudience,pacing:renderPacing,attribution:renderAttribution};
+  const R={dashboard:renderDashboard,campaigns:renderCampaigns,cpc:renderCPC,cpa:renderCPA,offer:renderOffer,anomaly:renderAnomaly,benchmarks:renderBenchmarks,simulator:renderSimulator,copilot:renderCopilot,forecasting:renderForecasting,scaling:renderScaling,reports:renderReports,integrations:renderIntegrations,automation:renderAutomation,settings:renderSettings,geo:renderGeo,creative:renderCreative,audience:renderAudience,pacing:renderPacing,attribution:renderAttribution};
   if(R[page])R[page](el,c);
 }
 
@@ -1862,7 +1868,8 @@ const CMD_PAGES=[
   {icon:'👥',label:'Audience Builder',page:'audience',sub:'AI-generated audience segments'},
   {icon:'💵',label:'Budget Pacing',page:'pacing',sub:'Real-time spend rate & pacing health'},
   {icon:'🔗',label:'Attribution',page:'attribution',sub:'Click-to-conversion path explorer'},
-  {icon:'🔌',label:'Integrations',page:'integrations',sub:'Connect traffic sources'},
+  {icon:'⚡',label:'Automation',page:'automation',sub:'Rule-based campaign automation engine'},
+  {icon:'🔌',label:'Integrations',page:'integrations',sub:'Connect traffic sources & data platforms'},
   {icon:'⚙',label:'Settings',page:'settings',sub:'Account preferences'},
   {icon:'📐',label:'Schema Explorer',page:'schema',sub:'Campaign data schema & TypeScript types'},
 ];
@@ -2857,46 +2864,8 @@ function renderReports(el,c){
   setTimeout(()=>{mkChart('chart-rep',{type:'line',data:{labels:DAYS,datasets:[{label:'Revenue',data:c.metrics.hist.spend.map((s,i)=>Math.round(s*(c.metrics.hist.roas?c.metrics.hist.roas[i]||c.metrics.week.roas:c.metrics.week.roas||2))),borderColor:'#0fba81',backgroundColor:'rgba(15,186,129,.07)',fill:true,tension:.45,borderWidth:2,pointRadius:2},{label:'Spend',data:c.metrics.hist.spend,borderColor:'#4f6ef7',backgroundColor:'rgba(79,110,247,.06)',fill:true,tension:.45,borderWidth:2,pointRadius:2}]},options:{...CD}})},60);
 }
 
-function renderIntegrations(el,c){
-  const intg=c.integration;
-  el.innerHTML=`
-<div class="page-hdr">
-  <div><div class="page-title">Integrations</div><div class="page-sub">${c.name} · ${intg.platform}</div></div>
-  <button class="btn btn-outline btn-sm" onclick="openQS()">Switch ⌘J</button>
-</div>
-<div class="alert alert-${intg.syncStatus==='error'?'red':intg.syncStatus==='live'?'green':'blue'} mb16">
-  <div class="alert-title">${intg.platform} · Sync: ${intg.syncStatus.toUpperCase()}</div>
-  <div class="alert-text">Account: ${intg.accountId} · Last sync: ${intg.lastSync}</div>
-</div>
-<div class="g2 mb16">
-  <div class="card">
-    <div class="card-hdr"><div class="card-title">Traffic Sources</div></div>
-    ${[{name:'Facebook Ads',key:'meta'},{name:'Google Ads',key:'google'},{name:'TikTok Ads',key:'tiktok'},{name:'Native Ads',key:'native'},{name:'Push Notifications',key:'push'}].map(p=>`
-    <div class="flex items-center justify-between" style="padding:12px 16px;border-bottom:1px solid var(--border)">
-      <div class="flex items-center gap12"><span style="font-size:20px">${PE[p.key]||'📊'}</span>
-      <div><div style="font-weight:600;font-size:13px">${p.name}</div>
-      <div class="text-xs text-muted">${p.key===c.traffic.sourceKey?'Active for '+c.name:'Not connected'}</div></div></div>
-      ${p.key===c.traffic.sourceKey?'<span class="badge badge-green">Connected</span>':'<button class="btn btn-outline btn-xs">Connect</button>'}
-    </div>`).join('')}
-  </div>
-  <div class="card">
-    <div class="card-hdr"><div class="card-title">Trackers & Analytics</div></div>
-    ${[['Voluum',intg.trackerName==='Voluum'],['RedTrack',false],['Binom',intg.trackerName==='Binom'],['Google Analytics',false],['Hyros',false]].map(([n,st])=>`
-    <div class="flex items-center justify-between" style="padding:12px 16px;border-bottom:1px solid var(--border)">
-      <div><div style="font-weight:600;font-size:13px">${n}</div>${st&&intg.postbackUrl?`<div class="text-xs text-muted" style="font-family:var(--mono);margin-top:2px">${intg.postbackUrl.slice(0,40)}…</div>`:''}
-      </div>
-      ${st?'<span class="badge badge-green">Connected</span>':'<button class="btn btn-outline btn-xs">Connect</button>'}
-    </div>`).join('')}
-  </div>
-</div>
-<div class="card">
-  <div class="card-hdr"><div class="card-title">Postback & Webhook Configuration</div></div>
-  <div class="card-body">
-    <div class="field"><label>S2S Postback URL</label><div class="input-wrap"><input type="text" value="${intg.postbackUrl||''}" placeholder="https://track.example.com/postback?cid={clickid}"></div></div>
-    <div class="field"><label>Webhook URL (outbound events)</label><div class="input-wrap"><input type="text" value="${intg.webhookUrl||''}" placeholder="https://your-endpoint.com/webhook"></div></div>
-    <button class="btn btn-primary btn-sm">Save Configuration</button>
-  </div>
-</div>`;
+function renderIntegrations(el){
+  stIntegrations(el);
 }
 
 let _stTab='profile';
