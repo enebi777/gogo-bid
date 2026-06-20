@@ -799,6 +799,89 @@ canvas{max-width:100%}
   .int-grid{grid-template-columns:repeat(2,1fr)}
 }
 @media(min-width:769px){#mobile-menu-btn{display:none}}
+
+/* ── RICH TOOLTIPS ── */
+.tt{position:relative}
+.tt:hover .tt-box{opacity:1;pointer-events:auto;transform:translateY(0)}
+.tt-box{opacity:0;pointer-events:none;transform:translateY(4px);position:absolute;z-index:9999;background:#0d0d28;border:1px solid var(--border2);border-radius:12px;padding:12px 14px;width:230px;box-shadow:0 20px 60px rgba(0,0,0,.8);transition:all .15s ease;bottom:calc(100% + 10px);left:50%;transform:translateX(-50%) translateY(4px)}
+.tt:hover .tt-box{opacity:1;pointer-events:none;transform:translateX(-50%) translateY(0)}
+.tt-title{font-size:12px;font-weight:700;color:var(--text);margin-bottom:5px}
+.tt-desc{font-size:11px;color:var(--muted);line-height:1.55}
+.tt-tag{display:inline-block;font-size:9px;font-weight:700;padding:2px 7px;border-radius:4px;background:rgba(79,110,247,.15);color:var(--accent2);margin-top:7px;text-transform:uppercase;letter-spacing:.5px}
+.tt-when{font-size:10px;color:var(--dim);margin-top:4px;line-height:1.4}
+
+/* ── EMPTY STATES ── */
+.empty-state{text-align:center;padding:64px 24px;max-width:460px;margin:0 auto}
+.empty-icon{font-size:52px;margin-bottom:20px;line-height:1}
+.empty-title{font-size:18px;font-weight:800;margin-bottom:8px;letter-spacing:-.3px}
+.empty-desc{font-size:13px;color:var(--muted);line-height:1.65;margin-bottom:24px}
+.empty-actions{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.empty-meta{font-size:11px;color:var(--dim);margin-top:14px;display:flex;align-items:center;gap:12px;justify-content:center}
+.empty-meta-item{display:flex;align-items:center;gap:4px}
+
+/* ── CAMPAIGN HUB ── */
+.hub-header{background:linear-gradient(135deg,rgba(79,110,247,.06),rgba(139,92,246,.04));border:1px solid var(--border2);border-radius:16px;padding:24px 28px;margin-bottom:20px;position:relative;overflow:hidden}
+.hub-header::before{content:'';position:absolute;top:-40px;right:-40px;width:200px;height:200px;background:radial-gradient(circle,rgba(79,110,247,.12),transparent 70%);pointer-events:none}
+.hub-health-ring{position:relative;display:inline-flex;align-items:center;justify-content:center}
+.hub-sections{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px}
+.hub-section{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 16px;cursor:pointer;transition:all .15s;position:relative;overflow:hidden}
+.hub-section:hover{border-color:rgba(79,110,247,.35);background:var(--card2);transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.3)}
+.hub-section.hs-connected::after{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--hs-col,var(--green))}
+.hub-section-icon{font-size:20px;margin-bottom:8px}
+.hub-section-title{font-size:11px;font-weight:700;margin-bottom:3px}
+.hub-section-desc{font-size:10px;color:var(--muted);line-height:1.4}
+.hub-section-status{display:flex;align-items:center;gap:5px;margin-top:8px;font-size:10px;font-weight:600}
+
+/* ── FLOATING AI ── */
+#ai-fab{position:fixed;bottom:24px;right:24px;z-index:8000;display:flex;flex-direction:column;align-items:flex-end;gap:8px}
+#ai-fab-btn{width:50px;height:50px;border-radius:15px;background:linear-gradient(135deg,#4f6ef7,#8b5cf6);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:20px;box-shadow:0 8px 28px rgba(79,110,247,.45);transition:all .2s;color:#fff;flex-shrink:0}
+#ai-fab-btn:hover{transform:scale(1.08) translateY(-2px);box-shadow:0 14px 40px rgba(79,110,247,.6)}
+#ai-quick-panel{background:#0a0a20;border:1px solid var(--border2);border-radius:16px;padding:16px;width:290px;box-shadow:0 30px 80px rgba(0,0,0,.9);display:none;max-height:70vh;overflow-y:auto}
+#ai-quick-panel.open{display:block;animation:drop-in .18s cubic-bezier(.16,1,.3,1)}
+.aiq-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.aiq-title{font-size:13px;font-weight:800;display:flex;align-items:center;gap:6px}
+.aiq-close{background:none;border:none;color:var(--muted);cursor:pointer;font-size:16px;padding:2px 6px;border-radius:5px;line-height:1}
+.aiq-close:hover{background:var(--card2);color:var(--text)}
+.aiq-context{font-size:10px;color:var(--muted);background:var(--bg3);border-radius:7px;padding:6px 10px;margin-bottom:12px;border:1px solid var(--border)}
+.aiq-section{font-size:9px;font-weight:700;color:var(--dim);text-transform:uppercase;letter-spacing:1px;margin:10px 0 6px}
+.aiq-chip{display:block;padding:8px 11px;border-radius:8px;background:var(--bg3);border:1px solid var(--border);font-size:11px;color:var(--muted);cursor:pointer;transition:all .12s;margin-bottom:5px;width:100%;text-align:left;font-family:inherit}
+.aiq-chip:hover{background:var(--card2);color:var(--text);border-color:var(--border3)}
+.aiq-input-row{display:flex;gap:6px;margin-top:12px}
+.aiq-input{flex:1;background:var(--bg3);border:1px solid var(--border2);border-radius:8px;padding:7px 10px;font-size:12px;color:var(--text);font-family:inherit;outline:none;transition:border .12s}
+.aiq-input:focus{border-color:var(--accent)}
+.aiq-send{padding:7px 12px;border-radius:8px;background:var(--accent);border:none;color:#fff;cursor:pointer;font-size:12px;font-weight:700;transition:all .12s;white-space:nowrap}
+.aiq-send:hover{background:#3d5ce6;transform:scale(1.04)}
+.aiq-response{background:rgba(79,110,247,.06);border:1px solid rgba(79,110,247,.15);border-radius:10px;padding:10px 12px;font-size:11px;color:var(--muted);line-height:1.6;margin-top:10px;display:none}
+.aiq-response.visible{display:block}
+
+/* ── DASHBOARD 2.0 ── */
+.dash-grid-4q{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:20px}
+@media(min-width:900px){.dash-grid-4q{grid-template-columns:repeat(4,1fr)}}
+.dq-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px;position:relative;overflow:hidden;transition:border-color .15s}
+.dq-card:hover{border-color:var(--border3)}
+.dq-accent{position:absolute;top:0;left:0;right:0;height:3px;border-radius:14px 14px 0 0}
+.dq-label{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted);margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.dq-value{font-size:24px;font-weight:900;letter-spacing:-.5px;margin-bottom:4px;line-height:1}
+.dq-detail{font-size:11px;color:var(--muted);line-height:1.5}
+.attention-row{display:flex;align-items:flex-start;gap:12px;padding:11px 0;border-bottom:1px solid var(--border)}
+.attention-row:last-child{border-bottom:none}
+.att-badge{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:5px}
+.att-content{flex:1}
+.att-title{font-size:12px;font-weight:700;margin-bottom:2px}
+.att-sub{font-size:11px;color:var(--muted);line-height:1.4}
+.att-btn{font-size:10px;font-weight:700;color:var(--accent2);cursor:pointer;padding:4px 9px;border-radius:6px;border:1px solid rgba(123,155,255,.25);background:rgba(79,110,247,.06);white-space:nowrap;flex-shrink:0;transition:all .12s;font-family:inherit}
+.att-btn:hover{background:rgba(79,110,247,.15);border-color:rgba(123,155,255,.5)}
+.next-item{display:flex;align-items:center;gap:12px;padding:10px 13px;border-radius:10px;background:var(--bg3);border:1px solid var(--border);margin-bottom:8px;cursor:pointer;transition:all .13s}
+.next-item:hover{background:var(--card2);border-color:var(--border3);transform:translateX(3px)}
+.ni-icon{width:32px;height:32px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0}
+.ni-body{flex:1;min-width:0}
+.ni-title{font-size:12px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ni-desc{font-size:10px;color:var(--muted);margin-top:1px}
+.feed-row{display:flex;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)}
+.feed-row:last-child{border-bottom:none}
+.feed-pip{width:6px;height:6px;border-radius:50%;flex-shrink:0;margin-top:5px}
+.feed-txt{font-size:11px;line-height:1.45;flex:1}
+.feed-when{font-size:10px;color:var(--dim);font-family:var(--mono);white-space:nowrap;margin-left:8px;margin-top:2px}
 </style>
 </head>
 <body>
@@ -874,25 +957,27 @@ canvas{max-width:100%}
     </div>
   </div>
 
-  <div class="sb-section">Overview</div>
+  <div class="sb-section">Workspace</div>
   <div class="nav-item active" onclick="nav('dashboard',this)">
     <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5" stroke-width="2"/><rect x="14" y="3" width="7" height="7" rx="1.5" stroke-width="2"/><rect x="3" y="14" width="7" height="7" rx="1.5" stroke-width="2"/><rect x="14" y="14" width="7" height="7" rx="1.5" stroke-width="2"/></svg>
     <span class="nav-label">Dashboard</span>
     <span class="nav-tooltip">Dashboard</span>
   </div>
+
+  <div class="sb-section">Campaigns</div>
   <div class="nav-item" onclick="nav('campaigns',this)">
     <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M3 7h18M3 12h18M3 17h11"/></svg>
-    <span class="nav-label">Campaigns</span>
+    <span class="nav-label">All Campaigns</span>
     <span class="nav-badge" id="nb-campaigns" style="display:none"></span>
-    <span class="nav-tooltip">Campaigns</span>
+    <span class="nav-tooltip">All Campaigns</span>
+  </div>
+  <div class="nav-item" onclick="nav('hub',this)">
+    <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3" stroke-width="2"/><path stroke-width="2" d="M12 2v3M12 19v3M4.22 4.22l2.12 2.12M17.66 17.66l2.12 2.12M2 12h3M19 12h3M4.22 19.78l2.12-2.12M17.66 6.34l2.12-2.12"/></svg>
+    <span class="nav-label">Campaign Hub</span>
+    <span class="nav-tooltip">Campaign Hub</span>
   </div>
 
   <div class="sb-section">Intelligence</div>
-  <div class="nav-item" onclick="nav('geo',this)">
-    <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke-width="2"/><path stroke-width="2" d="M2 12h20M12 2a15.3 15.3 0 010 20M12 2a15.3 15.3 0 000 20"/></svg>
-    <span class="nav-label">GEO Analysis</span>
-    <span class="nav-tooltip">GEO Analysis</span>
-  </div>
   <div class="nav-item" onclick="nav('cpc',this)">
     <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" stroke-width="2"/><path d="M12 7v5l3 3" stroke-width="2" stroke-linecap="round"/></svg>
     <span class="nav-label">CPC Intelligence</span>
@@ -908,6 +993,11 @@ canvas{max-width:100%}
     <span class="nav-label">Offer Analyzer</span>
     <span class="nav-tooltip">Offer Analyzer</span>
   </div>
+  <div class="nav-item" onclick="nav('geo',this)">
+    <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke-width="2"/><path stroke-width="2" d="M2 12h20M12 2a15.3 15.3 0 010 20M12 2a15.3 15.3 0 000 20"/></svg>
+    <span class="nav-label">GEO Analysis</span>
+    <span class="nav-tooltip">GEO Analysis</span>
+  </div>
   <div class="nav-item" onclick="nav('anomaly',this)">
     <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" stroke-linecap="round" d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13" stroke-width="2" stroke-linecap="round"/><line x1="12" y1="17" x2="12.01" y2="17" stroke-width="2.5" stroke-linecap="round"/></svg>
     <span class="nav-label">Anomaly Detection</span>
@@ -921,21 +1011,6 @@ canvas{max-width:100%}
   </div>
 
   <div class="sb-section">AI Tools</div>
-  <div class="nav-item" onclick="nav('creative',this)">
-    <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" stroke-width="2"/><circle cx="8.5" cy="8.5" r="1.5" stroke-width="2"/><path stroke-width="2" d="M21 15l-5-5L5 21"/></svg>
-    <span class="nav-label">Creative Studio</span>
-    <span class="nav-tooltip">Creative Studio</span>
-  </div>
-  <div class="nav-item" onclick="nav('audience',this)">
-    <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4" stroke-width="2"/><path stroke-width="2" d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
-    <span class="nav-label">Audience Builder</span>
-    <span class="nav-tooltip">Audience Builder</span>
-  </div>
-  <div class="nav-item" onclick="nav('simulator',this)">
-    <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" stroke-width="2" stroke-linejoin="round"/></svg>
-    <span class="nav-label">AI Simulator</span>
-    <span class="nav-tooltip">AI Simulator</span>
-  </div>
   <div class="nav-item" onclick="nav('copilot',this)">
     <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
     <span class="nav-label">AI Copilot</span>
@@ -946,13 +1021,28 @@ canvas{max-width:100%}
     <span class="nav-label">AI Forecasting</span>
     <span class="nav-tooltip">AI Forecasting</span>
   </div>
+  <div class="nav-item" onclick="nav('simulator',this)">
+    <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" stroke-width="2" stroke-linejoin="round"/></svg>
+    <span class="nav-label">AI Simulator</span>
+    <span class="nav-tooltip">AI Simulator</span>
+  </div>
   <div class="nav-item" onclick="nav('scaling',this)">
     <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18" stroke-width="2" stroke-linecap="round"/><polyline points="17 6 23 6 23 12" stroke-width="2" stroke-linecap="round"/></svg>
     <span class="nav-label">Scaling Engine</span>
     <span class="nav-tooltip">Scaling Engine</span>
   </div>
+  <div class="nav-item" onclick="nav('creative',this)">
+    <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" stroke-width="2"/><circle cx="8.5" cy="8.5" r="1.5" stroke-width="2"/><path stroke-width="2" d="M21 15l-5-5L5 21"/></svg>
+    <span class="nav-label">Creative Studio</span>
+    <span class="nav-tooltip">Creative Studio</span>
+  </div>
+  <div class="nav-item" onclick="nav('audience',this)">
+    <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4" stroke-width="2"/><path stroke-width="2" d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+    <span class="nav-label">Audience Builder</span>
+    <span class="nav-tooltip">Audience Builder</span>
+  </div>
 
-  <div class="sb-section">Account</div>
+  <div class="sb-section">Analytics</div>
   <div class="nav-item" onclick="nav('pacing',this)">
     <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M12 2v20M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
     <span class="nav-label">Budget Pacing</span>
@@ -968,6 +1058,8 @@ canvas{max-width:100%}
     <span class="nav-label">Reports</span>
     <span class="nav-tooltip">Reports</span>
   </div>
+
+  <div class="sb-section">Automate</div>
   <div class="nav-item" onclick="nav('automation',this)">
     <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" stroke-linecap="round" d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
     <span class="nav-label">Automation</span>
@@ -978,6 +1070,8 @@ canvas{max-width:100%}
     <span class="nav-label">Integrations</span>
     <span class="nav-tooltip">Integrations</span>
   </div>
+
+  <div class="sb-section">Account</div>
   <div class="nav-item" onclick="nav('settings',this)">
     <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3" stroke-width="2"/><path stroke-width="2" d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
     <span class="nav-label">Settings</span>
@@ -1113,6 +1207,7 @@ canvas{max-width:100%}
     <div id="page-attribution" class="page"></div>
     <div id="page-integrations" class="page"></div>
     <div id="page-automation" class="page"></div>
+    <div id="page-hub" class="page"></div>
     <div id="page-settings" class="page"></div>
   </div>
 </div>
@@ -1775,7 +1870,7 @@ function nav(page,el){
 }
 function renderPage(page){
   const c=CS.active,el=$('page-'+page);if(!el)return;
-  const R={dashboard:renderDashboard,campaigns:renderCampaigns,cpc:renderCPC,cpa:renderCPA,offer:renderOffer,anomaly:renderAnomaly,benchmarks:renderBenchmarks,simulator:renderSimulator,copilot:renderCopilot,forecasting:renderForecasting,scaling:renderScaling,reports:renderReports,integrations:renderIntegrations,automation:renderAutomation,settings:renderSettings,geo:renderGeo,creative:renderCreative,audience:renderAudience,pacing:renderPacing,attribution:renderAttribution};
+  const R={dashboard:renderDashboard,campaigns:renderCampaigns,hub:renderCampaignHub,cpc:renderCPC,cpa:renderCPA,offer:renderOffer,anomaly:renderAnomaly,benchmarks:renderBenchmarks,simulator:renderSimulator,copilot:renderCopilot,forecasting:renderForecasting,scaling:renderScaling,reports:renderReports,integrations:renderIntegrations,automation:renderAutomation,settings:renderSettings,geo:renderGeo,creative:renderCreative,audience:renderAudience,pacing:renderPacing,attribution:renderAttribution};
   if(R[page])R[page](el,c);
 }
 
@@ -2074,89 +2169,153 @@ function renderDashboard(el,c){
   const avgRoas=active.length?(active.reduce((n,x)=>n+(x.metrics.today.roas||0),0)/active.length).toFixed(1):'0';
   const allAnom=all.reduce((n,x)=>n+x.ai.anomalies.length,0);
   const allSuggs=all.flatMap(x=>x.ai.bidSuggestions.filter(s=>s.status==='pending'));
+  const needAttn=all.filter(x=>x.ai.healthScore<60||x.ai.anomalies.length>0);
+  const profitOk=totProfit>=0;
 
   el.innerHTML=`
 <div class="page-hdr">
   <div>
-    <div class="page-title">Portfolio Dashboard</div>
-    <div class="page-sub">AI-powered overview · <strong style="color:var(--text)">${c.name}</strong> in focus</div>
+    <div class="page-title">Dashboard</div>
+    <div class="page-sub">Your portfolio at a glance · <strong style="color:var(--text)">${c.name}</strong> in focus</div>
   </div>
   <div class="flex gap8 items-center">
     <span class="badge badge-green">● Live</span>
-    <button class="btn btn-outline btn-sm" onclick="openQS()">⌘J Switch Campaign</button>
+    <button class="btn btn-outline btn-sm" onclick="openQS()">⌘J Focus</button>
+    <button class="btn btn-primary btn-sm" onclick="nav('hub',document.querySelector('.nav-item[onclick*=hub]'))">Campaign Hub →</button>
   </div>
 </div>
 
-${allSuggs.length?`
-<div class="mb20">
-  <div class="flex items-center justify-between mb12">
-    <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;display:flex;align-items:center;gap:8px">
-      <span style="width:7px;height:7px;border-radius:50%;background:var(--accent);display:inline-block;animation:pulse-dot 2s infinite"></span>
-      ✦ AI Bid Suggestions — ${allSuggs.length} pending
+<!-- Q1: How am I performing? -->
+<div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1.2px;margin-bottom:10px;display:flex;align-items:center;gap:8px">
+  <span style="width:6px;height:6px;border-radius:50%;background:var(--accent);display:inline-block"></span>
+  How are my campaigns performing?
+</div>
+<div class="dash-grid-4q mb20">
+  <div class="dq-card" style="position:relative;overflow:hidden">
+    <div class="dq-accent" style="background:linear-gradient(90deg,var(--accent),#8b5cf6)"></div>
+    <div style="font-size:11px;color:var(--muted);margin-bottom:4px">Total Spend/day</div>
+    <div style="font-size:26px;font-weight:800;font-family:var(--mono);color:var(--accent2)">$${totSpend.toLocaleString()}</div>
+    <div style="font-size:11px;color:var(--muted);margin-top:4px">${active.length} active campaigns</div>
+  </div>
+  <div class="dq-card" style="position:relative;overflow:hidden">
+    <div class="dq-accent" style="background:var(--green)"></div>
+    <div style="font-size:11px;color:var(--muted);margin-bottom:4px">Revenue/day</div>
+    <div style="font-size:26px;font-weight:800;font-family:var(--mono);color:var(--green)">$${totRev.toLocaleString()}</div>
+    <div style="font-size:11px;color:var(--muted);margin-top:4px">ROAS ${avgRoas}× avg</div>
+  </div>
+  <div class="dq-card" style="position:relative;overflow:hidden">
+    <div class="dq-accent" style="background:${profitOk?'var(--green)':'var(--red)'}"></div>
+    <div style="font-size:11px;color:var(--muted);margin-bottom:4px">Profit/day</div>
+    <div style="font-size:26px;font-weight:800;font-family:var(--mono);color:${profitOk?'var(--green)':'var(--red)'}">${profitOk?'+':''}$${Math.abs(totProfit).toLocaleString()}</div>
+    <div style="font-size:11px;color:${profitOk?'var(--green)':'var(--red)'};margin-top:4px">${profitOk?'Profitable':'Review needed'}</div>
+  </div>
+  <div class="dq-card" style="position:relative;overflow:hidden">
+    <div class="dq-accent" style="background:${allAnom>0?'var(--red)':'var(--green)'}"></div>
+    <div style="font-size:11px;color:var(--muted);margin-bottom:4px">Active Alerts</div>
+    <div style="font-size:26px;font-weight:800;font-family:var(--mono);color:${allAnom>0?'var(--red)':'var(--green)'}">${allAnom}</div>
+    <div style="font-size:11px;color:var(--muted);margin-top:4px">${allAnom>0?needAttn.length+' campaigns':'All clear'}</div>
+  </div>
+</div>
+
+<!-- Q2: What needs attention? -->
+<div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1.2px;margin-bottom:10px;display:flex;align-items:center;gap:8px">
+  <span style="width:6px;height:6px;border-radius:50%;background:var(--yellow);display:inline-block"></span>
+  What needs attention?
+</div>
+<div class="card mb20">
+  ${needAttn.length===0?`<div style="padding:20px;text-align:center;color:var(--muted);font-size:13px">✓ All campaigns are healthy — nothing needs attention right now.</div>`
+  :needAttn.slice(0,4).map(camp=>`
+  <div class="attention-row" onclick="openDrawer('${camp.id}')">
+    <span style="width:8px;height:8px;border-radius:50%;background:${camp.color};flex-shrink:0;margin-top:5px"></span>
+    <div style="flex:1;min-width:0">
+      <div style="font-weight:700;font-size:13px;color:var(--text)">${camp.name}</div>
+      <div style="font-size:11px;color:var(--muted)">${camp.traffic.source} · Health ${camp.ai.healthScore}</div>
     </div>
-    <button class="btn btn-ghost btn-sm" onclick="nav('copilot',qs('.nav-item[onclick*=copilot]'))">View all →</button>
-  </div>
-  <div class="g2" id="dash-bsc"></div>
-</div>`:''}
-
-<!-- Portfolio KPIs -->
-<div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1.2px;margin-bottom:10px">Portfolio · ${active.length} Active</div>
-<div class="g5 mb16">
-  <div class="card kpi" style="border-left:3px solid var(--accent)"><div class="kpi-label">Total Spend/d</div><div class="kpi-val" style="color:var(--accent2)">$${totSpend.toLocaleString()}</div><div class="kpi-change neu">${active.length} campaigns</div></div>
-  <div class="card kpi" style="border-left:3px solid var(--green)"><div class="kpi-label">Revenue/d</div><div class="kpi-val pos">$${totRev.toLocaleString()}</div><div class="kpi-change pos">↑ all active</div></div>
-  <div class="card kpi" style="border-left:3px solid ${totProfit>=0?'var(--green)':'var(--red)'}"><div class="kpi-label">Profit/d</div><div class="kpi-val" style="color:${totProfit>=0?'var(--green)':'var(--red)'}">${totProfit>=0?'+':''}$${Math.abs(totProfit).toLocaleString()}</div><div class="kpi-change ${totProfit>=0?'pos':'neg'}">${totProfit>=0?'profitable':'review needed'}</div></div>
-  <div class="card kpi" style="border-left:3px solid var(--yellow)"><div class="kpi-label">Avg ROAS</div><div class="kpi-val pos">${avgRoas}×</div><div class="kpi-change pos">portfolio avg</div></div>
-  <div class="card kpi" style="border-left:3px solid ${allAnom>0?'var(--red)':'var(--green)'}"><div class="kpi-label">Alerts</div><div class="kpi-val" style="color:${allAnom>0?'var(--red)':'var(--green)'}">${allAnom}</div><div class="kpi-change ${allAnom>0?'neg':'pos'}">${allAnom>0?'needs attention':'all clear'}</div></div>
-</div>
-
-<!-- Focus Campaign -->
-<div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1.2px;margin-bottom:10px">Focus: ${c.name}</div>
-<div class="g4 mb16">
-  <div class="card kpi"><div class="kpi-label">CPC</div><div class="kpi-val" style="color:var(--accent2)">${m.cpc!=null?'$'+m.cpc.toFixed(2):'—'}</div><div class="kpi-change pos">vs $${c.metrics.bench.cpc} avg</div></div>
-  <div class="card kpi"><div class="kpi-label">CPA</div><div class="kpi-val" style="color:var(--yellow)">${m.cpa!=null?'$'+m.cpa.toFixed(2):'—'}</div><div class="kpi-change ${m.cpa&&m.cpa<c.optimization.targetCPA?'pos':'neg'}">target $${c.optimization.targetCPA}</div></div>
-  <div class="card kpi"><div class="kpi-label">CVR</div><div class="kpi-val pos">${m.cvr!=null?m.cvr.toFixed(1)+'%':'—'}</div><div class="kpi-change pos">vs ${c.metrics.bench.cvr}% avg</div></div>
-  <div class="card kpi"><div class="kpi-label">ROAS</div><div class="kpi-val pos">${m.roas!=null?m.roas.toFixed(1)+'×':'—'}</div><div class="kpi-change pos">target ${c.optimization.targetRoas}×</div></div>
-</div>
-
-<div class="g2 mb16">
-  <div class="card"><div class="card-hdr"><div class="card-title">Revenue & Profit — ${c.name}</div></div><div class="card-body"><canvas id="chart-dash-rp" height="190"></canvas></div></div>
-  <div class="card"><div class="card-hdr"><div class="card-title">CPC · CPA · CVR Trends</div></div><div class="card-body"><canvas id="chart-dash-trends" height="190"></canvas></div></div>
-</div>
-
-<div class="g2">
-  <div class="card">
-    <div class="card-hdr"><div class="card-title">All Campaigns</div><div class="card-desc">Click a row to open full detail →</div></div>
-    <div style="overflow-x:auto">
-      <table>
-        <thead><tr><th>Campaign</th><th>Status</th><th>Health</th><th>ROAS</th><th>CPA</th><th>Profit</th></tr></thead>
-        <tbody>
-          ${all.map(camp=>`<tr onclick="openDrawer('${camp.id}')" style="${camp.id===c.id?'background:rgba(79,110,247,.04)':''}">
-            <td><div style="font-weight:700;display:flex;align-items:center;gap:7px"><span style="width:8px;height:8px;border-radius:50%;background:${camp.color};flex-shrink:0"></span>${camp.name}</div><div class="text-xs text-muted">${camp.traffic.source}</div></td>
-            <td><span class="badge badge-${camp.status==='active'?'green':camp.status==='paused'?'yellow':'red'}">${camp.status}</span></td>
-            <td style="color:${camp.ai.healthScore>75?'var(--green)':camp.ai.healthScore>50?'var(--yellow)':'var(--red)'};font-weight:800;font-family:var(--mono)">${camp.ai.healthScore}</td>
-            <td style="color:${(camp.metrics.today.roas||0)>=1.5?'var(--green)':'var(--red)'};font-weight:700;font-family:var(--mono)">${camp.metrics.today.roas!=null?camp.metrics.today.roas.toFixed(1)+'×':'—'}</td>
-            <td style="font-family:var(--mono)">${camp.metrics.today.cpa!=null?'$'+camp.metrics.today.cpa.toFixed(2):'—'}</td>
-            <td style="color:${(camp.metrics.today.profit||0)>=0?'var(--green)':'var(--red)'};font-weight:700">${camp.metrics.today.profit!=null?(camp.metrics.today.profit>=0?'+':'')+'$'+Math.abs(camp.metrics.today.profit):'—'}</td>
-          </tr>`).join('')}
-        </tbody>
-      </table>
+    <div style="flex:2;min-width:0">
+      ${camp.ai.anomalies.slice(0,1).map(a=>`<div style="font-size:12px;color:var(--red);line-height:1.4">${a.msg||a.description||a.type}</div>`).join('')}
+      ${camp.ai.healthScore<60&&!camp.ai.anomalies.length?`<div style="font-size:12px;color:var(--yellow)">Low health score — review performance</div>`:''}
     </div>
-  </div>
+    <span class="badge badge-${camp.ai.healthScore>75?'green':camp.ai.healthScore>50?'yellow':'red'}">${camp.ai.healthScore}</span>
+    <span style="color:var(--muted);font-size:16px;flex-shrink:0">›</span>
+  </div>`).join('')}
+  ${allSuggs.length?`<div style="border-top:1px solid var(--border);padding:10px 0 0;margin-top:4px">
+    <div style="font-size:12px;color:var(--accent2);font-weight:600;margin-bottom:8px">✦ ${allSuggs.length} AI bid suggestions pending</div>
+    <div id="dash-bsc-mini"></div>
+  </div>`:''}
+</div>
+
+<!-- Q3 + Q4 grid -->
+<div class="g2 mb20">
+  <!-- Q3: What changed today? -->
   <div class="card">
-    <div class="card-hdr"><div class="card-title">✦ AI Recommendations</div><div class="card-desc">${c.name}</div></div>
-    <div class="card-body">
-      ${c.ai.recommendations.map(r=>`<div class="alert alert-blue mb12"><div class="alert-text">${r}</div></div>`).join('')}
-      <div class="flex gap8 mt12">
-        <button class="btn btn-primary btn-sm" onclick="nav('copilot',qs('.nav-item[onclick*=copilot]'))">Ask AI Copilot →</button>
-        <button class="btn btn-outline btn-sm" onclick="nav('scaling',qs('.nav-item[onclick*=scaling]'))">Scaling Engine →</button>
+    <div class="card-hdr">
+      <div>
+        <div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1.2px;margin-bottom:2px;display:flex;align-items:center;gap:8px"><span style="width:6px;height:6px;border-radius:50%;background:#8b5cf6;display:inline-block"></span>What changed today?</div>
+        <div class="card-title">${c.name} — Today's Snapshot</div>
       </div>
     </div>
+    <div class="card-body">
+      <div class="feed-row"><span style="font-size:16px">📈</span><div><div style="font-size:12px;font-weight:600">ROAS ${m.roas!=null?m.roas.toFixed(1)+'×':'—'} <span style="color:var(--green);font-size:11px">vs ${c.optimization.targetRoas}× target</span></div><div style="font-size:11px;color:var(--muted)">Performance metric</div></div></div>
+      <div class="feed-row"><span style="font-size:16px">💰</span><div><div style="font-size:12px;font-weight:600">CPA $${m.cpa!=null?m.cpa.toFixed(2):'—'} <span style="color:${m.cpa&&m.cpa<c.optimization.targetCPA?'var(--green)':'var(--yellow)'};font-size:11px">target $${c.optimization.targetCPA}</span></div><div style="font-size:11px;color:var(--muted)">Cost per acquisition</div></div></div>
+      <div class="feed-row"><span style="font-size:16px">🖱️</span><div><div style="font-size:12px;font-weight:600">CPC $${m.cpc!=null?m.cpc.toFixed(2):'—'} <span style="color:var(--muted);font-size:11px">vs $${c.metrics.bench.cpc} benchmark</span></div><div style="font-size:11px;color:var(--muted)">Cost per click</div></div></div>
+      <div class="feed-row" style="border-bottom:none"><span style="font-size:16px">📊</span><div><div style="font-size:12px;font-weight:600">CVR ${m.cvr!=null?m.cvr.toFixed(1)+'%':'—'} <span style="color:var(--muted);font-size:11px">benchmark ${c.metrics.bench.cvr}%</span></div><div style="font-size:11px;color:var(--muted)">Conversion rate</div></div></div>
+    </div>
+    <div style="padding:12px 16px 14px">
+      <canvas id="chart-dash-rp" height="140"></canvas>
+    </div>
+  </div>
+
+  <!-- Q4: What should I do next? -->
+  <div class="card">
+    <div class="card-hdr">
+      <div>
+        <div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1.2px;margin-bottom:2px;display:flex;align-items:center;gap:8px"><span style="width:6px;height:6px;border-radius:50%;background:var(--accent);display:inline-block;animation:pulse-dot 2s infinite"></span>What should I do next?</div>
+        <div class="card-title">AI Priority Queue</div>
+      </div>
+    </div>
+    <div class="card-body" style="display:flex;flex-direction:column;gap:8px">
+      ${c.ai.recommendations.slice(0,3).map((r,i)=>`
+      <div class="next-item" style="display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border-radius:10px;background:var(--bg3);cursor:pointer" onclick="nav('copilot',document.querySelector('.nav-item[onclick*=copilot]'))">
+        <span style="width:20px;height:20px;border-radius:6px;background:rgba(79,110,247,.15);color:var(--accent);font-size:10px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">${i+1}</span>
+        <div style="font-size:12px;color:var(--text);line-height:1.5">${r}</div>
+      </div>`).join('')}
+      ${allSuggs.length?`<div class="next-item" style="display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;background:rgba(79,110,247,.06);border:1px solid rgba(79,110,247,.2);cursor:pointer" onclick="nav('copilot',document.querySelector('.nav-item[onclick*=copilot]'))">
+        <span style="font-size:16px">✦</span>
+        <div style="font-size:12px;font-weight:600;color:var(--accent2)">${allSuggs.length} bid change${allSuggs.length>1?'s':''} ready to apply</div>
+        <span style="margin-left:auto;color:var(--accent);font-size:12px">Review →</span>
+      </div>`:''}
+    </div>
+    <div style="padding:0 16px 14px;display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn btn-primary btn-sm" onclick="nav('copilot',document.querySelector('.nav-item[onclick*=copilot]'))">Ask AI Copilot</button>
+      <button class="btn btn-outline btn-sm" onclick="nav('scaling',document.querySelector('.nav-item[onclick*=scaling]'))">Scaling Engine</button>
+      <button class="btn btn-outline btn-sm" onclick="nav('automation',document.querySelector('.nav-item[onclick*=automation]'))">Automations</button>
+    </div>
+  </div>
+</div>
+
+<!-- Campaign table -->
+<div class="card">
+  <div class="card-hdr"><div class="card-title">All Campaigns</div><div class="card-desc">Click row to open detail</div><button class="btn btn-primary btn-sm" onclick="openCreateCamp()">+ New</button></div>
+  <div style="overflow-x:auto">
+    <table>
+      <thead><tr><th>Campaign</th><th>Status</th><th>Health</th><th>ROAS</th><th>CPA</th><th>Profit/d</th></tr></thead>
+      <tbody>
+        ${all.map(camp=>`<tr onclick="openDrawer('${camp.id}')" style="${camp.id===c.id?'background:rgba(79,110,247,.04)':''}">
+          <td><div style="font-weight:700;display:flex;align-items:center;gap:7px"><span style="width:8px;height:8px;border-radius:50%;background:${camp.color};flex-shrink:0"></span>${camp.name}</div><div class="text-xs text-muted">${camp.traffic.source}</div></td>
+          <td><span class="badge badge-${camp.status==='active'?'green':camp.status==='paused'?'yellow':'red'}">${camp.status}</span></td>
+          <td style="color:${camp.ai.healthScore>75?'var(--green)':camp.ai.healthScore>50?'var(--yellow)':'var(--red)'};font-weight:800;font-family:var(--mono)">${camp.ai.healthScore}</td>
+          <td style="color:${(camp.metrics.today.roas||0)>=1.5?'var(--green)':'var(--red)'};font-weight:700;font-family:var(--mono)">${camp.metrics.today.roas!=null?camp.metrics.today.roas.toFixed(1)+'×':'—'}</td>
+          <td style="font-family:var(--mono)">${camp.metrics.today.cpa!=null?'$'+camp.metrics.today.cpa.toFixed(2):'—'}</td>
+          <td style="color:${(camp.metrics.today.profit||0)>=0?'var(--green)':'var(--red)'};font-weight:700">${camp.metrics.today.profit!=null?(camp.metrics.today.profit>=0?'+':'')+'$'+Math.abs(camp.metrics.today.profit):'—'}</td>
+        </tr>`).join('')}
+      </tbody>
+    </table>
   </div>
 </div>`;
 
-  // Render top bid suggestions inline
+  // Render mini bid suggestion cards
   if(allSuggs.length){
-    const bc=$('dash-bsc');
+    const bc=$('dash-bsc-mini');
     if(bc){
       const campsWith=CS.camps.filter(x=>x.ai.bidSuggestions.some(s=>s.status==='pending')).slice(0,2);
       bc.innerHTML='';
@@ -2186,12 +2345,134 @@ ${allSuggs.length?`
       {label:'Revenue',data:h.spend.map((s,i)=>Math.round(s*(h.roas?h.roas[i]||c.metrics.week.roas:c.metrics.week.roas))),borderColor:'#0fba81',backgroundColor:'rgba(15,186,129,.07)',fill:true,tension:.45,borderWidth:2,pointRadius:2},
       {label:'Profit',data:h.profit,borderColor:'#4f6ef7',backgroundColor:'rgba(79,110,247,.06)',fill:true,tension:.45,borderWidth:2,pointRadius:2}
     ]},options:{...CD}});
-    mkChart('chart-dash-trends',{type:'line',data:{labels:DAYS,datasets:[
-      {label:'CPC',data:h.cpc,borderColor:'#4f6ef7',tension:.45,borderWidth:2,pointRadius:2,yAxisID:'y'},
-      {label:'CPA',data:h.cpa,borderColor:'#f5a623',tension:.45,borderWidth:2,pointRadius:2,yAxisID:'y'},
-      {label:'CVR%',data:h.cvr,borderColor:'#0fba81',tension:.45,borderWidth:2,pointRadius:2,borderDash:[4,3],yAxisID:'y2'}
-    ]},options:{responsive:true,plugins:{legend:{labels:{color:'#5c5c85',font:{size:10}}}},scales:{x:{ticks:{color:'#5c5c85',font:{size:10}},grid:{color:'rgba(255,255,255,.035)'}},y:{position:'left',ticks:{color:'#5c5c85',font:{size:10}},grid:{color:'rgba(255,255,255,.05)'}},y2:{position:'right',ticks:{color:'#5c5c85',font:{size:10}},grid:{drawOnChartArea:false}}}}});
   },60);
+}
+
+function renderCampaignHub(el){
+  const c=CS.active,all=CS.camps;
+  if(!c){el.innerHTML='<div class="empty-state"><div class="empty-icon">🎯</div><div class="empty-title">No Campaign Selected</div><div class="empty-desc">Select or create a campaign to see its hub.</div><div class="empty-actions"><button class="btn btn-primary" onclick="openCreateCamp()">+ New Campaign</button></div></div>';return;}
+  const m=c.metrics.today,active=all.filter(x=>x.status==='active');
+  const totSpend=active.reduce((n,x)=>n+(x.metrics.today.spend||0),0);
+  const pendBids=c.ai.bidSuggestions.filter(s=>s.status==='pending').length;
+
+  el.innerHTML=`
+<div class="page-hdr">
+  <div>
+    <div class="page-title">Campaign Hub</div>
+    <div class="page-sub">Single source of truth for every campaign</div>
+  </div>
+  <div class="flex gap8 items-center">
+    <button class="btn btn-outline btn-sm" onclick="openQS()">⌘J Switch</button>
+    <button class="btn btn-primary btn-sm" onclick="openCreateCamp()">+ New Campaign</button>
+  </div>
+</div>
+
+<!-- Campaign selector strip -->
+<div style="display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;margin-bottom:20px">
+  ${all.map(camp=>`<div onclick="CS.setActive(camp.id);renderPage('hub')" style="flex-shrink:0;padding:8px 14px;border-radius:10px;border:1px solid ${camp.id===c.id?'var(--accent)':'var(--border)'};background:${camp.id===c.id?'rgba(79,110,247,.1)':'var(--bg2)'};cursor:pointer;white-space:nowrap;font-size:12px;font-weight:${camp.id===c.id?700:500};color:${camp.id===c.id?'var(--accent2)':'var(--text)'};display:flex;align-items:center;gap:7px"><span style="width:7px;height:7px;border-radius:50%;background:${camp.color};flex-shrink:0"></span>${camp.name}</div>`).join('')}
+</div>
+
+<!-- Hub header -->
+<div class="hub-header mb20">
+  <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap">
+    <div style="display:flex;align-items:center;gap:14px">
+      <div style="width:44px;height:44px;border-radius:12px;background:${c.color};display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:900;color:#fff;flex-shrink:0">${c.name[0]}</div>
+      <div>
+        <div style="font-size:20px;font-weight:800;color:var(--text)">${c.name}</div>
+        <div style="font-size:12px;color:var(--muted);margin-top:2px">${c.traffic.source}${c.traffic.adNetwork?' · '+c.traffic.adNetwork:''} · <span class="badge badge-${c.status==='active'?'green':c.status==='paused'?'yellow':'red'}">${c.status}</span></div>
+      </div>
+    </div>
+    <div style="display:flex;gap:8px">
+      <button class="btn btn-outline btn-sm" onclick="openDrawer('${c.id}')">Edit Campaign</button>
+      <button class="btn btn-primary btn-sm" onclick="nav('copilot',document.querySelector('.nav-item[onclick*=copilot]'))">✦ AI Advisor</button>
+    </div>
+  </div>
+  <!-- KPI strip -->
+  <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-top:20px">
+    ${[
+      ['Spend/d',m.spend!=null?'$'+m.spend.toLocaleString():'—','var(--accent2)','Daily budget burn'],
+      ['Revenue',m.revenue!=null?'$'+m.revenue.toLocaleString():'—','var(--green)','Total revenue today'],
+      ['ROAS',m.roas!=null?m.roas.toFixed(1)+'×':'—',m.roas>=c.optimization.targetRoas?'var(--green)':'var(--yellow)','Return on ad spend'],
+      ['CPA',m.cpa!=null?'$'+m.cpa.toFixed(2):'—',m.cpa&&m.cpa<c.optimization.targetCPA?'var(--green)':'var(--red)','Cost per acquisition'],
+      ['Health',''+c.ai.healthScore,c.ai.healthScore>75?'var(--green)':c.ai.healthScore>50?'var(--yellow)':'var(--red)','AI health score'],
+    ].map(([l,v,clr,tip])=>`<div><div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px">${l}</div><div style="font-size:22px;font-weight:800;font-family:var(--mono);color:${clr}">${v}</div><div style="font-size:10px;color:var(--muted);margin-top:2px">${tip}</div></div>`).join('')}
+  </div>
+</div>
+
+<!-- Hub sections grid -->
+<div class="hub-sections mb20">
+  <div class="hub-section" onclick="nav('cpc',document.querySelector('.nav-item[onclick*=cpc]'))">
+    <div style="font-size:22px;margin-bottom:8px">💡</div>
+    <div style="font-size:13px;font-weight:700;color:var(--text)">CPC Intelligence</div>
+    <div style="font-size:11px;color:var(--muted);margin-top:4px;line-height:1.5">Bid optimization & cost-per-click analysis</div>
+  </div>
+  <div class="hub-section" onclick="nav('cpa',document.querySelector('.nav-item[onclick*=cpa]'))">
+    <div style="font-size:22px;margin-bottom:8px">🎯</div>
+    <div style="font-size:13px;font-weight:700;color:var(--text)">CPA Intelligence</div>
+    <div style="font-size:11px;color:var(--muted);margin-top:4px;line-height:1.5">Acquisition cost & profitability levers</div>
+  </div>
+  <div class="hub-section" onclick="nav('anomaly',document.querySelector('.nav-item[onclick*=anomaly]'))">
+    <div style="font-size:22px;margin-bottom:8px">⚠️</div>
+    <div style="font-size:13px;font-weight:700;color:var(--text)">Anomaly Detection</div>
+    <div style="font-size:11px;color:var(--muted);margin-top:4px;line-height:1.5">${c.ai.anomalies.length} active alert${c.ai.anomalies.length!==1?'s':''} detected</div>
+  </div>
+  <div class="hub-section" onclick="nav('forecasting',document.querySelector('.nav-item[onclick*=forecasting]'))">
+    <div style="font-size:22px;margin-bottom:8px">📈</div>
+    <div style="font-size:13px;font-weight:700;color:var(--text)">AI Forecasting</div>
+    <div style="font-size:11px;color:var(--muted);margin-top:4px;line-height:1.5">Revenue & spend projections</div>
+  </div>
+  <div class="hub-section" onclick="nav('copilot',document.querySelector('.nav-item[onclick*=copilot]'))">
+    <div style="font-size:22px;margin-bottom:8px">✦</div>
+    <div style="font-size:13px;font-weight:700;color:var(--text)">AI Copilot</div>
+    <div style="font-size:11px;color:var(--muted);margin-top:4px;line-height:1.5">${pendBids} suggestion${pendBids!==1?'s':''} pending review</div>
+  </div>
+  <div class="hub-section" onclick="nav('creative',document.querySelector('.nav-item[onclick*=creative]'))">
+    <div style="font-size:22px;margin-bottom:8px">🎨</div>
+    <div style="font-size:13px;font-weight:700;color:var(--text)">Creative Studio</div>
+    <div style="font-size:11px;color:var(--muted);margin-top:4px;line-height:1.5">Generate & test ad creatives</div>
+  </div>
+  <div class="hub-section" onclick="nav('audience',document.querySelector('.nav-item[onclick*=audience]'))">
+    <div style="font-size:22px;margin-bottom:8px">👥</div>
+    <div style="font-size:13px;font-weight:700;color:var(--text)">Audience Builder</div>
+    <div style="font-size:11px;color:var(--muted);margin-top:4px;line-height:1.5">Segment & target the right users</div>
+  </div>
+  <div class="hub-section" onclick="nav('geo',document.querySelector('.nav-item[onclick*=geo]'))">
+    <div style="font-size:22px;margin-bottom:8px">🌍</div>
+    <div style="font-size:13px;font-weight:700;color:var(--text)">GEO Analysis</div>
+    <div style="font-size:11px;color:var(--muted);margin-top:4px;line-height:1.5">Geographic performance breakdown</div>
+  </div>
+  <div class="hub-section" onclick="nav('automation',document.querySelector('.nav-item[onclick*=automation]'))">
+    <div style="font-size:22px;margin-bottom:8px">⚡</div>
+    <div style="font-size:13px;font-weight:700;color:var(--text)">Automation</div>
+    <div style="font-size:11px;color:var(--muted);margin-top:4px;line-height:1.5">Rules & triggers for this campaign</div>
+  </div>
+  <div class="hub-section" onclick="nav('reports',document.querySelector('.nav-item[onclick*=reports]'))">
+    <div style="font-size:22px;margin-bottom:8px">📋</div>
+    <div style="font-size:13px;font-weight:700;color:var(--text)">Reports</div>
+    <div style="font-size:11px;color:var(--muted);margin-top:4px;line-height:1.5">Export & schedule reports</div>
+  </div>
+  <div class="hub-section" onclick="nav('attribution',document.querySelector('.nav-item[onclick*=attribution]'))">
+    <div style="font-size:22px;margin-bottom:8px">🔀</div>
+    <div style="font-size:13px;font-weight:700;color:var(--text)">Attribution</div>
+    <div style="font-size:11px;color:var(--muted);margin-top:4px;line-height:1.5">Channel & touchpoint analysis</div>
+  </div>
+  <div class="hub-section" onclick="nav('scaling',document.querySelector('.nav-item[onclick*=scaling]'))">
+    <div style="font-size:22px;margin-bottom:8px">🚀</div>
+    <div style="font-size:13px;font-weight:700;color:var(--text)">Scaling Engine</div>
+    <div style="font-size:11px;color:var(--muted);margin-top:4px;line-height:1.5">Find safe paths to scale profitably</div>
+  </div>
+</div>
+
+<!-- AI recommendations -->
+<div class="card">
+  <div class="card-hdr"><div class="card-title">✦ AI Recommendations for ${c.name}</div></div>
+  <div class="card-body" style="display:flex;flex-direction:column;gap:8px">
+    ${c.ai.recommendations.map((r,i)=>`<div class="next-item" style="display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border-radius:10px;background:var(--bg3)">
+      <span style="width:20px;height:20px;border-radius:6px;background:rgba(79,110,247,.15);color:var(--accent);font-size:10px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">${i+1}</span>
+      <div style="font-size:12px;color:var(--text);line-height:1.5">${r}</div>
+    </div>`).join('')}
+  </div>
+</div>`;
 }
 
 function renderCampaigns(el){
@@ -4935,6 +5216,66 @@ setTimeout(()=>{
     toast('Activate AI Features 🔑','Add your Anthropic API key to use AI Copilot & Offer Analyzer.','info',8000);
   }
 },3500);
+</script>
+
+<!-- Floating AI Assistant -->
+<div id="ai-fab">
+  <div id="ai-quick-panel">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+      <div style="font-size:13px;font-weight:700;color:var(--text)">✦ AI Assistant</div>
+      <button onclick="toggleAIFab()" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:16px;line-height:1;padding:0">×</button>
+    </div>
+    <div style="font-size:11px;color:var(--muted);margin-bottom:10px">Quick actions for the current view</div>
+    <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px">
+      <button class="aiq-chip" onclick="aiqAction('analyze')">📊 Analyze performance</button>
+      <button class="aiq-chip" onclick="aiqAction('suggest')">💡 Suggest optimizations</button>
+      <button class="aiq-chip" onclick="aiqAction('anomaly')">⚠️ Check anomalies</button>
+      <button class="aiq-chip" onclick="aiqAction('forecast')">📈 Quick forecast</button>
+      <button class="aiq-chip" onclick="aiqAction('scale')">🚀 Scale opportunities</button>
+      <button class="aiq-chip" onclick="aiqAction('creative')">🎨 Creative ideas</button>
+    </div>
+    <div style="position:relative">
+      <input id="aiq-input" type="text" placeholder="Ask anything about your campaigns…" style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:8px 36px 8px 10px;font-size:12px;color:var(--text);outline:none;box-sizing:border-box" onkeydown="if(event.key==='Enter')aiqSend()">
+      <button onclick="aiqSend()" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--accent);cursor:pointer;font-size:14px;padding:0;line-height:1">→</button>
+    </div>
+    <div id="aiq-response" style="margin-top:10px;font-size:12px;color:var(--text);line-height:1.6;display:none;max-height:180px;overflow-y:auto;background:var(--bg3);border-radius:8px;padding:10px"></div>
+    <div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center">
+      <span style="font-size:10px;color:var(--muted)">Powered by Claude</span>
+      <button class="btn btn-ghost btn-sm" onclick="toggleAIFab();nav('copilot',document.querySelector('.nav-item[onclick*=copilot]'))">Full Copilot →</button>
+    </div>
+  </div>
+  <button id="ai-fab-btn" onclick="toggleAIFab()" title="AI Assistant">✦</button>
+</div>
+
+<script>
+function toggleAIFab(){
+  const p=$('ai-quick-panel');
+  p.classList.toggle('open');
+}
+function aiqAction(type){
+  const c=CS.active;
+  const prompts={
+    analyze:`Analyze campaign "${c.name}" performance. ROAS: ${c.metrics.today.roas}×, CPA: $${c.metrics.today.cpa}, Health: ${c.ai.healthScore}. Give 3 key insights.`,
+    suggest:`Campaign "${c.name}" has ROAS ${c.metrics.today.roas}×, target ${c.optimization.targetRoas}×. CPA $${c.metrics.today.cpa}, target $${c.optimization.targetCPA}. Suggest 3 specific bid/budget optimizations.`,
+    anomaly:`Campaign "${c.name}" health score: ${c.ai.healthScore}. Anomalies: ${c.ai.anomalies.map(a=>a.type).join(', ')||'none'}. Explain what could cause these issues.`,
+    forecast:`Forecast next 7-day performance for "${c.name}". Current daily spend $${c.metrics.today.spend}, ROAS ${c.metrics.today.roas}×. Estimate revenue range.`,
+    scale:`Campaign "${c.name}" is spending $${c.metrics.today.spend}/day at ROAS ${c.metrics.today.roas}×. Is this a good candidate to scale? What would you recommend?`,
+    creative:`Campaign "${c.name}" on ${c.traffic.source}. Suggest 3 creative angles to test to improve CVR ${c.metrics.today.cvr}%.`
+  };
+  $('aiq-input').value=prompts[type]||'';
+  aiqSend();
+}
+async function aiqSend(){
+  const inp=$('aiq-input'),resp=$('aiq-response');
+  const q=inp.value.trim();if(!q)return;
+  if(!_anthropicKey){resp.style.display='block';resp.innerHTML='<span style="color:var(--red)">Add your Anthropic API key in Settings to use the AI assistant.</span>';return;}
+  resp.style.display='block';resp.innerHTML='<span style="color:var(--muted)">Thinking…</span>';
+  try{
+    const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'x-api-key':_anthropicKey,'anthropic-version':'2023-06-01','content-type':'application/json','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:'claude-haiku-4-5-20251001',max_tokens:400,system:'You are GoGo Bid AI, a media buying optimization assistant. Be concise and actionable.',messages:[{role:'user',content:q}]})});
+    const d=await r.json();
+    resp.innerHTML=d.content?.[0]?.text?.replace(/\n/g,'<br>')||'No response';
+  }catch(e){resp.innerHTML='<span style="color:var(--red)">Error: '+e.message+'</span>';}
+}
 </script>
 </body>
 </html>
