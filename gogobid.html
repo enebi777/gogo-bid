@@ -2868,6 +2868,258 @@ function renderIntegrations(el){
   stIntegrations(el);
 }
 
+// ═══════════════════════════════════════════════════
+// AUTOMATION ENGINE
+// ═══════════════════════════════════════════════════
+let _autoTab='rules',_autoBuilderOpen=false;
+let AUTOMATION_RULES=[
+  {id:'r1',name:'CPA Guard — Pause on Spike',enabled:true,trigger:'CPA',operator:'>',value:45,action:'Pause Campaign',actParam:'',fires:127,lastFired:'2m ago',tag:'Protection',tagCol:'var(--red)'},
+  {id:'r2',name:'ROAS Scale-Up',enabled:true,trigger:'ROAS',operator:'>',value:3.5,action:'Increase Budget',actParam:'+15%',fires:23,lastFired:'1h ago',tag:'Scaling',tagCol:'var(--green)'},
+  {id:'r3',name:'Low Spend Alert',enabled:true,trigger:'Spend',operator:'<',value:50,action:'Send Alert',actParam:'Slack',fires:8,lastFired:'4h ago',tag:'Alerts',tagCol:'var(--accent2)'},
+  {id:'r4',name:'CTR Drop — Reduce Bid',enabled:false,trigger:'CTR',operator:'<',value:1.2,action:'Decrease CPC',actParam:'-10%',fires:44,lastFired:'Yesterday',tag:'Bidding',tagCol:'var(--yellow)'},
+  {id:'r5',name:'Profit Milestone — Scale',enabled:true,trigger:'Profit',operator:'>',value:500,action:'Increase Budget',actParam:'+20%',fires:6,lastFired:'3d ago',tag:'Scaling',tagCol:'var(--green)'},
+  {id:'r6',name:'Budget Exhausted Alert',enabled:true,trigger:'Budget Used',operator:'>',value:90,action:'Send Alert',actParam:'Email + Slack',fires:19,lastFired:'6h ago',tag:'Alerts',tagCol:'var(--accent2)'},
+];
+const AUTO_LOG=[
+  {time:'2m ago',rule:'CPA Guard — Pause on Spike',camp:'Keto ClickBank US',action:'Campaign Paused',result:'success',metric:'CPA $48.20'},
+  {time:'1h ago',rule:'ROAS Scale-Up',camp:'GoGo Bid Main',action:'Budget +15%',result:'success',metric:'ROAS 3.82×'},
+  {time:'3h ago',rule:'Low Spend Alert',camp:'ClickBank Brazil',action:'Slack Sent',result:'success',metric:'Spend $31.40'},
+  {time:'4h ago',rule:'Budget Exhausted Alert',camp:'Keto ClickBank US',action:'Email Sent',result:'success',metric:'Budget 92%'},
+  {time:'6h ago',rule:'CPA Guard — Pause on Spike',camp:'GoGo Bid Main',action:'Evaluated — No Action',result:'skip',metric:'CPA $38.10'},
+  {time:'8h ago',rule:'ROAS Scale-Up',camp:'Weight Loss Nutra',action:'Budget +15%',result:'success',metric:'ROAS 4.12×'},
+  {time:'12h ago',rule:'Low Spend Alert',camp:'ClickBank Brazil',action:'Slack Sent',result:'success',metric:'Spend $22.80'},
+  {time:'Yesterday',rule:'CTR Drop — Reduce Bid',camp:'Keto ClickBank US',action:'CPC −10%',result:'success',metric:'CTR 0.98%'},
+];
+const AUTO_TEMPLATES=[
+  {icon:'🛡',name:'CPA Guard',desc:'Auto-pause any campaign when CPA exceeds your target by 20%.',tag:'Protection',rule:'CPA > Target+20%',action:'Pause Campaign'},
+  {icon:'🚀',name:'ROAS Scale Booster',desc:'Automatically increase budget when ROAS is strong for 3 consecutive hours.',tag:'Scaling',rule:'ROAS > 3.0 for 3h',action:'Budget +15%'},
+  {icon:'🔔',name:'Budget Burn Alert',desc:'Notify you when daily budget hits 80% before noon.',tag:'Alerts',rule:'Budget Used > 80% before 12pm',action:'Alert via Slack'},
+  {icon:'📉',name:'CTR Decay Biddown',desc:'Reduce CPC when CTR drops below 1% for 2+ hours.',tag:'Bidding',rule:'CTR < 1% for 2h',action:'CPC −10%'},
+  {icon:'💰',name:'Profit Milestone Scaler',desc:'Aggressively scale budget when daily profit exceeds $500.',tag:'Scaling',rule:'Profit > $500/day',action:'Budget +25%'},
+  {icon:'⏰',name:'Day-Parting Scheduler',desc:'Pause campaigns during low-conversion hours (midnight–6am).',tag:'Scheduling',rule:'Time between 00:00–06:00',action:'Pause Campaign'},
+];
+function autoToggle(id){const r=AUTOMATION_RULES.find(x=>x.id===id);if(r){r.enabled=!r.enabled;renderAutomation($('page-automation'));toast(r.enabled?'Rule Enabled':'Rule Disabled',r.name,r.enabled?'success':'info',2000);}}
+function autoDelete(id){AUTOMATION_RULES=AUTOMATION_RULES.filter(x=>x.id!==id);renderAutomation($('page-automation'));toast('Rule Deleted','Automation rule removed.','info',2000);}
+function autoApplyTemplate(name){
+  const t=AUTO_TEMPLATES.find(x=>x.name===name);if(!t)return;
+  const id='r'+(Date.now()%10000);
+  AUTOMATION_RULES.push({id,name:t.name,enabled:true,trigger:t.rule.split(' ')[0],operator:'>',value:0,action:t.action,actParam:'',fires:0,lastFired:'Never',tag:t.tag,tagCol:t.tag==='Protection'?'var(--red)':t.tag==='Scaling'?'var(--green)':t.tag==='Alerts'?'var(--accent2)':'var(--yellow)'});
+  _autoTab='rules';renderAutomation($('page-automation'));
+  toast('✓ Template Applied',t.name+' rule added and enabled.','success',3000);
+}
+function renderAutomation(el){
+  const activeRules=AUTOMATION_RULES.filter(r=>r.enabled).length;
+  const totalFires=AUTOMATION_RULES.reduce((n,r)=>n+r.fires,0);
+  el.innerHTML=`
+<div class="page-hdr">
+  <div>
+    <div class="page-title">Automation Engine</div>
+    <div class="page-sub">Rule-based campaign automation — set triggers, conditions, and actions</div>
+  </div>
+  <div class="flex gap8">
+    <button class="btn btn-outline btn-sm" onclick="_autoTab='log';renderAutomation($('page-automation'))">📋 Execution Log</button>
+    <button class="btn btn-primary btn-sm" onclick="_autoTab='builder';renderAutomation($('page-automation'))">+ New Rule</button>
+  </div>
+</div>
+<div class="g4 mb20">
+  ${[['Active Rules',activeRules,'var(--green)','⚡'],['Total Rules',AUTOMATION_RULES.length,'var(--accent2)','📋'],['Triggers Today',totalFires,'var(--yellow)','🔥'],['Actions Saved','$2,840','var(--green)','💰']].map(([l,v,col,icon])=>`
+  <div class="card kpi" style="border-color:${col}22">
+    <div class="kpi-label">${icon} ${l}</div>
+    <div class="kpi-val" style="font-size:22px;color:${col}">${v}</div>
+  </div>`).join('')}
+</div>
+<div class="int-tab-bar mb16">
+  ${[['rules','⚡ Active Rules'],['templates','📦 Templates'],['builder','🔧 Rule Builder'],['log','📋 Execution Log'],['schedule','🕐 Schedule']].map(([k,l])=>`<div class="int-tab${_autoTab===k?' active':''}" onclick="_autoTab='${k}';renderAutomation($('page-automation'))">${l}</div>`).join('')}
+</div>
+<div id="auto-body">${_autoTab==='rules'?_autoRules():_autoTab==='templates'?_autoTemplates():_autoTab==='builder'?_autoBuilder():_autoTab==='log'?_autoLog():_autoSchedule()}</div>`;
+}
+function _autoRules(){
+  if(!AUTOMATION_RULES.length) return`<div class="card" style="text-align:center;padding:40px;color:var(--muted)"><div style="font-size:32px;margin-bottom:12px">⚡</div><div style="font-size:14px;font-weight:600">No Rules Yet</div><div class="text-xs mt8">Start with a template or build a custom rule.</div><button class="btn btn-primary btn-sm mt16" onclick="_autoTab='templates';renderAutomation($('page-automation'))">Browse Templates</button></div>`;
+  return`<div class="card">
+  <div class="card-hdr"><div class="card-title">Automation Rules</div><div class="card-desc">${AUTOMATION_RULES.filter(r=>r.enabled).length} of ${AUTOMATION_RULES.length} active</div></div>
+  <div style="overflow:hidden">
+    <div style="display:grid;grid-template-columns:1fr 180px 140px 100px 80px 90px;gap:0;padding:9px 16px;background:var(--bg3);font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;border-bottom:1px solid var(--border)">
+      <div>Rule</div><div>Trigger Condition</div><div>Action</div><div style="text-align:center">Fires</div><div style="text-align:center">Status</div><div></div>
+    </div>
+    ${AUTOMATION_RULES.map(r=>`
+    <div style="display:grid;grid-template-columns:1fr 180px 140px 100px 80px 90px;gap:0;padding:13px 16px;border-bottom:1px solid var(--border);align-items:center;${r.enabled?'':'opacity:.55'}">
+      <div>
+        <div style="font-size:12px;font-weight:700;margin-bottom:3px">${r.name}</div>
+        <div style="display:flex;gap:6px;align-items:center">
+          <span style="font-size:9px;font-weight:700;padding:2px 7px;border-radius:4px;background:${r.tagCol}18;color:${r.tagCol};border:1px solid ${r.tagCol}30">${r.tag}</span>
+          <span style="font-size:10px;color:var(--muted)">Last: ${r.lastFired}</span>
+        </div>
+      </div>
+      <div style="font-size:11px;font-family:var(--mono);color:var(--accent2)">${r.trigger} ${r.operator} ${r.value}${r.trigger==='Budget Used'?'%':r.trigger==='CTR'||r.trigger==='ROAS'?'×':''}</div>
+      <div>
+        <div style="font-size:11px;font-weight:600">${r.action}</div>
+        ${r.actParam?`<div style="font-size:10px;color:var(--muted);font-family:var(--mono)">${r.actParam}</div>`:''}
+      </div>
+      <div style="text-align:center;font-size:13px;font-weight:700;font-family:var(--mono);color:var(--yellow)">${r.fires}</div>
+      <div style="text-align:center">
+        <button class="acc-toggle${r.enabled?' on':''}" onclick="autoToggle('${r.id}')"></button>
+      </div>
+      <div style="display:flex;gap:6px;justify-content:flex-end">
+        <button class="btn btn-ghost btn-xs" onclick="toast('Edit Rule','Rule editor coming soon.','info')">Edit</button>
+        <button class="btn btn-ghost btn-xs" style="color:var(--red)" onclick="autoDelete('${r.id}')">✕</button>
+      </div>
+    </div>`).join('')}
+  </div>
+</div>`;
+}
+function _autoTemplates(){
+  return`<div class="g2">
+  ${AUTO_TEMPLATES.map(t=>`
+  <div class="card" style="position:relative">
+    <div style="display:flex;align-items:flex-start;gap:12px;margin-bottom:12px">
+      <div style="font-size:28px;line-height:1;flex-shrink:0">${t.icon}</div>
+      <div>
+        <div style="font-size:13px;font-weight:800;margin-bottom:4px">${t.name}</div>
+        <div style="font-size:11px;color:var(--muted);line-height:1.5">${t.desc}</div>
+      </div>
+    </div>
+    <div style="background:var(--bg3);border-radius:8px;padding:10px 12px;margin-bottom:12px">
+      <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">Rule</div>
+      <div style="font-size:11px;font-family:var(--mono);color:var(--accent2)">${t.rule}</div>
+      <div style="font-size:10px;color:var(--muted);margin-top:6px">→ <span style="color:var(--green);font-weight:700">${t.action}</span></div>
+    </div>
+    <div style="display:flex;align-items:center;justify-content:space-between">
+      <span style="font-size:10px;font-weight:700;padding:3px 8px;border-radius:5px;background:rgba(79,110,247,.1);color:var(--accent2)">${t.tag}</span>
+      <button class="btn btn-primary btn-xs" onclick="autoApplyTemplate('${t.name}')">Apply Template →</button>
+    </div>
+  </div>`).join('')}
+</div>`;
+}
+function _autoBuilder(){
+  const triggers=['CPA','ROAS','CTR','CVR','Spend','Revenue','Profit','Budget Used','CPC','Impressions'];
+  const operators=['>','<','>=','<=','='];
+  const actions=['Pause Campaign','Resume Campaign','Increase Budget','Decrease Budget','Decrease CPC','Increase CPC','Send Alert','Apply Bid Rule','Tag Campaign'];
+  return`<div class="g2">
+  <div class="card">
+    <div class="card-hdr"><div class="card-title">🔧 Rule Builder</div><div class="card-desc">Define a custom automation rule</div></div>
+    <div class="card-body">
+      <div class="field"><label>Rule Name</label><div class="input-wrap"><input type="text" placeholder="e.g. CPA Guard v2" id="rb-name"></div></div>
+      <div class="field"><label>Campaign Scope</label>
+        <select id="rb-scope"><option>All Campaigns</option><option>Active Campaigns Only</option><option>Specific Campaign…</option></select>
+      </div>
+      <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);margin:14px 0 8px">Trigger Condition</div>
+      <div style="display:grid;grid-template-columns:1fr auto 1fr;gap:8px;align-items:end;margin-bottom:14px">
+        <div class="field" style="margin:0"><label>Metric</label><select id="rb-trigger">${triggers.map(t=>`<option>${t}</option>`).join('')}</select></div>
+        <div class="field" style="margin:0"><label>Is</label><select id="rb-op">${operators.map(o=>`<option>${o}</option>`).join('')}</select></div>
+        <div class="field" style="margin:0"><label>Value</label><div class="input-wrap"><input type="number" id="rb-val" placeholder="0" value="45"></div></div>
+      </div>
+      <div class="field">
+        <label>Duration (apply only if true for…)</label>
+        <select><option>Immediately</option><option>1 hour</option><option>2 hours</option><option>3 hours</option><option>6 hours</option></select>
+      </div>
+      <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);margin:14px 0 8px">Action</div>
+      <div class="field"><label>Action Type</label><select id="rb-action">${actions.map(a=>`<option>${a}</option>`).join('')}</select></div>
+      <div class="field"><label>Action Parameter (optional)</label><div class="input-wrap"><input type="text" id="rb-param" placeholder="+15% or slack-channel-name"></div></div>
+      <div class="field">
+        <label>Cooldown (don't re-trigger within…)</label>
+        <select><option>No cooldown</option><option>30 minutes</option><option>1 hour</option><option>4 hours</option><option>24 hours</option></select>
+      </div>
+      <div style="display:flex;gap:10px;margin-top:8px">
+        <button class="btn btn-primary btn-sm" onclick="(function(){
+          const name=$('rb-name')?.value?.trim()||'New Rule';
+          const trigger=$('rb-trigger')?.value||'CPA';
+          const op=$('rb-op')?.value||'>';
+          const val=parseFloat($('rb-val')?.value)||0;
+          const action=$('rb-action')?.value||'Pause Campaign';
+          const param=$('rb-param')?.value||'';
+          const tagMap={'Pause Campaign':'Protection','Resume Campaign':'Scheduling','Increase Budget':'Scaling','Decrease Budget':'Protection','Decrease CPC':'Bidding','Increase CPC':'Bidding','Send Alert':'Alerts','Apply Bid Rule':'Bidding','Tag Campaign':'Alerts'};
+          const colMap={'Protection':'var(--red)','Scaling':'var(--green)','Alerts':'var(--accent2)','Bidding':'var(--yellow)','Scheduling':'var(--muted)'};
+          const tag=tagMap[action]||'Custom';
+          AUTOMATION_RULES.push({id:'r'+Date.now(),name,enabled:true,trigger,operator:op,value:val,action,actParam:param,fires:0,lastFired:'Never',tag,tagCol:colMap[tag]||'var(--muted)'});
+          _autoTab='rules';renderAutomation($('page-automation'));
+          toast('✓ Rule Created',name+' is now active.','success',3000);
+        })()">✓ Create Rule</button>
+        <button class="btn btn-outline btn-sm" onclick="_autoTab='rules';renderAutomation($('page-automation'))">Cancel</button>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-hdr"><div class="card-title">Rule Preview</div><div class="card-desc">How your rule will behave</div></div>
+    <div class="card-body">
+      <div style="background:var(--bg3);border-radius:10px;padding:16px;margin-bottom:16px;font-size:12px;line-height:1.9">
+        <div style="color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Rule Logic</div>
+        <div><span style="color:var(--accent2);font-weight:700">IF</span> <span style="font-family:var(--mono);color:var(--text)">CPA &gt; 45</span></div>
+        <div><span style="color:var(--accent2);font-weight:700">AND</span> campaign is <span style="font-family:var(--mono)">active</span></div>
+        <div><span style="color:var(--green);font-weight:700">THEN</span> pause campaign</div>
+        <div><span style="color:var(--muted);font-weight:700">WITH</span> 1h cooldown</div>
+      </div>
+      <div style="font-size:11px;font-weight:700;color:var(--muted);margin-bottom:8px">Evaluation Frequency</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        ${['Every 5 min','Every 15 min','Every 1h','Every 6h','Daily'].map((f,i)=>`<div style="padding:5px 12px;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;${i===0?'background:var(--accent2);color:#fff':'background:var(--bg3);color:var(--muted);border:1px solid var(--border)'}">${f}</div>`).join('')}
+      </div>
+      <div style="margin-top:16px;padding:12px;border-radius:8px;background:rgba(15,186,129,.07);border:1px solid rgba(15,186,129,.2)">
+        <div style="font-size:11px;font-weight:700;color:var(--green);margin-bottom:6px">✦ AI Recommendation</div>
+        <div style="font-size:11px;color:var(--muted);line-height:1.6">Based on your campaign data, a CPA threshold of <strong style="color:var(--text)">$42–$48</strong> would have triggered 127 times this month, saving an estimated <strong style="color:var(--green)">$1,240</strong>.</div>
+      </div>
+    </div>
+  </div>
+</div>`;
+}
+function _autoLog(){
+  return`<div class="card">
+  <div class="card-hdr">
+    <div class="card-title">📋 Execution Log</div>
+    <div class="card-desc">${AUTO_LOG.length} events today</div>
+    <div style="display:flex;gap:6px;margin-left:auto">
+      ${['All','Success','Skipped'].map((f,i)=>`<button class="btn btn-${i===0?'outline':'ghost'} btn-xs">${f}</button>`).join('')}
+    </div>
+  </div>
+  <div style="overflow:hidden">
+    <div style="display:grid;grid-template-columns:80px 1fr 160px 120px 100px 70px;gap:0;padding:9px 16px;background:var(--bg3);font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;border-bottom:1px solid var(--border)">
+      <div>Time</div><div>Rule</div><div>Campaign</div><div>Action</div><div>Metric</div><div>Result</div>
+    </div>
+    ${AUTO_LOG.map(e=>`
+    <div style="display:grid;grid-template-columns:80px 1fr 160px 120px 100px 70px;gap:0;padding:11px 16px;border-bottom:1px solid var(--border);align-items:center">
+      <div style="font-size:10px;color:var(--muted);font-family:var(--mono)">${e.time}</div>
+      <div style="font-size:11px;font-weight:600">${e.rule}</div>
+      <div style="font-size:11px;color:var(--muted)">${e.camp}</div>
+      <div style="font-size:11px;font-family:var(--mono);color:var(--accent2)">${e.action}</div>
+      <div style="font-size:11px;font-family:var(--mono)">${e.metric}</div>
+      <div><span style="font-size:9px;font-weight:700;padding:2px 7px;border-radius:4px;background:${e.result==='success'?'rgba(15,186,129,.15)':e.result==='skip'?'rgba(92,92,133,.15)':'rgba(240,82,82,.15)'};color:${e.result==='success'?'var(--green)':e.result==='skip'?'var(--muted)':'var(--red)'}">${e.result==='success'?'✓ Done':e.result==='skip'?'— Skip':'✕ Fail'}</span></div>
+    </div>`).join('')}
+  </div>
+</div>`;
+}
+function _autoSchedule(){
+  const days=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+  const hours=Array.from({length:24},(_,i)=>i);
+  return`<div class="card mb16">
+  <div class="card-hdr"><div class="card-title">🕐 Day-Parting Schedule</div><div class="card-desc">Set active hours for your campaigns</div></div>
+  <div class="card-body">
+    <div style="overflow-x:auto">
+      <div style="display:grid;grid-template-columns:40px repeat(24,1fr);gap:3px;min-width:600px">
+        <div></div>
+        ${hours.map(h=>`<div style="font-size:9px;text-align:center;color:var(--muted);font-family:var(--mono)">${h}</div>`).join('')}
+        ${days.map(d=>`
+          <div style="font-size:10px;font-weight:700;color:var(--muted);display:flex;align-items:center">${d}</div>
+          ${hours.map(h=>{const on=!(h<6)&&!(h>22)&&!(d==='Sun'&&h<10);return`<div style="height:20px;border-radius:3px;cursor:pointer;background:${on?'rgba(79,110,247,.4)':'var(--bg3)'};border:1px solid ${on?'rgba(79,110,247,.3)':'var(--border)'}" onclick="this.style.background=this.style.background.includes('79')?'var(--bg3)':'rgba(79,110,247,.4)'"></div>`}).join('')}
+        `).join('')}
+      </div>
+      <div style="display:flex;align-items:center;gap:12px;margin-top:12px;font-size:11px">
+        <div style="display:flex;align-items:center;gap:6px"><div style="width:16px;height:16px;border-radius:3px;background:rgba(79,110,247,.4)"></div> Active</div>
+        <div style="display:flex;align-items:center;gap:6px"><div style="width:16px;height:16px;border-radius:3px;background:var(--bg3);border:1px solid var(--border)"></div> Paused</div>
+      </div>
+    </div>
+    <button class="btn btn-primary btn-sm mt16">Save Schedule</button>
+  </div>
+</div>
+<div class="card">
+  <div class="card-hdr"><div class="card-title">Timezone Settings</div></div>
+  <div class="card-body">
+    <div class="g2">
+      <div class="field"><label>Campaign Timezone</label><select><option>UTC-5 (Eastern)</option><option>UTC-8 (Pacific)</option><option>UTC+0 (London)</option><option>UTC+1 (CET)</option></select></div>
+      <div class="field"><label>Apply To</label><select><option>All Campaigns</option><option>Active Campaign Only</option></select></div>
+    </div>
+    <button class="btn btn-primary btn-sm">Save</button>
+  </div>
+</div>`;
+}
+
 let _stTab='profile';
 function renderSettings(el,c){
   el.innerHTML=`
