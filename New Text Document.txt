@@ -1,0 +1,634 @@
+# GoGo Bid – Complete Integrations System Implementation (Windsor.ai-Inspired, Affiliate Intelligence Enhanced)
+
+You are a world-class SaaS Architect, Senior Product Manager, Staff Software Engineer, Data Platform Architect, AI Systems Engineer, and UX Designer.
+
+---
+
+# PROJECT
+
+GoGo Bid
+
+An AI-Powered Affiliate Marketing, Media Buying, Attribution, Intelligence, Optimization, and Automation Operating System.
+
+---
+
+# CORE PRODUCT VISION
+
+GoGo Bid must become:
+
+> "One place to connect all your marketing data, affiliate networks, offers, tracking systems, AI intelligence, and campaign automation workflows."
+
+The platform should combine the best concepts from:
+
+* Windsor.ai
+* Voluum
+* RedTrack
+* Hyros
+* Triple Whale
+* Northbeam
+* HubSpot
+* Stripe
+* Notion
+* Linear
+
+while remaining specifically optimized for:
+
+* Affiliate Marketers
+* Media Buyers
+* Performance Marketers
+* Agencies
+* E-commerce Brands
+* Lead Generation Businesses
+
+---
+
+# CRITICAL REQUIREMENTS
+
+IMPORTANT!!!
+
+The current application structure must NOT be affected.
+
+Do NOT:
+
+* Break existing pages
+* Break existing routes
+* Replace existing layouts
+* Modify current workflows
+* Remove existing components
+* Affect existing state management
+* Affect existing authentication
+* Affect current database compatibility
+
+All new functionality must be added modularly.
+
+Every new integration component must be plug-and-play.
+
+---
+
+# GOGO BID INTEGRATIONS MISSION
+
+GoGo Bid Integrations should evolve into an enterprise-grade integration ecosystem inspired by Windsor.ai and designed around:
+
+## 1. Unified Integration Hub
+
+Single location where users connect their entire marketing stack.
+
+## 2. Multi-Account Management
+
+Users can connect unlimited:
+
+* Ad Accounts
+* Business Managers
+* MCC Accounts
+* Affiliate Network Accounts
+* Tracker Accounts
+* Workspaces
+* Brands
+* Clients
+
+## 3. Destination Layer
+
+Users can export data anywhere.
+
+## 4. Templates
+
+Prebuilt dashboards, reports, workflows, automations, attribution models, and AI templates.
+
+## 5. Data Connectivity
+
+Universal data ingestion layer.
+
+## 6. ETL / ELT Infrastructure
+
+Automated extraction, transformation, normalization, and delivery.
+
+## 7. Multi-Platform Synchronization
+
+Continuous syncing across all connected systems.
+
+## 8. No-Code Onboarding UX
+
+Connect everything without technical knowledge.
+
+---
+
+# CORE GOGO BID DATA FLOW
+
+All integrations must support:
+
+Traffic Source
+↓
+Affiliate Network
+↓
+Offer
+↓
+Checkout Platform
+↓
+Tracker & Attribution
+↓
+Campaign
+↓
+AI Intelligence
+↓
+Automation
+↓
+Reporting & Destinations
+
+This becomes the universal GoGo Bid intelligence pipeline.
+
+---
+
+# SETTINGS → INTEGRATIONS
+
+Implement:
+
+```text
+Settings
+└── Integrations
+
+    ├── Overview
+    ├── Quick Setup Wizard
+
+    ├── Traffic Sources
+    ├── Affiliate Networks & Marketplaces
+    ├── Checkout & Payment Platforms
+    ├── Trackers & Attribution
+
+    ├── Analytics & Data
+    ├── CRM & Lead Management
+    ├── E-Commerce
+    ├── Email Marketing
+    ├── Communication & Alerts
+
+    ├── Destinations & Reporting
+
+    ├── Templates Marketplace
+
+    ├── Webhooks & Postbacks
+    ├── AI Integrations
+
+    ├── Network Marketplace
+
+    ├── Health Center
+
+    └── Advanced Settings
+```
+
+---
+
+# UNIFIED INTEGRATION HUB
+
+Create a central command center.
+
+Display:
+
+* Connected Platforms
+* Connected Accounts
+* Connected Offers
+* Connected Networks
+* Connected Trackers
+* Connected Destinations
+* Sync Health
+* Active Campaigns
+
+Quick Actions:
+
+* Connect Platform
+* Launch Wizard
+* Sync Now
+* Run Health Check
+* View Logs
+
+---
+
+# MULTI-ACCOUNT MANAGEMENT SYSTEM
+
+Every integration must support:
+
+## Multiple Accounts
+
+Examples:
+
+Meta Ads
+
+* Multiple Business Managers
+* Multiple Ad Accounts
+
+Google Ads
+
+* Multiple MCC Accounts
+* Multiple Child Accounts
+
+TikTok Ads
+
+* Multiple Business Centers
+* Multiple Ad Accounts
+
+Affiliate Networks
+
+* Multiple Accounts Per Network
+
+Trackers
+
+* Multiple Workspaces
+
+Support:
+
+* Tags
+* Labels
+* Groups
+* Workspaces
+* Clients
+* Teams
+
+---
+
+# TRAFFIC SOURCES
+
+Implement dedicated integration modules.
+
+Meta
+
+* Meta Ads
+* Instagram
+* Facebook Lead Ads
+
+Google
+
+* Google Ads
+* Merchant Center
+* Search Console
+* YouTube
+
+TikTok
+
+* TikTok Ads
+* TikTok Shop
+
+Native
+
+* Taboola
+* Outbrain
+* MGID
+* Revcontent
+
+Push
+
+* PropellerAds
+* RichPush
+* ZeroPark
+* Push.House
+
+---
+
+# AFFILIATE NETWORKS & MARKETPLACES
+
+Priority Networks:
+
+* ClickBank
+* BuyGoods
+* Digistore24
+* MaxWeb
+* GuruMedia
+* TerraLeads
+* LeadRock
+* CPA House
+* NutriProfits
+* Everad
+* Leadbit
+* Health Trader
+* SellHealth
+* WebVork
+* Traffic Light
+
+Additional Networks:
+
+* JVZoo
+* CPA Combo
+* Smart Adv
+* A1CallHub
+* Dr.cash
+* Ambalaya
+* Orbio
+* Vortex Alpha
+* Click Hunts
+* Easy Profits
+* LemonAD
+* MediaScalers
+* NetVork
+* Shakes.pro
+* Loazz
+
+Regional Platforms:
+
+* Monetizze
+* Braip
+* Kiwify
+* Perfect Pay
+* CartPanda
+* Hubla
+
+---
+
+# NETWORK MARKETPLACE
+
+Create a Windsor.ai-style connector marketplace enhanced for affiliates.
+
+When user selects:
+
+ClickBank
+
+Automatically load:
+
+* Click ID
+* Revenue Parameter
+* Transaction Parameter
+* Tracking Templates
+* Postback Templates
+* Webhook Templates
+
+Features:
+
+* Auto Mapping
+* Auto Attribution
+* Auto Tracking Setup
+* Auto Revenue Mapping
+* Auto Conversion Mapping
+
+No manual configuration required.
+
+---
+
+# TRACKERS & ATTRIBUTION
+
+Support:
+
+* Voluum
+* RedTrack
+* Binom
+* Bemob
+* Keitaro
+* Hyros
+* Everflow
+* ClickMagick
+* AppsFlyer
+* Adjust
+
+Capabilities:
+
+* Click Tracking
+* Conversion Tracking
+* Revenue Tracking
+* Attribution Validation
+* Token Mapping
+* S2S Postbacks
+
+---
+
+# DESTINATION LAYER
+
+Inspired by Windsor.ai.
+
+Allow users to send GoGo Bid intelligence anywhere.
+
+BI Platforms
+
+* Looker Studio
+* Power BI
+* Tableau
+* Metabase
+
+Warehouses
+
+* BigQuery
+* Snowflake
+* Redshift
+* Databricks
+
+Databases
+
+* PostgreSQL
+* MySQL
+* MongoDB
+
+Spreadsheets
+
+* Google Sheets
+* Excel
+
+Exports
+
+* CSV
+* JSON
+
+APIs
+
+* REST API
+* Webhooks
+* Custom Endpoints
+
+---
+
+# TEMPLATES MARKETPLACE
+
+Create a marketplace similar to Windsor.ai templates.
+
+Provide:
+
+## Dashboard Templates
+
+* Affiliate Dashboard
+* Google Ads Dashboard
+* TikTok Dashboard
+* CPA Dashboard
+* Revenue Dashboard
+* Executive Dashboard
+
+## Attribution Templates
+
+* First Click
+* Last Click
+* Linear
+* Position-Based
+* Custom Attribution
+
+## Automation Templates
+
+* CPA Protection
+* Budget Scaling
+* ROAS Protection
+* Campaign Monitoring
+
+## AI Templates
+
+* Offer Analysis
+* Scaling Opportunities
+* Forecasting
+* Budget Allocation
+
+One-click deployment.
+
+---
+
+# ETL / ELT DATA PLATFORM
+
+Build a unified data pipeline.
+
+Stages:
+
+Extract
+↓
+Normalize
+↓
+Transform
+↓
+Enrich
+↓
+Analyze
+↓
+Deliver
+
+Features:
+
+* Scheduled Syncs
+* Real-Time Syncs
+* Incremental Syncs
+* Retry Queues
+* Data Validation
+* Error Recovery
+
+---
+
+# MULTI-PLATFORM SYNCHRONIZATION
+
+Continuously synchronize:
+
+* Ad Accounts
+* Offers
+* Trackers
+* Conversions
+* Revenue
+* Campaigns
+* Analytics
+
+Support:
+
+* Real-Time Updates
+* Scheduled Updates
+* Background Jobs
+* Sync Queues
+
+---
+
+# NO-CODE ONBOARDING EXPERIENCE
+
+Create a setup wizard that feels as simple as Windsor.ai.
+
+Step 1
+
+Connect Traffic Sources
+
+Step 2
+
+Connect Affiliate Networks
+
+Step 3
+
+Connect Trackers
+
+Step 4
+
+Connect Analytics
+
+Step 5
+
+Connect Destinations
+
+Step 6
+
+Activate AI
+
+Step 7
+
+Health Validation
+
+Step 8
+
+Launch Workspace
+
+Provide:
+
+* AI Guidance
+* Progress Tracking
+* Error Recovery
+* Auto Validation
+* Smart Recommendations
+
+---
+
+# AI INTELLIGENCE LAYER
+
+All integrations must feed:
+
+* AI Copilot
+* AI Forecasting
+* AI Simulator
+* Offer Analyzer
+* Scaling Engine
+* CPC Intelligence
+* CPA Intelligence
+* Budget Optimizer
+* Anomaly Detection
+
+AI must understand:
+
+* Campaigns
+* Offers
+* Networks
+* Traffic Sources
+* GEOs
+* Devices
+* Revenue
+* EPC
+* CPC
+* CPA
+* ROAS
+
+---
+
+# HEALTH CENTER
+
+Monitor:
+
+* API Health
+* Integration Health
+* Sync Health
+* Attribution Health
+* Tracking Health
+* AI Health
+
+Provide:
+
+* Health Scores
+* Error Logs
+* Recommended Fixes
+* Reconnect Flows
+
+---
+
+# FINAL OBJECTIVE
+
+Build a production-ready integrations ecosystem that combines:
+
+* Windsor.ai's connectivity
+* Voluum's tracking concepts
+* Hyros attribution concepts
+* Affiliate network intelligence
+* AI-powered optimization
+* Automation workflows
+
+The result should feel like:
+
+"Stripe meets Windsor.ai meets Voluum meets an AI-powered Affiliate Marketing Operating System."
+
+Users should be able to connect their entire marketing stack from one place and allow GoGo Bid to automatically track, analyze, optimize, automate, and scale their campaigns.

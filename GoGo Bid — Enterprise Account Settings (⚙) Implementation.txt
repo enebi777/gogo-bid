@@ -1,0 +1,639 @@
+This is the perfect next step. However, the **⚙ Account Settings** should not be a simple edit dialog. It should become the **Account Control Center** for every connected integration.
+
+This is where GoGo Bid can surpass Windsor.ai.
+
+Below is a production-ready prompt.
+
+---
+
+# GoGo Bid — Enterprise Account Settings (⚙) Implementation
+
+## Objective
+
+Transform the current **⚙ Settings** button on every connected account into a complete **Account Control Center**.
+
+This is **not** an edit modal.
+
+It is the command center for each connected account.
+
+Examples:
+
+* Meta Business Manager
+* Google MCC
+* TikTok Business Center
+* Taboola Account
+* Voluum Workspace
+* ClickBank Account
+
+The UI should feel comparable to:
+
+* Stripe
+* HubSpot
+* Vercel
+* Linear
+* Notion
+
+Use a right-side slide-over panel (preferred) or full-page drawer.
+
+---
+
+# Layout
+
+```
+┌─────────────────────────────────────────────────────────────┐
+
+Meta Ads
+
+Business Manager
+North America
+
+Connected
+
+Healthy
+
+Last Sync 2 min ago
+
+─────────────────────────────────────────────────────────────
+
+General
+
+Connection
+
+Sync
+
+Permissions
+
+Field Mapping
+
+Webhooks
+
+Notifications
+
+Automation
+
+AI
+
+Advanced
+
+Danger Zone
+
+─────────────────────────────────────────────────────────────
+
+(Content)
+
+```
+
+---
+
+# 1. General
+
+Display:
+
+Account Name
+
+Provider
+
+Provider Account ID
+
+Business Manager
+
+Workspace
+
+Client
+
+Team
+
+Region
+
+Currency
+
+Timezone
+
+Created
+
+Last Sync
+
+Status
+
+Editable fields:
+
+Display Name
+
+Description
+
+Workspace
+
+Client
+
+Labels
+
+Tags
+
+Notes
+
+Toggle:
+
+Favorite Account
+
+Pin to Dashboard
+
+Show in Reports
+
+Include in AI
+
+---
+
+# 2. Connection
+
+Connection Health
+
+```
+Connected
+
+Healthy
+
+98%
+```
+
+Display
+
+OAuth Status
+
+Token Expiration
+
+Scopes
+
+Permissions
+
+Last Authentication
+
+Buttons
+
+Reconnect
+
+Refresh Token
+
+Disconnect
+
+View Logs
+
+---
+
+# 3. Sync
+
+Controls
+
+Automatic Sync
+
+Sync Frequency
+
+```
+5 min
+
+15 min
+
+30 min
+
+1 hour
+
+6 hours
+
+12 hours
+
+24 hours
+```
+
+Manual Buttons
+
+Sync Now
+
+Force Full Import
+
+Pause Sync
+
+Resume Sync
+
+Display
+
+Last Sync
+
+Duration
+
+Records Imported
+
+Campaigns
+
+Ads
+
+Creatives
+
+Conversions
+
+Errors
+
+---
+
+# 4. Permissions
+
+Display OAuth scopes.
+
+Example Meta
+
+```
+ads_read
+
+ads_management
+
+business_management
+
+pages_read_engagement
+
+pages_manage_metadata
+```
+
+Allow:
+
+Refresh Permissions
+
+Reconnect
+
+---
+
+# 5. Field Mapping
+
+Unified Data Layer mapping.
+
+Example
+
+Meta Spend
+
+↓
+
+Spend
+
+Meta Clicks
+
+↓
+
+Clicks
+
+Meta Purchases
+
+↓
+
+Conversions
+
+Allow:
+
+Custom Mapping
+
+Default Mapping
+
+Reset Mapping
+
+Preview
+
+---
+
+# 6. Webhooks
+
+Webhook URL
+
+Secret Key
+
+Status
+
+Recent Deliveries
+
+Buttons
+
+Generate Secret
+
+Copy URL
+
+Test Webhook
+
+Retry Failed
+
+---
+
+# 7. Notifications
+
+Toggle:
+
+Token Expiring
+
+Sync Failed
+
+Campaign Import Complete
+
+API Errors
+
+Performance Alerts
+
+Spend Spike
+
+Revenue Drop
+
+Slack
+
+Discord
+
+Email
+
+Webhook
+
+Microsoft Teams
+
+---
+
+# 8. Automation
+
+Enable account-specific automation.
+
+Examples
+
+Auto Sync
+
+Auto Retry
+
+Auto Reconnect
+
+Pause Broken Campaigns
+
+Refresh Tokens
+
+Health Monitoring
+
+Data Cleanup
+
+Campaign Archiving
+
+Budget Alerts
+
+---
+
+# 9. AI Settings
+
+Allow AI to use this account.
+
+Toggle
+
+```
+Enable AI Intelligence
+```
+
+Options
+
+Performance Analysis
+
+Scaling Recommendations
+
+Creative Analysis
+
+Budget Optimization
+
+Forecasting
+
+Anomaly Detection
+
+Natural Language Insights
+
+Priority Level
+
+```
+High
+
+Medium
+
+Low
+```
+
+---
+
+# 10. Advanced
+
+Display
+
+Internal Account UUID
+
+Provider UUID
+
+Connector Version
+
+API Version
+
+Connector Status
+
+Rate Limits
+
+Last API Call
+
+Sync Queue
+
+Processing Queue
+
+Developer Mode
+
+Export Configuration
+
+Import Configuration
+
+Clone Settings
+
+---
+
+# 11. Danger Zone
+
+Red section.
+
+Actions
+
+Disconnect Account
+
+Delete Imported Data
+
+Reset Sync History
+
+Clear Cache
+
+Delete Mapping
+
+Remove Account
+
+Require confirmation.
+
+---
+
+# Multi-Account Management
+
+Every provider supports unlimited accounts.
+
+Example
+
+```
+Meta
+
+Business Manager A
+
+Account 1
+
+⚙
+
+Business Manager A
+
+Account 2
+
+⚙
+
+Business Manager B
+
+Account 3
+
+⚙
+```
+
+Each account maintains independent:
+
+* settings
+* sync schedule
+* permissions
+* automation
+* AI configuration
+* notifications
+* field mappings
+* webhooks
+* health status
+
+---
+
+# Account Health Widget
+
+Display at the top.
+
+```
+Health
+
+98%
+
+API
+
+Healthy
+
+OAuth
+
+Valid
+
+Sync
+
+Healthy
+
+Automation
+
+Running
+
+AI
+
+Enabled
+
+Webhooks
+
+Connected
+```
+
+---
+
+# Activity Timeline
+
+Bottom section.
+
+Chronological events.
+
+```
+Today
+
+Sync completed
+
+2 min ago
+
+Yesterday
+
+OAuth refreshed
+
+Yesterday
+
+Campaign import
+
+Yesterday
+
+AI optimization completed
+
+2 days ago
+
+Webhook delivered
+
+3 days ago
+```
+
+Filter
+
+* All
+* Sync
+* OAuth
+* AI
+* Automation
+* Errors
+
+---
+
+# Database Support
+
+Each account stores:
+
+```
+integration_accounts
+
+oauth_tokens
+
+sync_settings
+
+sync_logs
+
+field_mappings
+
+automation_rules
+
+notifications
+
+webhooks
+
+connection_health
+
+activity_logs
+
+permissions
+
+ai_settings
+```
+
+---
+
+# UX Principles
+
+* Enterprise-grade interface
+* Right-side slide-over panel
+* Instant save
+* Optimistic UI
+* Auto validation
+* Keyboard shortcuts
+* Mobile responsive
+* Dark mode
+* Progressive disclosure
+* No page reloads
+* Real-time status updates
+
+---
+
+# Final Goal
+
+The ⚙ Account Settings panel should become the operational command center for every connected integration, giving users complete control over connection health, synchronization, permissions, AI, automation, notifications, mappings, and diagnostics. Every connected account operates independently while sharing a unified architecture, making GoGo Bid a true enterprise-grade marketing operating system rather than just an integration manager.
