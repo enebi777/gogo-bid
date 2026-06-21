@@ -1,0 +1,318 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ── Identity ──
+
+model Organization {
+  id        String   @id @default(cuid())
+  name      String
+  createdAt DateTime @default(now())
+  users     User[]
+  campaigns Campaign[]
+  integrationAccounts IntegrationAccount[]
+  auditLogs AuditLog[]
+}
+
+model User {
+  id             String   @id @default(cuid())
+  email          String   @unique
+  passwordHash   String
+  name           String?
+  role           Role     @default(MEMBER)
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id])
+  createdAt      DateTime @default(now())
+  auditLogs      AuditLog[]
+}
+
+enum Role {
+  OWNER
+  ADMIN
+  MEMBER
+  VIEWER
+}
+
+// ── Integrations (OAuth-connected accounts) ──
+
+model IntegrationAccount {
+  id               String   @id @default(cuid())
+  organizationId   String
+  organization     Organization @relation(fields: [organizationId], references: [id])
+  provider         IntegrationProvider
+  externalAccountId String
+  label            String?
+  accessTokenEnc   String?  // AES-256-GCM encrypted, never sent to frontend
+  refreshTokenEnc  String?
+  tokenExpiresAt   DateTime?
+  scopes           String?
+  status           IntegrationStatus @default(CONNECTED)
+  lastSyncedAt     DateTime?
+  metadata         Json?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  campaigns        Campaign[]
+
+  @@unique([organizationId, provider, externalAccountId])
+}
+
+enum IntegrationProvider {
+  META_ADS
+  GOOGLE_ADS
+  TIKTOK_ADS
+  TABOOLA
+  OUTBRAIN
+  MGID
+  PROPELLERADS
+  RICHPUSH
+  PUSHHOUSE
+  ZEROPARK
+  CLICKBANK
+  BUYGOODS
+  DIGISTORE24
+  MAXWEB
+  GURUMEDIA
+  TERRALEADS
+  LEADROCK
+  CPAHOUSE
+  CARTPANDA
+  HUBLA
+  KIWIFY
+  MONETIZZE
+  BRAIP
+  PERFECTPAY
+  VOLUUM
+  REDTRACK
+  BINOM
+  BEMOB
+  KEITARO
+  HYROS
+  GA4
+  MIXPANEL
+  AMPLITUDE
+  GOOGLE_SHEETS
+  LOOKER_STUDIO
+  POWER_BI
+}
+
+enum IntegrationStatus {
+  CONNECTED
+  TOKEN_EXPIRED
+  ERROR
+  DISCONNECTED
+}
+
+// ── Campaigns (the central object — Campaign Context) ──
+
+model Campaign {
+  id                   String   @id @default(cuid())
+  organizationId       String
+  organization         Organization @relation(fields: [organizationId], references: [id])
+  integrationAccountId String?
+  integrationAccount   IntegrationAccount? @relation(fields: [integrationAccountId], references: [id])
+  name                 String
+  status               String   @default("active")
+  dailyBudget          Decimal?
+  offerId              String?
+  offer                Offer?   @relation(fields: [offerId], references: [id])
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+
+  adSets        AdSet[]
+  clicks        Click[]
+  conversions   Conversion[]
+  costs         Cost[]
+  revenues      Revenue[]
+  aiPredictions AiPrediction[]
+  forecasts     Forecast[]
+  alerts        Alert[]
+}
+
+model AdSet {
+  id         String   @id @default(cuid())
+  campaignId String
+  campaign   Campaign @relation(fields: [campaignId], references: [id])
+  name       String
+  externalId String?
+  ads        Ad[]
+}
+
+model Ad {
+  id         String   @id @default(cuid())
+  adSetId    String
+  adSet      AdSet    @relation(fields: [adSetId], references: [id])
+  name       String
+  externalId String?
+  creativeUrl String?
+  headline    String?
+  body        String?
+}
+
+// ── Offers / affiliate side ──
+
+model Offer {
+  id          String   @id @default(cuid())
+  name        String
+  network     String?
+  payout      Decimal?
+  epc         Decimal?
+  refundRate  Decimal?
+  url         String?
+  campaigns   Campaign[]
+  orders      Order[]
+}
+
+model Order {
+  id           String   @id @default(cuid())
+  offerId      String?
+  offer        Offer?   @relation(fields: [offerId], references: [id])
+  provider     IntegrationProvider
+  externalId   String
+  customerEmail String?
+  amount       Decimal
+  status       String
+  isUpsell     Boolean  @default(false)
+  isRefund     Boolean  @default(false)
+  isChargeback Boolean  @default(false)
+  createdAt    DateTime @default(now())
+
+  @@unique([provider, externalId])
+}
+
+// ── Tracking data ──
+
+model Click {
+  id           String   @id @default(cuid())
+  campaignId   String
+  campaign     Campaign @relation(fields: [campaignId], references: [id])
+  tracker      IntegrationProvider
+  clickId      String
+  cost         Decimal?
+  source       String?
+  country      String?
+  createdAt    DateTime @default(now())
+
+  @@unique([tracker, clickId])
+}
+
+model Conversion {
+  id           String   @id @default(cuid())
+  campaignId   String
+  campaign     Campaign @relation(fields: [campaignId], references: [id])
+  tracker      IntegrationProvider
+  clickId      String?
+  conversionId String
+  revenue      Decimal?
+  payout       Decimal?
+  status       String   @default("approved")
+  createdAt    DateTime @default(now())
+
+  @@unique([tracker, conversionId])
+}
+
+model Cost {
+  id         String   @id @default(cuid())
+  campaignId String
+  campaign   Campaign @relation(fields: [campaignId], references: [id])
+  date       DateTime
+  amount     Decimal
+  source     IntegrationProvider
+
+  @@unique([campaignId, date, source])
+}
+
+model Revenue {
+  id         String   @id @default(cuid())
+  campaignId String
+  campaign   Campaign @relation(fields: [campaignId], references: [id])
+  date       DateTime
+  amount     Decimal
+  source     IntegrationProvider
+
+  @@unique([campaignId, date, source])
+}
+
+// ── AI ──
+
+model AiPrediction {
+  id         String   @id @default(cuid())
+  campaignId String
+  campaign   Campaign @relation(fields: [campaignId], references: [id])
+  type       String   // 'cpc' | 'cpa' | 'scaling' | 'anomaly' | ...
+  input      Json
+  output     Json
+  confidence Decimal?
+  createdAt  DateTime @default(now())
+}
+
+model Forecast {
+  id         String   @id @default(cuid())
+  campaignId String
+  campaign   Campaign @relation(fields: [campaignId], references: [id])
+  horizon    String   // 'daily' | 'weekly' | 'monthly'
+  metrics    Json     // { clicks, conversions, revenue, profit, roas, cpa }
+  generatedAt DateTime @default(now())
+}
+
+model Alert {
+  id         String   @id @default(cuid())
+  campaignId String
+  campaign   Campaign @relation(fields: [campaignId], references: [id])
+  type       String   // 'traffic_drop' | 'cpa_spike' | 'conversion_drop' | 'tracking_failure' | 'api_failure' | 'revenue_anomaly'
+  severity   String   @default("warning")
+  message    String
+  resolved   Boolean  @default(false)
+  createdAt  DateTime @default(now())
+}
+
+// ── Webhooks / Postbacks / Audit ──
+
+model WebhookEvent {
+  id         String   @id @default(cuid())
+  provider   IntegrationProvider
+  externalId String?  // dedup key from the source system
+  signatureValid Boolean
+  payload    Json
+  status     WebhookStatus @default(RECEIVED)
+  attempts   Int      @default(0)
+  lastError  String?
+  receivedAt DateTime @default(now())
+  processedAt DateTime?
+
+  @@unique([provider, externalId])
+}
+
+enum WebhookStatus {
+  RECEIVED
+  PROCESSED
+  FAILED
+  RETRYING
+}
+
+model ApiToken {
+  id        String   @id @default(cuid())
+  userId    String
+  label     String?
+  tokenHash String
+  scopes    String?
+  createdAt DateTime @default(now())
+  revokedAt DateTime?
+}
+
+model AuditLog {
+  id             String   @id @default(cuid())
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id])
+  userId         String?
+  user           User?    @relation(fields: [userId], references: [id])
+  action         String
+  entityType     String?
+  entityId       String?
+  metadata       Json?
+  createdAt      DateTime @default(now())
+}

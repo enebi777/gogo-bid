@@ -1,0 +1,50 @@
+{
+  "name": "gogo-bid-backend",
+  "version": "0.1.0",
+  "private": true,
+  "description": "GoGo Bid production backend — OAuth integrations, postback/webhook receivers, queue workers, AI services.",
+  "scripts": {
+    "build": "nest build",
+    "start": "node dist/main.js",
+    "start:dev": "nest start --watch",
+    "prisma:generate": "prisma generate",
+    "prisma:migrate": "prisma migrate dev",
+    "worker": "node dist/queue/worker.main.js",
+    "worker:dev": "ts-node-dev --respawn src/queue/worker.main.ts",
+    "scheduler": "node dist/queue/scheduler.main.js",
+    "scheduler:dev": "ts-node-dev src/queue/scheduler.main.ts",
+    "lint": "eslint \"src/**/*.ts\""
+  },
+  "dependencies": {
+    "@nestjs/common": "^10.4.0",
+    "@nestjs/core": "^10.4.0",
+    "@nestjs/jwt": "^10.2.0",
+    "@nestjs/passport": "^10.0.3",
+    "@nestjs/platform-express": "^10.4.0",
+    "@nestjs/config": "^3.2.3",
+    "@nestjs/throttler": "^6.0.0",
+    "@prisma/client": "^5.19.0",
+    "bullmq": "^5.12.0",
+    "ioredis": "^5.4.1",
+    "passport": "^0.7.0",
+    "passport-jwt": "^4.0.1",
+    "bcrypt": "^5.1.1",
+    "axios": "^1.7.4",
+    "class-validator": "^0.14.1",
+    "class-transformer": "^0.5.1",
+    "google-ads-api": "^17.0.0",
+    "reflect-metadata": "^0.2.2",
+    "rxjs": "^7.8.1",
+    "helmet": "^7.1.0"
+  },
+  "devDependencies": {
+    "@nestjs/cli": "^10.4.5",
+    "@types/express": "^4.17.21",
+    "@types/node": "^20.14.0",
+    "@types/bcrypt": "^5.0.2",
+    "@types/passport-jwt": "^4.0.1",
+    "prisma": "^5.19.0",
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^5.5.4"
+  }
+}
