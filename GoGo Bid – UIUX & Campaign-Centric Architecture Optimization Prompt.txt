@@ -1,0 +1,504 @@
+# GoGo Bid – UI/UX & Campaign-Centric Architecture Optimization Prompt
+
+## Objective
+
+Redesign and refactor the entire GoGo Bid application to create an intuitive, modern, enterprise-grade user experience while preserving all existing functionality.
+
+The current application feels feature-heavy and complex. The goal is **not to remove features**, but to reorganize, simplify, and guide users so every capability is easy to discover and understand.
+
+The application should feel comparable to modern SaaS platforms such as HubSpot, Monday.com, ClickUp, Notion, Stripe Dashboard, Datadog, and Windsor.ai—powerful, yet approachable.
+
+---
+
+# Core Principle
+
+## Everything revolves around the currently selected Campaign.
+
+The Campaign is the central object of the entire platform.
+
+Every module, AI engine, intelligence system, report, automation, integration, workflow, and analytics page should automatically operate on the currently selected Campaign.
+
+Think of the Campaign as the application's "workspace."
+
+```
+Campaign
+│
+├── Intelligence
+│     CPC Intelligence
+│     CPA Intelligence
+│     Offer Analyzer
+│     GEO Analysis
+│     Anomaly Detection
+│     Benchmarks
+│
+├── AI Tools
+│     AI Copilot
+│     AI Forecasting
+│     AI Simulator
+│     Scaling Engine
+│     Creative Studio
+│     Audience Builder
+│
+├── Analytics
+│     Budget Pacing
+│     Attribution
+│     Reports
+│
+└── Automate
+      Automation
+      Integrations
+```
+
+No module should require the user to repeatedly select campaigns.
+
+Instead:
+
+* Campaign is selected once.
+* Every page automatically uses that Campaign context.
+* Switching campaigns updates every module instantly.
+
+---
+
+# Campaign Context System
+
+Implement a global Campaign Context.
+
+The currently selected Campaign must be persistent across the entire application.
+
+Display it prominently:
+
+Top Navigation
+
+```
+Current Campaign
+
+Facebook - Nutra US - Spring 2026
+```
+
+or
+
+```
+Campaign ▼
+
+Affiliate Max
+```
+
+Changing the campaign should instantly refresh:
+
+* Intelligence
+* AI Tools
+* Analytics
+* Automation
+* Reports
+* Integrations
+* Forecasting
+* Copilot
+* Creative Studio
+* Audience Builder
+
+without requiring additional selections.
+
+---
+
+# Simplify Navigation
+
+Reduce visual complexity.
+
+Group features into four primary sections.
+
+## Intelligence
+
+Contains every analytical engine.
+
+Examples:
+
+* CPC Intelligence
+* CPA Intelligence
+* Offer Analyzer
+* GEO Intelligence
+* Benchmark Engine
+* Anomaly Detection
+
+---
+
+## AI Tools
+
+Contains every AI-powered assistant.
+
+Examples:
+
+* AI Copilot
+* AI Forecasting
+* Scaling Engine
+* AI Simulator
+* Creative Studio
+* Audience Builder
+
+---
+
+## Analytics
+
+Contains reporting and performance.
+
+Examples:
+
+* Reports
+* Budget Pacing
+* Attribution
+* Dashboards
+* KPI Monitoring
+
+---
+
+## Automate
+
+Contains execution.
+
+Examples:
+
+* Automation
+* Integrations
+* Rules
+* Workflows
+* Notifications
+
+---
+
+# Progressive Disclosure
+
+Never overwhelm users.
+
+Instead of showing every setting immediately:
+
+Level 1
+
+Simple summary.
+
+Example:
+
+```
+Budget Pacing
+
+Healthy
+
+96%
+
+View Details →
+```
+
+Level 2
+
+Expand into:
+
+* charts
+* insights
+* recommendations
+
+Level 3
+
+Advanced settings
+
+Only power users access them.
+
+---
+
+# Context-Aware Pages
+
+Every screen should clearly indicate the current campaign.
+
+Example page header:
+
+```
+Campaign
+
+Affiliate Max
+
+↓
+
+AI Forecasting
+
+Forecasting the next 14 days
+using Affiliate Max data.
+```
+
+Never leave users wondering:
+
+"What campaign am I editing?"
+
+---
+
+# Smart Empty States
+
+Instead of blank pages:
+
+Show onboarding guidance.
+
+Example:
+
+"No Meta account connected.
+
+Connect Meta Ads to enable CPC Intelligence."
+
+Include:
+
+* explanation
+* button
+* benefits
+
+---
+
+# Intelligent Tooltips
+
+Every feature should include contextual explanations.
+
+Examples:
+
+CPA Intelligence
+
+"Analyzes historical CPA performance and predicts future acquisition costs."
+
+Offer Analyzer
+
+"Scores affiliate offers using EPC, conversion rate, payout quality, and historical trends."
+
+Scaling Engine
+
+"Uses AI to recommend profitable budget increases."
+
+Anomaly Detection
+
+"Automatically identifies unusual changes in campaign performance."
+
+Tooltips should explain:
+
+* What it does
+* Why it matters
+* When to use it
+
+---
+
+# Guided User Experience
+
+Every complex workflow should become a guided experience.
+
+Examples:
+
+Create Campaign
+
+Step 1
+
+Campaign Info
+
+↓
+
+Step 2
+
+Connect Accounts
+
+↓
+
+Step 3
+
+Import Data
+
+↓
+
+Step 4
+
+Enable AI
+
+↓
+
+Step 5
+
+Review
+
+↓
+
+Finish
+
+Avoid presenting large forms all at once.
+
+---
+
+# Improve Readability
+
+Increase whitespace.
+
+Use clear section spacing.
+
+Group related controls.
+
+Avoid dense tables.
+
+Prefer:
+
+Cards
+
+Panels
+
+Visual summaries
+
+Charts
+
+Icons
+
+Status indicators
+
+Use typography hierarchy:
+
+Page Title
+
+Section Title
+
+Card Title
+
+Description
+
+Metrics
+
+Actions
+
+Every page should be scannable within seconds.
+
+---
+
+# AI-First User Experience
+
+Every page should answer:
+
+"What should I do next?"
+
+Each module should include an AI Insights panel.
+
+Example:
+
+AI Recommendation
+
+"Increase budget by 18%.
+
+Predicted ROI improvement: +12%"
+
+Instead of only showing data, provide actionable guidance.
+
+---
+
+# Cross-Module Awareness
+
+All modules should share context.
+
+Example:
+
+Offer Analyzer identifies a weak offer.
+
+↓
+
+Scaling Engine adjusts recommendations.
+
+↓
+
+Automation creates an optimization rule.
+
+↓
+
+Reports reflect projected improvements.
+
+↓
+
+AI Copilot explains the reasoning.
+
+The platform should behave as one integrated intelligence system rather than isolated tools.
+
+---
+
+# Consistent Design Language
+
+Use consistent:
+
+Icons
+
+Buttons
+
+Spacing
+
+Typography
+
+Cards
+
+Status badges
+
+Charts
+
+Colors
+
+Interactions
+
+Every module should feel like part of the same product.
+
+---
+
+# User Assistance
+
+Provide help throughout the application.
+
+Include:
+
+* inline hints
+* hover tooltips
+* onboarding tours
+* contextual help panels
+* "Learn More" links
+* explanation cards
+* first-time guidance
+
+The application should be self-explanatory without requiring external documentation.
+
+---
+
+# Intelligent Defaults
+
+Automatically:
+
+* remember recent campaigns
+* remember filters
+* remember layouts
+* remember dashboards
+* suggest recent integrations
+* pre-fill common settings
+
+Reduce repetitive user actions.
+
+---
+
+# Navigation Goals
+
+A new user should understand:
+
+* where they are
+* what campaign is active
+* what each module does
+* what action to take next
+
+within the first 30 seconds.
+
+---
+
+# Final Goal
+
+Transform GoGo Bid into an enterprise-grade, AI-first, campaign-centric marketing intelligence platform where every feature is connected through the currently selected Campaign.
+
+The interface should prioritize:
+
+* Simplicity
+* Clarity
+* Readability
+* Discoverability
+* Guided workflows
+* Context awareness
+* Progressive disclosure
+* AI-assisted decision making
+* Consistent navigation
+* Excellent onboarding
+* Enterprise scalability
+
+The final experience should make advanced marketing intelligence feel effortless, intuitive, and approachable while preserving the platform's full power for advanced users.

@@ -799,6 +799,89 @@ canvas{max-width:100%}
   .int-grid{grid-template-columns:repeat(2,1fr)}
 }
 @media(min-width:769px){#mobile-menu-btn{display:none}}
+
+/* ── RICH TOOLTIPS ── */
+.tt{position:relative}
+.tt:hover .tt-box{opacity:1;pointer-events:auto;transform:translateY(0)}
+.tt-box{opacity:0;pointer-events:none;transform:translateY(4px);position:absolute;z-index:9999;background:#0d0d28;border:1px solid var(--border2);border-radius:12px;padding:12px 14px;width:230px;box-shadow:0 20px 60px rgba(0,0,0,.8);transition:all .15s ease;bottom:calc(100% + 10px);left:50%;transform:translateX(-50%) translateY(4px)}
+.tt:hover .tt-box{opacity:1;pointer-events:none;transform:translateX(-50%) translateY(0)}
+.tt-title{font-size:12px;font-weight:700;color:var(--text);margin-bottom:5px}
+.tt-desc{font-size:11px;color:var(--muted);line-height:1.55}
+.tt-tag{display:inline-block;font-size:9px;font-weight:700;padding:2px 7px;border-radius:4px;background:rgba(79,110,247,.15);color:var(--accent2);margin-top:7px;text-transform:uppercase;letter-spacing:.5px}
+.tt-when{font-size:10px;color:var(--dim);margin-top:4px;line-height:1.4}
+
+/* ── EMPTY STATES ── */
+.empty-state{text-align:center;padding:64px 24px;max-width:460px;margin:0 auto}
+.empty-icon{font-size:52px;margin-bottom:20px;line-height:1}
+.empty-title{font-size:18px;font-weight:800;margin-bottom:8px;letter-spacing:-.3px}
+.empty-desc{font-size:13px;color:var(--muted);line-height:1.65;margin-bottom:24px}
+.empty-actions{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.empty-meta{font-size:11px;color:var(--dim);margin-top:14px;display:flex;align-items:center;gap:12px;justify-content:center}
+.empty-meta-item{display:flex;align-items:center;gap:4px}
+
+/* ── CAMPAIGN HUB ── */
+.hub-header{background:linear-gradient(135deg,rgba(79,110,247,.06),rgba(139,92,246,.04));border:1px solid var(--border2);border-radius:16px;padding:24px 28px;margin-bottom:20px;position:relative;overflow:hidden}
+.hub-header::before{content:'';position:absolute;top:-40px;right:-40px;width:200px;height:200px;background:radial-gradient(circle,rgba(79,110,247,.12),transparent 70%);pointer-events:none}
+.hub-health-ring{position:relative;display:inline-flex;align-items:center;justify-content:center}
+.hub-sections{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px}
+.hub-section{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 16px;cursor:pointer;transition:all .15s;position:relative;overflow:hidden}
+.hub-section:hover{border-color:rgba(79,110,247,.35);background:var(--card2);transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.3)}
+.hub-section.hs-connected::after{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--hs-col,var(--green))}
+.hub-section-icon{font-size:20px;margin-bottom:8px}
+.hub-section-title{font-size:11px;font-weight:700;margin-bottom:3px}
+.hub-section-desc{font-size:10px;color:var(--muted);line-height:1.4}
+.hub-section-status{display:flex;align-items:center;gap:5px;margin-top:8px;font-size:10px;font-weight:600}
+
+/* ── FLOATING AI ── */
+#ai-fab{position:fixed;bottom:24px;right:24px;z-index:8000;display:flex;flex-direction:column;align-items:flex-end;gap:8px}
+#ai-fab-btn{width:50px;height:50px;border-radius:15px;background:linear-gradient(135deg,#4f6ef7,#8b5cf6);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:20px;box-shadow:0 8px 28px rgba(79,110,247,.45);transition:all .2s;color:#fff;flex-shrink:0}
+#ai-fab-btn:hover{transform:scale(1.08) translateY(-2px);box-shadow:0 14px 40px rgba(79,110,247,.6)}
+#ai-quick-panel{background:#0a0a20;border:1px solid var(--border2);border-radius:16px;padding:16px;width:290px;box-shadow:0 30px 80px rgba(0,0,0,.9);display:none;max-height:70vh;overflow-y:auto}
+#ai-quick-panel.open{display:block;animation:drop-in .18s cubic-bezier(.16,1,.3,1)}
+.aiq-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.aiq-title{font-size:13px;font-weight:800;display:flex;align-items:center;gap:6px}
+.aiq-close{background:none;border:none;color:var(--muted);cursor:pointer;font-size:16px;padding:2px 6px;border-radius:5px;line-height:1}
+.aiq-close:hover{background:var(--card2);color:var(--text)}
+.aiq-context{font-size:10px;color:var(--muted);background:var(--bg3);border-radius:7px;padding:6px 10px;margin-bottom:12px;border:1px solid var(--border)}
+.aiq-section{font-size:9px;font-weight:700;color:var(--dim);text-transform:uppercase;letter-spacing:1px;margin:10px 0 6px}
+.aiq-chip{display:block;padding:8px 11px;border-radius:8px;background:var(--bg3);border:1px solid var(--border);font-size:11px;color:var(--muted);cursor:pointer;transition:all .12s;margin-bottom:5px;width:100%;text-align:left;font-family:inherit}
+.aiq-chip:hover{background:var(--card2);color:var(--text);border-color:var(--border3)}
+.aiq-input-row{display:flex;gap:6px;margin-top:12px}
+.aiq-input{flex:1;background:var(--bg3);border:1px solid var(--border2);border-radius:8px;padding:7px 10px;font-size:12px;color:var(--text);font-family:inherit;outline:none;transition:border .12s}
+.aiq-input:focus{border-color:var(--accent)}
+.aiq-send{padding:7px 12px;border-radius:8px;background:var(--accent);border:none;color:#fff;cursor:pointer;font-size:12px;font-weight:700;transition:all .12s;white-space:nowrap}
+.aiq-send:hover{background:#3d5ce6;transform:scale(1.04)}
+.aiq-response{background:rgba(79,110,247,.06);border:1px solid rgba(79,110,247,.15);border-radius:10px;padding:10px 12px;font-size:11px;color:var(--muted);line-height:1.6;margin-top:10px;display:none}
+.aiq-response.visible{display:block}
+
+/* ── DASHBOARD 2.0 ── */
+.dash-grid-4q{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:20px}
+@media(min-width:900px){.dash-grid-4q{grid-template-columns:repeat(4,1fr)}}
+.dq-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px;position:relative;overflow:hidden;transition:border-color .15s}
+.dq-card:hover{border-color:var(--border3)}
+.dq-accent{position:absolute;top:0;left:0;right:0;height:3px;border-radius:14px 14px 0 0}
+.dq-label{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted);margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.dq-value{font-size:24px;font-weight:900;letter-spacing:-.5px;margin-bottom:4px;line-height:1}
+.dq-detail{font-size:11px;color:var(--muted);line-height:1.5}
+.attention-row{display:flex;align-items:flex-start;gap:12px;padding:11px 0;border-bottom:1px solid var(--border)}
+.attention-row:last-child{border-bottom:none}
+.att-badge{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:5px}
+.att-content{flex:1}
+.att-title{font-size:12px;font-weight:700;margin-bottom:2px}
+.att-sub{font-size:11px;color:var(--muted);line-height:1.4}
+.att-btn{font-size:10px;font-weight:700;color:var(--accent2);cursor:pointer;padding:4px 9px;border-radius:6px;border:1px solid rgba(123,155,255,.25);background:rgba(79,110,247,.06);white-space:nowrap;flex-shrink:0;transition:all .12s;font-family:inherit}
+.att-btn:hover{background:rgba(79,110,247,.15);border-color:rgba(123,155,255,.5)}
+.next-item{display:flex;align-items:center;gap:12px;padding:10px 13px;border-radius:10px;background:var(--bg3);border:1px solid var(--border);margin-bottom:8px;cursor:pointer;transition:all .13s}
+.next-item:hover{background:var(--card2);border-color:var(--border3);transform:translateX(3px)}
+.ni-icon{width:32px;height:32px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0}
+.ni-body{flex:1;min-width:0}
+.ni-title{font-size:12px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ni-desc{font-size:10px;color:var(--muted);margin-top:1px}
+.feed-row{display:flex;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)}
+.feed-row:last-child{border-bottom:none}
+.feed-pip{width:6px;height:6px;border-radius:50%;flex-shrink:0;margin-top:5px}
+.feed-txt{font-size:11px;line-height:1.45;flex:1}
+.feed-when{font-size:10px;color:var(--dim);font-family:var(--mono);white-space:nowrap;margin-left:8px;margin-top:2px}
 </style>
 </head>
 <body>
@@ -874,25 +957,27 @@ canvas{max-width:100%}
     </div>
   </div>
 
-  <div class="sb-section">Overview</div>
+  <div class="sb-section">Workspace</div>
   <div class="nav-item active" onclick="nav('dashboard',this)">
     <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5" stroke-width="2"/><rect x="14" y="3" width="7" height="7" rx="1.5" stroke-width="2"/><rect x="3" y="14" width="7" height="7" rx="1.5" stroke-width="2"/><rect x="14" y="14" width="7" height="7" rx="1.5" stroke-width="2"/></svg>
     <span class="nav-label">Dashboard</span>
     <span class="nav-tooltip">Dashboard</span>
   </div>
+
+  <div class="sb-section">Campaigns</div>
   <div class="nav-item" onclick="nav('campaigns',this)">
     <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M3 7h18M3 12h18M3 17h11"/></svg>
-    <span class="nav-label">Campaigns</span>
+    <span class="nav-label">All Campaigns</span>
     <span class="nav-badge" id="nb-campaigns" style="display:none"></span>
-    <span class="nav-tooltip">Campaigns</span>
+    <span class="nav-tooltip">All Campaigns</span>
+  </div>
+  <div class="nav-item" onclick="nav('hub',this)">
+    <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3" stroke-width="2"/><path stroke-width="2" d="M12 2v3M12 19v3M4.22 4.22l2.12 2.12M17.66 17.66l2.12 2.12M2 12h3M19 12h3M4.22 19.78l2.12-2.12M17.66 6.34l2.12-2.12"/></svg>
+    <span class="nav-label">Campaign Hub</span>
+    <span class="nav-tooltip">Campaign Hub</span>
   </div>
 
   <div class="sb-section">Intelligence</div>
-  <div class="nav-item" onclick="nav('geo',this)">
-    <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke-width="2"/><path stroke-width="2" d="M2 12h20M12 2a15.3 15.3 0 010 20M12 2a15.3 15.3 0 000 20"/></svg>
-    <span class="nav-label">GEO Analysis</span>
-    <span class="nav-tooltip">GEO Analysis</span>
-  </div>
   <div class="nav-item" onclick="nav('cpc',this)">
     <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" stroke-width="2"/><path d="M12 7v5l3 3" stroke-width="2" stroke-linecap="round"/></svg>
     <span class="nav-label">CPC Intelligence</span>
@@ -908,6 +993,11 @@ canvas{max-width:100%}
     <span class="nav-label">Offer Analyzer</span>
     <span class="nav-tooltip">Offer Analyzer</span>
   </div>
+  <div class="nav-item" onclick="nav('geo',this)">
+    <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke-width="2"/><path stroke-width="2" d="M2 12h20M12 2a15.3 15.3 0 010 20M12 2a15.3 15.3 0 000 20"/></svg>
+    <span class="nav-label">GEO Analysis</span>
+    <span class="nav-tooltip">GEO Analysis</span>
+  </div>
   <div class="nav-item" onclick="nav('anomaly',this)">
     <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" stroke-linecap="round" d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13" stroke-width="2" stroke-linecap="round"/><line x1="12" y1="17" x2="12.01" y2="17" stroke-width="2.5" stroke-linecap="round"/></svg>
     <span class="nav-label">Anomaly Detection</span>
@@ -921,21 +1011,6 @@ canvas{max-width:100%}
   </div>
 
   <div class="sb-section">AI Tools</div>
-  <div class="nav-item" onclick="nav('creative',this)">
-    <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" stroke-width="2"/><circle cx="8.5" cy="8.5" r="1.5" stroke-width="2"/><path stroke-width="2" d="M21 15l-5-5L5 21"/></svg>
-    <span class="nav-label">Creative Studio</span>
-    <span class="nav-tooltip">Creative Studio</span>
-  </div>
-  <div class="nav-item" onclick="nav('audience',this)">
-    <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4" stroke-width="2"/><path stroke-width="2" d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
-    <span class="nav-label">Audience Builder</span>
-    <span class="nav-tooltip">Audience Builder</span>
-  </div>
-  <div class="nav-item" onclick="nav('simulator',this)">
-    <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" stroke-width="2" stroke-linejoin="round"/></svg>
-    <span class="nav-label">AI Simulator</span>
-    <span class="nav-tooltip">AI Simulator</span>
-  </div>
   <div class="nav-item" onclick="nav('copilot',this)">
     <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
     <span class="nav-label">AI Copilot</span>
@@ -946,13 +1021,28 @@ canvas{max-width:100%}
     <span class="nav-label">AI Forecasting</span>
     <span class="nav-tooltip">AI Forecasting</span>
   </div>
+  <div class="nav-item" onclick="nav('simulator',this)">
+    <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" stroke-width="2" stroke-linejoin="round"/></svg>
+    <span class="nav-label">AI Simulator</span>
+    <span class="nav-tooltip">AI Simulator</span>
+  </div>
   <div class="nav-item" onclick="nav('scaling',this)">
     <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18" stroke-width="2" stroke-linecap="round"/><polyline points="17 6 23 6 23 12" stroke-width="2" stroke-linecap="round"/></svg>
     <span class="nav-label">Scaling Engine</span>
     <span class="nav-tooltip">Scaling Engine</span>
   </div>
+  <div class="nav-item" onclick="nav('creative',this)">
+    <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" stroke-width="2"/><circle cx="8.5" cy="8.5" r="1.5" stroke-width="2"/><path stroke-width="2" d="M21 15l-5-5L5 21"/></svg>
+    <span class="nav-label">Creative Studio</span>
+    <span class="nav-tooltip">Creative Studio</span>
+  </div>
+  <div class="nav-item" onclick="nav('audience',this)">
+    <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4" stroke-width="2"/><path stroke-width="2" d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+    <span class="nav-label">Audience Builder</span>
+    <span class="nav-tooltip">Audience Builder</span>
+  </div>
 
-  <div class="sb-section">Account</div>
+  <div class="sb-section">Analytics</div>
   <div class="nav-item" onclick="nav('pacing',this)">
     <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M12 2v20M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
     <span class="nav-label">Budget Pacing</span>
@@ -968,11 +1058,20 @@ canvas{max-width:100%}
     <span class="nav-label">Reports</span>
     <span class="nav-tooltip">Reports</span>
   </div>
+
+  <div class="sb-section">Automate</div>
+  <div class="nav-item" onclick="nav('automation',this)">
+    <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" stroke-linecap="round" d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+    <span class="nav-label">Automation</span>
+    <span class="nav-tooltip">Automation</span>
+  </div>
   <div class="nav-item" onclick="nav('integrations',this)">
     <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="18" cy="5" r="3" stroke-width="2"/><circle cx="6" cy="12" r="3" stroke-width="2"/><circle cx="18" cy="19" r="3" stroke-width="2"/><path d="M8.59 13.51l6.83 3.98M15.41 6.51l-6.82 3.98" stroke-width="2"/></svg>
     <span class="nav-label">Integrations</span>
     <span class="nav-tooltip">Integrations</span>
   </div>
+
+  <div class="sb-section">Account</div>
   <div class="nav-item" onclick="nav('settings',this)">
     <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3" stroke-width="2"/><path stroke-width="2" d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
     <span class="nav-label">Settings</span>
@@ -1107,6 +1206,8 @@ canvas{max-width:100%}
     <div id="page-pacing" class="page"></div>
     <div id="page-attribution" class="page"></div>
     <div id="page-integrations" class="page"></div>
+    <div id="page-automation" class="page"></div>
+    <div id="page-hub" class="page"></div>
     <div id="page-settings" class="page"></div>
   </div>
 </div>
@@ -1450,6 +1551,13 @@ function confirmOk(){closeConfirm();if(_confirmCallback)_confirmCallback();}
 const qs = s => document.querySelector(s);
 const qsa = s => document.querySelectorAll(s);
 const $ = id => document.getElementById(id);
+function seedRand(seed){
+  let h=0;for(let i=0;i<seed.length;i++){h=(h<<5)-h+seed.charCodeAt(i);h|=0;}
+  return ()=>{h=(h*1103515245+12345)&0x7fffffff;return (h%1000)/1000;};
+}
+function tip(title,desc,when){
+  return `<span class="tt" style="display:inline-block;margin-left:6px;vertical-align:middle"><span style="display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;border-radius:50%;background:rgba(79,110,247,.15);color:var(--accent2);font-size:10px;font-weight:700;cursor:help">i</span><span class="tt-box"><span class="tt-title">${title}</span><span class="tt-desc">${desc}</span>${when?`<span class="tt-when">⊙ ${when}</span>`:''}</span></span></span>`;
+}
 const PE = {meta:'📘',google:'🔍',tiktok:'🎵',native:'📰',push:'🔔'};
 const DAYS = ['Mon','Tue','Wed','Thu','Fri','Sat','Today'];
 
@@ -1769,7 +1877,7 @@ function nav(page,el){
 }
 function renderPage(page){
   const c=CS.active,el=$('page-'+page);if(!el)return;
-  const R={dashboard:renderDashboard,campaigns:renderCampaigns,cpc:renderCPC,cpa:renderCPA,offer:renderOffer,anomaly:renderAnomaly,benchmarks:renderBenchmarks,simulator:renderSimulator,copilot:renderCopilot,forecasting:renderForecasting,scaling:renderScaling,reports:renderReports,integrations:renderIntegrations,settings:renderSettings,geo:renderGeo,creative:renderCreative,audience:renderAudience,pacing:renderPacing,attribution:renderAttribution};
+  const R={dashboard:renderDashboard,campaigns:renderCampaigns,hub:renderCampaignHub,cpc:renderCPC,cpa:renderCPA,offer:renderOffer,anomaly:renderAnomaly,benchmarks:renderBenchmarks,simulator:renderSimulator,copilot:renderCopilot,forecasting:renderForecasting,scaling:renderScaling,reports:renderReports,integrations:renderIntegrations,automation:renderAutomation,settings:renderSettings,geo:renderGeo,creative:renderCreative,audience:renderAudience,pacing:renderPacing,attribution:renderAttribution};
   if(R[page])R[page](el,c);
 }
 
@@ -1862,7 +1970,8 @@ const CMD_PAGES=[
   {icon:'👥',label:'Audience Builder',page:'audience',sub:'AI-generated audience segments'},
   {icon:'💵',label:'Budget Pacing',page:'pacing',sub:'Real-time spend rate & pacing health'},
   {icon:'🔗',label:'Attribution',page:'attribution',sub:'Click-to-conversion path explorer'},
-  {icon:'🔌',label:'Integrations',page:'integrations',sub:'Connect traffic sources'},
+  {icon:'⚡',label:'Automation',page:'automation',sub:'Rule-based campaign automation engine'},
+  {icon:'🔌',label:'Integrations',page:'integrations',sub:'Connect traffic sources & data platforms'},
   {icon:'⚙',label:'Settings',page:'settings',sub:'Account preferences'},
   {icon:'📐',label:'Schema Explorer',page:'schema',sub:'Campaign data schema & TypeScript types'},
 ];
@@ -1928,9 +2037,22 @@ function renderBSC(container,campId){
   }).join('');
 }
 function acceptBid(campId,suggId){
-  const card=$('bsc-'+suggId);if(card)card.style.transition='all .3s';
+  const camp=CS.getById(campId);if(!camp)return;
+  const s=camp.ai.bidSuggestions.find(x=>x.id===suggId);if(!s)return;
+  const apply=()=>{
+    const card=$('bsc-'+suggId);if(card)card.style.transition='all .3s';
+    CS.acceptBid(campId,suggId);
+    setTimeout(()=>renderPage(_page),320);
+  };
+  if(camp.optimization.autoPilot){apply();return;}
+  const chg=s.metric==='Budget'?`Budget +$${s.change}/day ($${s.from}→$${s.to})`:`${s.action} ${s.metric} $${Math.abs(s.change).toFixed(2)} ($${s.from}→$${s.to})`;
+  openConfirm('Apply Bid Suggestion',`${camp.name}: ${chg}. Projected ROAS ${s.projRoas}, profit ${s.projProfit}. Apply this change now?`,'✓ Apply',apply,'var(--green)');
+}
+function autoApplyBid(campId,suggId){
+  const camp=CS.getById(campId);if(!camp)return;
   CS.acceptBid(campId,suggId);
-  setTimeout(()=>renderPage(_page),320);
+  toast('AutoPilot',`${camp.name}: AI suggestion auto-applied without confirmation.`,'success');
+  if(_page==='dashboard'||_page==='hub'||_page==='campaigns')renderPage(_page);
 }
 function dismissBid(campId,suggId){
   const card=$('bsc-'+suggId);
@@ -2067,89 +2189,153 @@ function renderDashboard(el,c){
   const avgRoas=active.length?(active.reduce((n,x)=>n+(x.metrics.today.roas||0),0)/active.length).toFixed(1):'0';
   const allAnom=all.reduce((n,x)=>n+x.ai.anomalies.length,0);
   const allSuggs=all.flatMap(x=>x.ai.bidSuggestions.filter(s=>s.status==='pending'));
+  const needAttn=all.filter(x=>x.ai.healthScore<60||x.ai.anomalies.length>0);
+  const profitOk=totProfit>=0;
 
   el.innerHTML=`
 <div class="page-hdr">
   <div>
-    <div class="page-title">Portfolio Dashboard</div>
-    <div class="page-sub">AI-powered overview · <strong style="color:var(--text)">${c.name}</strong> in focus</div>
+    <div class="page-title">Dashboard</div>
+    <div class="page-sub">Your portfolio at a glance · <strong style="color:var(--text)">${c.name}</strong> in focus</div>
   </div>
   <div class="flex gap8 items-center">
     <span class="badge badge-green">● Live</span>
-    <button class="btn btn-outline btn-sm" onclick="openQS()">⌘J Switch Campaign</button>
+    <button class="btn btn-outline btn-sm" onclick="openQS()">⌘J Focus</button>
+    <button class="btn btn-primary btn-sm" onclick="nav('hub',document.querySelector('.nav-item[onclick*=hub]'))">Campaign Hub →</button>
   </div>
 </div>
 
-${allSuggs.length?`
-<div class="mb20">
-  <div class="flex items-center justify-between mb12">
-    <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;display:flex;align-items:center;gap:8px">
-      <span style="width:7px;height:7px;border-radius:50%;background:var(--accent);display:inline-block;animation:pulse-dot 2s infinite"></span>
-      ✦ AI Bid Suggestions — ${allSuggs.length} pending
+<!-- Q1: How am I performing? -->
+<div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1.2px;margin-bottom:10px;display:flex;align-items:center;gap:8px">
+  <span style="width:6px;height:6px;border-radius:50%;background:var(--accent);display:inline-block"></span>
+  How are my campaigns performing?
+</div>
+<div class="dash-grid-4q mb20">
+  <div class="dq-card" style="position:relative;overflow:hidden">
+    <div class="dq-accent" style="background:linear-gradient(90deg,var(--accent),#8b5cf6)"></div>
+    <div style="font-size:11px;color:var(--muted);margin-bottom:4px">Total Spend/day</div>
+    <div style="font-size:26px;font-weight:800;font-family:var(--mono);color:var(--accent2)">$${totSpend.toLocaleString()}</div>
+    <div style="font-size:11px;color:var(--muted);margin-top:4px">${active.length} active campaigns</div>
+  </div>
+  <div class="dq-card" style="position:relative;overflow:hidden">
+    <div class="dq-accent" style="background:var(--green)"></div>
+    <div style="font-size:11px;color:var(--muted);margin-bottom:4px">Revenue/day</div>
+    <div style="font-size:26px;font-weight:800;font-family:var(--mono);color:var(--green)">$${totRev.toLocaleString()}</div>
+    <div style="font-size:11px;color:var(--muted);margin-top:4px">ROAS ${avgRoas}× avg</div>
+  </div>
+  <div class="dq-card" style="position:relative;overflow:hidden">
+    <div class="dq-accent" style="background:${profitOk?'var(--green)':'var(--red)'}"></div>
+    <div style="font-size:11px;color:var(--muted);margin-bottom:4px">Profit/day</div>
+    <div style="font-size:26px;font-weight:800;font-family:var(--mono);color:${profitOk?'var(--green)':'var(--red)'}">${profitOk?'+':''}$${Math.abs(totProfit).toLocaleString()}</div>
+    <div style="font-size:11px;color:${profitOk?'var(--green)':'var(--red)'};margin-top:4px">${profitOk?'Profitable':'Review needed'}</div>
+  </div>
+  <div class="dq-card" style="position:relative;overflow:hidden">
+    <div class="dq-accent" style="background:${allAnom>0?'var(--red)':'var(--green)'}"></div>
+    <div style="font-size:11px;color:var(--muted);margin-bottom:4px">Active Alerts</div>
+    <div style="font-size:26px;font-weight:800;font-family:var(--mono);color:${allAnom>0?'var(--red)':'var(--green)'}">${allAnom}</div>
+    <div style="font-size:11px;color:var(--muted);margin-top:4px">${allAnom>0?needAttn.length+' campaigns':'All clear'}</div>
+  </div>
+</div>
+
+<!-- Q2: What needs attention? -->
+<div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1.2px;margin-bottom:10px;display:flex;align-items:center;gap:8px">
+  <span style="width:6px;height:6px;border-radius:50%;background:var(--yellow);display:inline-block"></span>
+  What needs attention?
+</div>
+<div class="card mb20">
+  ${needAttn.length===0?`<div style="padding:20px;text-align:center;color:var(--muted);font-size:13px">✓ All campaigns are healthy — nothing needs attention right now.</div>`
+  :needAttn.slice(0,4).map(camp=>`
+  <div class="attention-row" onclick="openDrawer('${camp.id}')">
+    <span style="width:8px;height:8px;border-radius:50%;background:${camp.color};flex-shrink:0;margin-top:5px"></span>
+    <div style="flex:1;min-width:0">
+      <div style="font-weight:700;font-size:13px;color:var(--text)">${camp.name}</div>
+      <div style="font-size:11px;color:var(--muted)">${camp.traffic.source} · Health ${camp.ai.healthScore}</div>
     </div>
-    <button class="btn btn-ghost btn-sm" onclick="nav('copilot',qs('.nav-item[onclick*=copilot]'))">View all →</button>
-  </div>
-  <div class="g2" id="dash-bsc"></div>
-</div>`:''}
-
-<!-- Portfolio KPIs -->
-<div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1.2px;margin-bottom:10px">Portfolio · ${active.length} Active</div>
-<div class="g5 mb16">
-  <div class="card kpi" style="border-left:3px solid var(--accent)"><div class="kpi-label">Total Spend/d</div><div class="kpi-val" style="color:var(--accent2)">$${totSpend.toLocaleString()}</div><div class="kpi-change neu">${active.length} campaigns</div></div>
-  <div class="card kpi" style="border-left:3px solid var(--green)"><div class="kpi-label">Revenue/d</div><div class="kpi-val pos">$${totRev.toLocaleString()}</div><div class="kpi-change pos">↑ all active</div></div>
-  <div class="card kpi" style="border-left:3px solid ${totProfit>=0?'var(--green)':'var(--red)'}"><div class="kpi-label">Profit/d</div><div class="kpi-val" style="color:${totProfit>=0?'var(--green)':'var(--red)'}">${totProfit>=0?'+':''}$${Math.abs(totProfit).toLocaleString()}</div><div class="kpi-change ${totProfit>=0?'pos':'neg'}">${totProfit>=0?'profitable':'review needed'}</div></div>
-  <div class="card kpi" style="border-left:3px solid var(--yellow)"><div class="kpi-label">Avg ROAS</div><div class="kpi-val pos">${avgRoas}×</div><div class="kpi-change pos">portfolio avg</div></div>
-  <div class="card kpi" style="border-left:3px solid ${allAnom>0?'var(--red)':'var(--green)'}"><div class="kpi-label">Alerts</div><div class="kpi-val" style="color:${allAnom>0?'var(--red)':'var(--green)'}">${allAnom}</div><div class="kpi-change ${allAnom>0?'neg':'pos'}">${allAnom>0?'needs attention':'all clear'}</div></div>
-</div>
-
-<!-- Focus Campaign -->
-<div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1.2px;margin-bottom:10px">Focus: ${c.name}</div>
-<div class="g4 mb16">
-  <div class="card kpi"><div class="kpi-label">CPC</div><div class="kpi-val" style="color:var(--accent2)">${m.cpc!=null?'$'+m.cpc.toFixed(2):'—'}</div><div class="kpi-change pos">vs $${c.metrics.bench.cpc} avg</div></div>
-  <div class="card kpi"><div class="kpi-label">CPA</div><div class="kpi-val" style="color:var(--yellow)">${m.cpa!=null?'$'+m.cpa.toFixed(2):'—'}</div><div class="kpi-change ${m.cpa&&m.cpa<c.optimization.targetCPA?'pos':'neg'}">target $${c.optimization.targetCPA}</div></div>
-  <div class="card kpi"><div class="kpi-label">CVR</div><div class="kpi-val pos">${m.cvr!=null?m.cvr.toFixed(1)+'%':'—'}</div><div class="kpi-change pos">vs ${c.metrics.bench.cvr}% avg</div></div>
-  <div class="card kpi"><div class="kpi-label">ROAS</div><div class="kpi-val pos">${m.roas!=null?m.roas.toFixed(1)+'×':'—'}</div><div class="kpi-change pos">target ${c.optimization.targetRoas}×</div></div>
-</div>
-
-<div class="g2 mb16">
-  <div class="card"><div class="card-hdr"><div class="card-title">Revenue & Profit — ${c.name}</div></div><div class="card-body"><canvas id="chart-dash-rp" height="190"></canvas></div></div>
-  <div class="card"><div class="card-hdr"><div class="card-title">CPC · CPA · CVR Trends</div></div><div class="card-body"><canvas id="chart-dash-trends" height="190"></canvas></div></div>
-</div>
-
-<div class="g2">
-  <div class="card">
-    <div class="card-hdr"><div class="card-title">All Campaigns</div><div class="card-desc">Click a row to open full detail →</div></div>
-    <div style="overflow-x:auto">
-      <table>
-        <thead><tr><th>Campaign</th><th>Status</th><th>Health</th><th>ROAS</th><th>CPA</th><th>Profit</th></tr></thead>
-        <tbody>
-          ${all.map(camp=>`<tr onclick="openDrawer('${camp.id}')" style="${camp.id===c.id?'background:rgba(79,110,247,.04)':''}">
-            <td><div style="font-weight:700;display:flex;align-items:center;gap:7px"><span style="width:8px;height:8px;border-radius:50%;background:${camp.color};flex-shrink:0"></span>${camp.name}</div><div class="text-xs text-muted">${camp.traffic.source}</div></td>
-            <td><span class="badge badge-${camp.status==='active'?'green':camp.status==='paused'?'yellow':'red'}">${camp.status}</span></td>
-            <td style="color:${camp.ai.healthScore>75?'var(--green)':camp.ai.healthScore>50?'var(--yellow)':'var(--red)'};font-weight:800;font-family:var(--mono)">${camp.ai.healthScore}</td>
-            <td style="color:${(camp.metrics.today.roas||0)>=1.5?'var(--green)':'var(--red)'};font-weight:700;font-family:var(--mono)">${camp.metrics.today.roas!=null?camp.metrics.today.roas.toFixed(1)+'×':'—'}</td>
-            <td style="font-family:var(--mono)">${camp.metrics.today.cpa!=null?'$'+camp.metrics.today.cpa.toFixed(2):'—'}</td>
-            <td style="color:${(camp.metrics.today.profit||0)>=0?'var(--green)':'var(--red)'};font-weight:700">${camp.metrics.today.profit!=null?(camp.metrics.today.profit>=0?'+':'')+'$'+Math.abs(camp.metrics.today.profit):'—'}</td>
-          </tr>`).join('')}
-        </tbody>
-      </table>
+    <div style="flex:2;min-width:0">
+      ${camp.ai.anomalies.slice(0,1).map(a=>`<div style="font-size:12px;color:var(--red);line-height:1.4">${a.msg||a.description||a.type}</div>`).join('')}
+      ${camp.ai.healthScore<60&&!camp.ai.anomalies.length?`<div style="font-size:12px;color:var(--yellow)">Low health score — review performance</div>`:''}
     </div>
-  </div>
+    <span class="badge badge-${camp.ai.healthScore>75?'green':camp.ai.healthScore>50?'yellow':'red'}">${camp.ai.healthScore}</span>
+    <span style="color:var(--muted);font-size:16px;flex-shrink:0">›</span>
+  </div>`).join('')}
+  ${allSuggs.length?`<div style="border-top:1px solid var(--border);padding:10px 0 0;margin-top:4px">
+    <div style="font-size:12px;color:var(--accent2);font-weight:600;margin-bottom:8px">✦ ${allSuggs.length} AI bid suggestions pending</div>
+    <div id="dash-bsc-mini"></div>
+  </div>`:''}
+</div>
+
+<!-- Q3 + Q4 grid -->
+<div class="g2 mb20">
+  <!-- Q3: What changed today? -->
   <div class="card">
-    <div class="card-hdr"><div class="card-title">✦ AI Recommendations</div><div class="card-desc">${c.name}</div></div>
-    <div class="card-body">
-      ${c.ai.recommendations.map(r=>`<div class="alert alert-blue mb12"><div class="alert-text">${r}</div></div>`).join('')}
-      <div class="flex gap8 mt12">
-        <button class="btn btn-primary btn-sm" onclick="nav('copilot',qs('.nav-item[onclick*=copilot]'))">Ask AI Copilot →</button>
-        <button class="btn btn-outline btn-sm" onclick="nav('scaling',qs('.nav-item[onclick*=scaling]'))">Scaling Engine →</button>
+    <div class="card-hdr">
+      <div>
+        <div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1.2px;margin-bottom:2px;display:flex;align-items:center;gap:8px"><span style="width:6px;height:6px;border-radius:50%;background:#8b5cf6;display:inline-block"></span>What changed today?</div>
+        <div class="card-title">${c.name} — Today's Snapshot</div>
       </div>
     </div>
+    <div class="card-body">
+      <div class="feed-row"><span style="font-size:16px">📈</span><div><div style="font-size:12px;font-weight:600">ROAS ${m.roas!=null?m.roas.toFixed(1)+'×':'—'} <span style="color:var(--green);font-size:11px">vs ${c.optimization.targetRoas}× target</span></div><div style="font-size:11px;color:var(--muted)">Performance metric</div></div></div>
+      <div class="feed-row"><span style="font-size:16px">💰</span><div><div style="font-size:12px;font-weight:600">CPA $${m.cpa!=null?m.cpa.toFixed(2):'—'} <span style="color:${m.cpa&&m.cpa<c.optimization.targetCPA?'var(--green)':'var(--yellow)'};font-size:11px">target $${c.optimization.targetCPA}</span></div><div style="font-size:11px;color:var(--muted)">Cost per acquisition</div></div></div>
+      <div class="feed-row"><span style="font-size:16px">🖱️</span><div><div style="font-size:12px;font-weight:600">CPC $${m.cpc!=null?m.cpc.toFixed(2):'—'} <span style="color:var(--muted);font-size:11px">vs $${c.metrics.bench.cpc} benchmark</span></div><div style="font-size:11px;color:var(--muted)">Cost per click</div></div></div>
+      <div class="feed-row" style="border-bottom:none"><span style="font-size:16px">📊</span><div><div style="font-size:12px;font-weight:600">CVR ${m.cvr!=null?m.cvr.toFixed(1)+'%':'—'} <span style="color:var(--muted);font-size:11px">benchmark ${c.metrics.bench.cvr}%</span></div><div style="font-size:11px;color:var(--muted)">Conversion rate</div></div></div>
+    </div>
+    <div style="padding:12px 16px 14px">
+      <canvas id="chart-dash-rp" height="140"></canvas>
+    </div>
+  </div>
+
+  <!-- Q4: What should I do next? -->
+  <div class="card">
+    <div class="card-hdr">
+      <div>
+        <div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1.2px;margin-bottom:2px;display:flex;align-items:center;gap:8px"><span style="width:6px;height:6px;border-radius:50%;background:var(--accent);display:inline-block;animation:pulse-dot 2s infinite"></span>What should I do next?</div>
+        <div class="card-title">AI Priority Queue</div>
+      </div>
+    </div>
+    <div class="card-body" style="display:flex;flex-direction:column;gap:8px">
+      ${c.ai.recommendations.slice(0,3).map((r,i)=>`
+      <div class="next-item" style="display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border-radius:10px;background:var(--bg3);cursor:pointer" onclick="nav('copilot',document.querySelector('.nav-item[onclick*=copilot]'))">
+        <span style="width:20px;height:20px;border-radius:6px;background:rgba(79,110,247,.15);color:var(--accent);font-size:10px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">${i+1}</span>
+        <div style="font-size:12px;color:var(--text);line-height:1.5">${r}</div>
+      </div>`).join('')}
+      ${allSuggs.length?`<div class="next-item" style="display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;background:rgba(79,110,247,.06);border:1px solid rgba(79,110,247,.2);cursor:pointer" onclick="nav('copilot',document.querySelector('.nav-item[onclick*=copilot]'))">
+        <span style="font-size:16px">✦</span>
+        <div style="font-size:12px;font-weight:600;color:var(--accent2)">${allSuggs.length} bid change${allSuggs.length>1?'s':''} ready to apply</div>
+        <span style="margin-left:auto;color:var(--accent);font-size:12px">Review →</span>
+      </div>`:''}
+    </div>
+    <div style="padding:0 16px 14px;display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn btn-primary btn-sm" onclick="nav('copilot',document.querySelector('.nav-item[onclick*=copilot]'))">Ask AI Copilot</button>
+      <button class="btn btn-outline btn-sm" onclick="nav('scaling',document.querySelector('.nav-item[onclick*=scaling]'))">Scaling Engine</button>
+      <button class="btn btn-outline btn-sm" onclick="nav('automation',document.querySelector('.nav-item[onclick*=automation]'))">Automations</button>
+    </div>
+  </div>
+</div>
+
+<!-- Campaign table -->
+<div class="card">
+  <div class="card-hdr"><div class="card-title">All Campaigns</div><div class="card-desc">Click row to open detail</div><button class="btn btn-primary btn-sm" onclick="openCreateCamp()">+ New</button></div>
+  <div style="overflow-x:auto">
+    <table>
+      <thead><tr><th>Campaign</th><th>Status</th><th>Health</th><th>ROAS</th><th>CPA</th><th>Profit/d</th></tr></thead>
+      <tbody>
+        ${all.map(camp=>`<tr onclick="openDrawer('${camp.id}')" style="${camp.id===c.id?'background:rgba(79,110,247,.04)':''}">
+          <td><div style="font-weight:700;display:flex;align-items:center;gap:7px"><span style="width:8px;height:8px;border-radius:50%;background:${camp.color};flex-shrink:0"></span>${camp.name}</div><div class="text-xs text-muted">${camp.traffic.source}</div></td>
+          <td><span class="badge badge-${camp.status==='active'?'green':camp.status==='paused'?'yellow':'red'}">${camp.status}</span></td>
+          <td style="color:${camp.ai.healthScore>75?'var(--green)':camp.ai.healthScore>50?'var(--yellow)':'var(--red)'};font-weight:800;font-family:var(--mono)">${camp.ai.healthScore}</td>
+          <td style="color:${(camp.metrics.today.roas||0)>=1.5?'var(--green)':'var(--red)'};font-weight:700;font-family:var(--mono)">${camp.metrics.today.roas!=null?camp.metrics.today.roas.toFixed(1)+'×':'—'}</td>
+          <td style="font-family:var(--mono)">${camp.metrics.today.cpa!=null?'$'+camp.metrics.today.cpa.toFixed(2):'—'}</td>
+          <td style="color:${(camp.metrics.today.profit||0)>=0?'var(--green)':'var(--red)'};font-weight:700">${camp.metrics.today.profit!=null?(camp.metrics.today.profit>=0?'+':'')+'$'+Math.abs(camp.metrics.today.profit):'—'}</td>
+        </tr>`).join('')}
+      </tbody>
+    </table>
   </div>
 </div>`;
 
-  // Render top bid suggestions inline
+  // Render mini bid suggestion cards
   if(allSuggs.length){
-    const bc=$('dash-bsc');
+    const bc=$('dash-bsc-mini');
     if(bc){
       const campsWith=CS.camps.filter(x=>x.ai.bidSuggestions.some(s=>s.status==='pending')).slice(0,2);
       bc.innerHTML='';
@@ -2179,16 +2365,139 @@ ${allSuggs.length?`
       {label:'Revenue',data:h.spend.map((s,i)=>Math.round(s*(h.roas?h.roas[i]||c.metrics.week.roas:c.metrics.week.roas))),borderColor:'#0fba81',backgroundColor:'rgba(15,186,129,.07)',fill:true,tension:.45,borderWidth:2,pointRadius:2},
       {label:'Profit',data:h.profit,borderColor:'#4f6ef7',backgroundColor:'rgba(79,110,247,.06)',fill:true,tension:.45,borderWidth:2,pointRadius:2}
     ]},options:{...CD}});
-    mkChart('chart-dash-trends',{type:'line',data:{labels:DAYS,datasets:[
-      {label:'CPC',data:h.cpc,borderColor:'#4f6ef7',tension:.45,borderWidth:2,pointRadius:2,yAxisID:'y'},
-      {label:'CPA',data:h.cpa,borderColor:'#f5a623',tension:.45,borderWidth:2,pointRadius:2,yAxisID:'y'},
-      {label:'CVR%',data:h.cvr,borderColor:'#0fba81',tension:.45,borderWidth:2,pointRadius:2,borderDash:[4,3],yAxisID:'y2'}
-    ]},options:{responsive:true,plugins:{legend:{labels:{color:'#5c5c85',font:{size:10}}}},scales:{x:{ticks:{color:'#5c5c85',font:{size:10}},grid:{color:'rgba(255,255,255,.035)'}},y:{position:'left',ticks:{color:'#5c5c85',font:{size:10}},grid:{color:'rgba(255,255,255,.05)'}},y2:{position:'right',ticks:{color:'#5c5c85',font:{size:10}},grid:{drawOnChartArea:false}}}}});
   },60);
+}
+
+function renderCampaignHub(el){
+  const c=CS.active,all=CS.camps;
+  if(!c){el.innerHTML='<div class="empty-state"><div class="empty-icon">🎯</div><div class="empty-title">No Campaign Selected</div><div class="empty-desc">Select or create a campaign to see its hub.</div><div class="empty-actions"><button class="btn btn-primary" onclick="openCreateCamp()">+ New Campaign</button></div></div>';return;}
+  const m=c.metrics.today,active=all.filter(x=>x.status==='active');
+  const totSpend=active.reduce((n,x)=>n+(x.metrics.today.spend||0),0);
+  const pendBids=c.ai.bidSuggestions.filter(s=>s.status==='pending').length;
+
+  el.innerHTML=`
+<div class="page-hdr">
+  <div>
+    <div class="page-title">Campaign Hub</div>
+    <div class="page-sub">Single source of truth for every campaign</div>
+  </div>
+  <div class="flex gap8 items-center">
+    <button class="btn btn-outline btn-sm" onclick="openQS()">⌘J Switch</button>
+    <button class="btn btn-primary btn-sm" onclick="openCreateCamp()">+ New Campaign</button>
+  </div>
+</div>
+
+<!-- Campaign selector strip -->
+<div style="display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;margin-bottom:20px">
+  ${all.map(camp=>`<div onclick="CS.setActive(camp.id);renderPage('hub')" style="flex-shrink:0;padding:8px 14px;border-radius:10px;border:1px solid ${camp.id===c.id?'var(--accent)':'var(--border)'};background:${camp.id===c.id?'rgba(79,110,247,.1)':'var(--bg2)'};cursor:pointer;white-space:nowrap;font-size:12px;font-weight:${camp.id===c.id?700:500};color:${camp.id===c.id?'var(--accent2)':'var(--text)'};display:flex;align-items:center;gap:7px"><span style="width:7px;height:7px;border-radius:50%;background:${camp.color};flex-shrink:0"></span>${camp.name}</div>`).join('')}
+</div>
+
+<!-- Hub header -->
+<div class="hub-header mb20">
+  <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap">
+    <div style="display:flex;align-items:center;gap:14px">
+      <div style="width:44px;height:44px;border-radius:12px;background:${c.color};display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:900;color:#fff;flex-shrink:0">${c.name[0]}</div>
+      <div>
+        <div style="font-size:20px;font-weight:800;color:var(--text)">${c.name}</div>
+        <div style="font-size:12px;color:var(--muted);margin-top:2px">${c.traffic.source}${c.traffic.adNetwork?' · '+c.traffic.adNetwork:''} · <span class="badge badge-${c.status==='active'?'green':c.status==='paused'?'yellow':'red'}">${c.status}</span></div>
+      </div>
+    </div>
+    <div style="display:flex;gap:8px">
+      <button class="btn btn-outline btn-sm" onclick="openDrawer('${c.id}')">Edit Campaign</button>
+      <button class="btn btn-primary btn-sm" onclick="nav('copilot',document.querySelector('.nav-item[onclick*=copilot]'))">✦ AI Advisor</button>
+    </div>
+  </div>
+  <!-- KPI strip -->
+  <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-top:20px">
+    ${[
+      ['Spend/d',m.spend!=null?'$'+m.spend.toLocaleString():'—','var(--accent2)','Daily budget burn'],
+      ['Revenue',m.revenue!=null?'$'+m.revenue.toLocaleString():'—','var(--green)','Total revenue today'],
+      ['ROAS',m.roas!=null?m.roas.toFixed(1)+'×':'—',m.roas>=c.optimization.targetRoas?'var(--green)':'var(--yellow)','Return on ad spend'],
+      ['CPA',m.cpa!=null?'$'+m.cpa.toFixed(2):'—',m.cpa&&m.cpa<c.optimization.targetCPA?'var(--green)':'var(--red)','Cost per acquisition'],
+      ['Health',''+c.ai.healthScore,c.ai.healthScore>75?'var(--green)':c.ai.healthScore>50?'var(--yellow)':'var(--red)','AI health score'],
+    ].map(([l,v,clr,tip])=>`<div><div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px">${l}</div><div style="font-size:22px;font-weight:800;font-family:var(--mono);color:${clr}">${v}</div><div style="font-size:10px;color:var(--muted);margin-top:2px">${tip}</div></div>`).join('')}
+  </div>
+</div>
+
+<!-- Hub sections grid -->
+<div class="hub-sections mb20">
+  <div class="hub-section" onclick="nav('cpc',document.querySelector('.nav-item[onclick*=cpc]'))">
+    <div style="font-size:22px;margin-bottom:8px">💡</div>
+    <div style="font-size:13px;font-weight:700;color:var(--text)">CPC Intelligence</div>
+    <div style="font-size:11px;color:var(--muted);margin-top:4px;line-height:1.5">Bid optimization & cost-per-click analysis</div>
+  </div>
+  <div class="hub-section" onclick="nav('cpa',document.querySelector('.nav-item[onclick*=cpa]'))">
+    <div style="font-size:22px;margin-bottom:8px">🎯</div>
+    <div style="font-size:13px;font-weight:700;color:var(--text)">CPA Intelligence</div>
+    <div style="font-size:11px;color:var(--muted);margin-top:4px;line-height:1.5">Acquisition cost & profitability levers</div>
+  </div>
+  <div class="hub-section" onclick="nav('anomaly',document.querySelector('.nav-item[onclick*=anomaly]'))">
+    <div style="font-size:22px;margin-bottom:8px">⚠️</div>
+    <div style="font-size:13px;font-weight:700;color:var(--text)">Anomaly Detection</div>
+    <div style="font-size:11px;color:var(--muted);margin-top:4px;line-height:1.5">${c.ai.anomalies.length} active alert${c.ai.anomalies.length!==1?'s':''} detected</div>
+  </div>
+  <div class="hub-section" onclick="nav('forecasting',document.querySelector('.nav-item[onclick*=forecasting]'))">
+    <div style="font-size:22px;margin-bottom:8px">📈</div>
+    <div style="font-size:13px;font-weight:700;color:var(--text)">AI Forecasting</div>
+    <div style="font-size:11px;color:var(--muted);margin-top:4px;line-height:1.5">Revenue & spend projections</div>
+  </div>
+  <div class="hub-section" onclick="nav('copilot',document.querySelector('.nav-item[onclick*=copilot]'))">
+    <div style="font-size:22px;margin-bottom:8px">✦</div>
+    <div style="font-size:13px;font-weight:700;color:var(--text)">AI Copilot</div>
+    <div style="font-size:11px;color:var(--muted);margin-top:4px;line-height:1.5">${pendBids} suggestion${pendBids!==1?'s':''} pending review</div>
+  </div>
+  <div class="hub-section" onclick="nav('creative',document.querySelector('.nav-item[onclick*=creative]'))">
+    <div style="font-size:22px;margin-bottom:8px">🎨</div>
+    <div style="font-size:13px;font-weight:700;color:var(--text)">Creative Studio</div>
+    <div style="font-size:11px;color:var(--muted);margin-top:4px;line-height:1.5">Generate & test ad creatives</div>
+  </div>
+  <div class="hub-section" onclick="nav('audience',document.querySelector('.nav-item[onclick*=audience]'))">
+    <div style="font-size:22px;margin-bottom:8px">👥</div>
+    <div style="font-size:13px;font-weight:700;color:var(--text)">Audience Builder</div>
+    <div style="font-size:11px;color:var(--muted);margin-top:4px;line-height:1.5">Segment & target the right users</div>
+  </div>
+  <div class="hub-section" onclick="nav('geo',document.querySelector('.nav-item[onclick*=geo]'))">
+    <div style="font-size:22px;margin-bottom:8px">🌍</div>
+    <div style="font-size:13px;font-weight:700;color:var(--text)">GEO Analysis</div>
+    <div style="font-size:11px;color:var(--muted);margin-top:4px;line-height:1.5">Geographic performance breakdown</div>
+  </div>
+  <div class="hub-section" onclick="nav('automation',document.querySelector('.nav-item[onclick*=automation]'))">
+    <div style="font-size:22px;margin-bottom:8px">⚡</div>
+    <div style="font-size:13px;font-weight:700;color:var(--text)">Automation</div>
+    <div style="font-size:11px;color:var(--muted);margin-top:4px;line-height:1.5">Rules & triggers for this campaign</div>
+  </div>
+  <div class="hub-section" onclick="nav('reports',document.querySelector('.nav-item[onclick*=reports]'))">
+    <div style="font-size:22px;margin-bottom:8px">📋</div>
+    <div style="font-size:13px;font-weight:700;color:var(--text)">Reports</div>
+    <div style="font-size:11px;color:var(--muted);margin-top:4px;line-height:1.5">Export & schedule reports</div>
+  </div>
+  <div class="hub-section" onclick="nav('attribution',document.querySelector('.nav-item[onclick*=attribution]'))">
+    <div style="font-size:22px;margin-bottom:8px">🔀</div>
+    <div style="font-size:13px;font-weight:700;color:var(--text)">Attribution</div>
+    <div style="font-size:11px;color:var(--muted);margin-top:4px;line-height:1.5">Channel & touchpoint analysis</div>
+  </div>
+  <div class="hub-section" onclick="nav('scaling',document.querySelector('.nav-item[onclick*=scaling]'))">
+    <div style="font-size:22px;margin-bottom:8px">🚀</div>
+    <div style="font-size:13px;font-weight:700;color:var(--text)">Scaling Engine</div>
+    <div style="font-size:11px;color:var(--muted);margin-top:4px;line-height:1.5">Find safe paths to scale profitably</div>
+  </div>
+</div>
+
+<!-- AI recommendations -->
+<div class="card">
+  <div class="card-hdr"><div class="card-title">✦ AI Recommendations for ${c.name}</div></div>
+  <div class="card-body" style="display:flex;flex-direction:column;gap:8px">
+    ${c.ai.recommendations.map((r,i)=>`<div class="next-item" style="display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border-radius:10px;background:var(--bg3)">
+      <span style="width:20px;height:20px;border-radius:6px;background:rgba(79,110,247,.15);color:var(--accent);font-size:10px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">${i+1}</span>
+      <div style="font-size:12px;color:var(--text);line-height:1.5">${r}</div>
+    </div>`).join('')}
+  </div>
+</div>`;
 }
 
 function renderCampaigns(el){
   const all=CS.camps,c=CS.active;
+  if(!all.length){el.innerHTML=`<div class="empty-state"><div class="empty-icon">📭</div><div class="empty-title">No Campaigns Yet</div><div class="empty-desc">Create your first campaign to start tracking performance, bids, and AI recommendations.</div><div class="empty-actions"><button class="btn btn-primary" onclick="openCreateCamp()">+ New Campaign</button></div></div>`;return;}
   const totSpend=all.reduce((n,x)=>n+(x.metrics.today.spend||0),0);
   const totProfit=all.reduce((n,x)=>n+(x.metrics.today.profit||0),0);
   const pendBids=all.reduce((n,x)=>n+x.ai.bidSuggestions.filter(s=>s.status==='pending').length,0);
@@ -2201,8 +2510,8 @@ function renderCampaigns(el){
   </div>
 </div>
 <div class="camp-filter-bar">
-  <input type="text" placeholder="🔍  Search campaigns…" oninput="_campFilter=this.value;renderPage('campaigns')" value="${_campFilter}">
-  ${['all','active','paused','stopped'].map(s=>`<div class="filter-chip${_campStatusFilter===s?' active-chip':''}" onclick="_campStatusFilter='${s}';renderPage('campaigns')">${s==='all'?'All':s.charAt(0).toUpperCase()+s.slice(1)}</div>`).join('')}
+  <input type="text" placeholder="🔍  Search campaigns…" oninput="_campFilter=this.value;_campPage=1;renderPage('campaigns')" value="${_campFilter}">
+  ${['all','active','paused','stopped'].map(s=>`<div class="filter-chip${_campStatusFilter===s?' active-chip':''}" onclick="_campStatusFilter='${s}';_campPage=1;renderPage('campaigns')">${s==='all'?'All':s.charAt(0).toUpperCase()+s.slice(1)}</div>`).join('')}
 </div>
 <div class="g5 mb16">
   <div class="card kpi"><div class="kpi-label">Active</div><div class="kpi-val pos">${all.filter(x=>x.status==='active').length}</div></div>
@@ -2216,12 +2525,19 @@ function renderCampaigns(el){
     <table>
       <thead><tr><th>Campaign</th><th>Platform</th><th>Status</th><th>Budget/d</th><th>Spend</th><th>CVR</th><th>CPC</th><th>CPA</th><th>ROAS</th><th>Profit</th><th>Health</th><th></th></tr></thead>
       <tbody>
-        ${all.filter(camp=>{
-          const flt=_campFilter.toLowerCase();
-          const matchSearch=!flt||camp.name.toLowerCase().includes(flt)||camp.offer.type.toLowerCase().includes(flt)||camp.traffic.source.toLowerCase().includes(flt);
-          const matchStatus=_campStatusFilter==='all'||camp.status===_campStatusFilter;
-          return matchSearch&&matchStatus;
-        }).map(camp=>{
+        ${(()=>{
+          const filtered=all.filter(camp=>{
+            const flt=_campFilter.toLowerCase();
+            const matchSearch=!flt||camp.name.toLowerCase().includes(flt)||camp.offer.type.toLowerCase().includes(flt)||camp.traffic.source.toLowerCase().includes(flt);
+            const matchStatus=_campStatusFilter==='all'||camp.status===_campStatusFilter;
+            return matchSearch&&matchStatus;
+          });
+          const totalPages=Math.max(1,Math.ceil(filtered.length/CAMP_PAGE_SIZE));
+          if(_campPage>totalPages)_campPage=totalPages;
+          window._campPageRows=filtered.slice((_campPage-1)*CAMP_PAGE_SIZE,_campPage*CAMP_PAGE_SIZE);
+          window._campPageMeta={total:filtered.length,totalPages};
+          return window._campPageRows;
+        })().map(camp=>{
           const m=camp.metrics.today,isSel=camp.id===c.id;
           const sc={active:'badge-green',paused:'badge-yellow',stopped:'badge-red'}[camp.status];
           const rc=(m.roas||0)>=1.5?'var(--green)':'var(--red)';
@@ -2249,6 +2565,15 @@ function renderCampaigns(el){
       </tbody>
     </table>
   </div>
+  ${window._campPageMeta&&window._campPageMeta.totalPages>1?`
+  <div class="flex items-center justify-between" style="padding:12px 4px 2px;border-top:1px solid var(--border);margin-top:8px">
+    <span style="font-size:11px;color:var(--muted)">Showing ${(_campPage-1)*CAMP_PAGE_SIZE+1}–${Math.min(_campPage*CAMP_PAGE_SIZE,window._campPageMeta.total)} of ${window._campPageMeta.total}</span>
+    <div class="flex gap6">
+      <button class="btn btn-outline btn-xs" ${_campPage<=1?'disabled':''} onclick="_campPage--;renderPage('campaigns')">‹ Prev</button>
+      <span style="font-size:11px;color:var(--muted);padding:4px 8px">Page ${_campPage} / ${window._campPageMeta.totalPages}</span>
+      <button class="btn btn-outline btn-xs" ${_campPage>=window._campPageMeta.totalPages?'disabled':''} onclick="_campPage++;renderPage('campaigns')">Next ›</button>
+    </div>
+  </div>`:''}
 </div>
 <div class="g2 mb16">
   <div class="card">
@@ -2284,7 +2609,7 @@ function renderCPC(el,c){
   const pend=c.ai.bidSuggestions.filter(s=>s.status==='pending'&&s.metric==='CPC');
   el.innerHTML=`
 <div class="page-hdr">
-  <div><div class="page-title">CPC Intelligence</div><div class="page-sub">Optimal bid targets — <strong style="color:var(--text)">${c.name}</strong></div></div>
+  <div><div class="page-title">CPC Intelligence${tip('CPC Intelligence','Analyzes your offer economics to recommend ideal, minimum, and break-even cost-per-click targets.','Use before raising bids to confirm you stay profitable.')}</div><div class="page-sub">Optimal bid targets — <strong style="color:var(--text)">${c.name}</strong></div></div>
   <button class="btn btn-outline btn-sm" onclick="openQS()">Switch ⌘J</button>
 </div>
 ${pend.length?`<div class="mb16" id="cpc-bsc"></div>`:''}
@@ -2329,7 +2654,7 @@ function renderCPA(el,c){
   const pend=c.ai.bidSuggestions.filter(s=>s.status==='pending'&&(s.metric==='CPA'||s.metric==='CPA Target'));
   el.innerHTML=`
 <div class="page-hdr">
-  <div><div class="page-title">CPA Intelligence</div><div class="page-sub">CPA targets — <strong style="color:var(--text)">${c.name}</strong></div></div>
+  <div><div class="page-title">CPA Intelligence${tip('CPA Intelligence','Analyzes historical CPA performance and predicts future acquisition costs.','Use to set acquisition targets before scaling spend.')}</div><div class="page-sub">CPA targets — <strong style="color:var(--text)">${c.name}</strong></div></div>
   <button class="btn btn-outline btn-sm" onclick="openQS()">Switch ⌘J</button>
 </div>
 ${pend.length?`<div class="mb16" id="cpa-bsc"></div>`:''}
@@ -2378,7 +2703,7 @@ function renderOffer(el,c){
   const o=c.offer;
   el.innerHTML=`
 <div class="page-hdr">
-  <div><div class="page-title">Offer Analyzer</div><div class="page-sub">AI Offer Forensics · linked to <strong style="color:var(--text)">${c.name}</strong></div></div>
+  <div><div class="page-title">Offer Analyzer${tip('Offer Analyzer','Scores affiliate offers using EPC, conversion rate, payout quality, and historical trends.','Use when deciding whether to keep, scale, or drop an offer.')}</div><div class="page-sub">AI Offer Forensics · linked to <strong style="color:var(--text)">${c.name}</strong></div></div>
   <button class="btn btn-outline btn-sm" onclick="openQS()">Switch ⌘J</button>
 </div>
 <div class="card mb16">
@@ -2591,7 +2916,7 @@ function renderAnomaly(el,c){
   const allAnom=all.flatMap(camp=>camp.ai.anomalies.map(a=>({...a,campId:camp.id,campName:camp.name,source:camp.traffic.source})));
   el.innerHTML=`
 <div class="page-hdr">
-  <div><div class="page-title">Anomaly Detection</div><div class="page-sub">AI monitors ${all.length} campaigns in real-time · ${allAnom.length} active alerts</div></div>
+  <div><div class="page-title">Anomaly Detection${tip('Anomaly Detection','Automatically identifies unusual changes in campaign performance.','Use to catch problems before they drain budget.')}</div><div class="page-sub">AI monitors ${all.length} campaigns in real-time · ${allAnom.length} active alerts</div></div>
   <button class="btn btn-outline btn-sm" onclick="openQS()">Switch ⌘J</button>
 </div>
 <div class="g4 mb16">
@@ -2630,7 +2955,7 @@ function renderBenchmarks(el,c){
   const m=c.metrics.today,b=c.metrics.bench;
   el.innerHTML=`
 <div class="page-hdr">
-  <div><div class="page-title">Benchmarks</div><div class="page-sub">${c.name} vs ${c.offer.type} industry averages</div></div>
+  <div><div class="page-title">Benchmarks${tip('Benchmarks','Compares your campaign metrics against industry averages for this offer type.','Use to gauge whether performance is competitive or lagging.')}</div><div class="page-sub">${c.name} vs ${c.offer.type} industry averages</div></div>
   <button class="btn btn-outline btn-sm" onclick="openQS()">Switch ⌘J</button>
 </div>
 <div class="g4 mb16">
@@ -2649,7 +2974,7 @@ function renderBenchmarks(el,c){
 function renderSimulator(el,c){
   el.innerHTML=`
 <div class="page-hdr">
-  <div><div class="page-title">AI Simulator</div><div class="page-sub">Scenario testing — <strong style="color:var(--text)">${c.name}</strong></div></div>
+  <div><div class="page-title">AI Simulator${tip('AI Simulator','Models "what-if" budget and bid scenarios to predict their impact before you spend.','Use to test a change risk-free before applying it live.')}</div><div class="page-sub">Scenario testing — <strong style="color:var(--text)">${c.name}</strong></div></div>
   <button class="btn btn-outline btn-sm" onclick="openQS()">Switch ⌘J</button>
 </div>
 <div class="g13 mb16">
@@ -2686,7 +3011,7 @@ let _chatHistory=[];
 function renderCopilot(el,c){
   el.innerHTML=`
 <div class="page-hdr">
-  <div><div class="page-title">AI Copilot</div><div class="page-sub">Context: <strong style="color:var(--text)">${c.name}</strong> · Health ${c.ai.healthScore}/100</div></div>
+  <div><div class="page-title">AI Copilot${tip('AI Copilot','A conversational assistant that answers questions and explains recommendations using your live campaign data.','Use whenever you want a plain-language answer instead of digging through reports.')}</div><div class="page-sub">Context: <strong style="color:var(--text)">${c.name}</strong> · Health ${c.ai.healthScore}/100</div></div>
   <button class="btn btn-outline btn-sm" onclick="openQS()">Switch ⌘J</button>
 </div>
 <div class="g31">
@@ -2751,7 +3076,7 @@ function renderForecasting(el,c){
   const projRev=projSp.map(s=>Math.round(s*fr));
   el.innerHTML=`
 <div class="page-hdr">
-  <div><div class="page-title">AI Forecasting</div><div class="page-sub">7-day projection — <strong style="color:var(--text)">${c.name}</strong> · ${c.ai.forecastConfidence}% confidence</div></div>
+  <div><div class="page-title">AI Forecasting${tip('AI Forecasting','Projects future spend, revenue, and ROAS based on recent trends.','Use to plan budget ahead of time and spot trajectory changes early.')}</div><div class="page-sub">7-day projection — <strong style="color:var(--text)">${c.name}</strong> · ${c.ai.forecastConfidence}% confidence</div></div>
   <button class="btn btn-outline btn-sm" onclick="openQS()">Switch ⌘J</button>
 </div>
 <div class="g4 mb16">
@@ -2775,7 +3100,7 @@ function renderScaling(el,c){
   const pendBudget=c.ai.bidSuggestions.filter(s=>s.status==='pending'&&s.metric==='Budget');
   el.innerHTML=`
 <div class="page-hdr">
-  <div><div class="page-title">Scaling Engine</div><div class="page-sub">Budget scaling calculator — <strong style="color:var(--text)">${c.name}</strong></div></div>
+  <div><div class="page-title">Scaling Engine${tip('Scaling Engine','Uses AI to recommend profitable budget increases.','Use once a campaign is stable and you want to grow spend without losing ROAS.')}</div><div class="page-sub">Budget scaling calculator — <strong style="color:var(--text)">${c.name}</strong></div></div>
   <button class="btn btn-outline btn-sm" onclick="openQS()">Switch ⌘J</button>
 </div>
 ${pendBudget.length?`<div class="mb16" id="sc-bsc"></div>`:''}
@@ -2857,44 +3182,258 @@ function renderReports(el,c){
   setTimeout(()=>{mkChart('chart-rep',{type:'line',data:{labels:DAYS,datasets:[{label:'Revenue',data:c.metrics.hist.spend.map((s,i)=>Math.round(s*(c.metrics.hist.roas?c.metrics.hist.roas[i]||c.metrics.week.roas:c.metrics.week.roas||2))),borderColor:'#0fba81',backgroundColor:'rgba(15,186,129,.07)',fill:true,tension:.45,borderWidth:2,pointRadius:2},{label:'Spend',data:c.metrics.hist.spend,borderColor:'#4f6ef7',backgroundColor:'rgba(79,110,247,.06)',fill:true,tension:.45,borderWidth:2,pointRadius:2}]},options:{...CD}})},60);
 }
 
-function renderIntegrations(el,c){
-  const intg=c.integration;
+function renderIntegrations(el){
+  stIntegrations(el);
+}
+
+// ═══════════════════════════════════════════════════
+// AUTOMATION ENGINE
+// ═══════════════════════════════════════════════════
+let _autoTab='rules',_autoBuilderOpen=false;
+let AUTOMATION_RULES=[
+  {id:'r1',name:'CPA Guard — Pause on Spike',enabled:true,trigger:'CPA',operator:'>',value:45,action:'Pause Campaign',actParam:'',fires:127,lastFired:'2m ago',tag:'Protection',tagCol:'var(--red)'},
+  {id:'r2',name:'ROAS Scale-Up',enabled:true,trigger:'ROAS',operator:'>',value:3.5,action:'Increase Budget',actParam:'+15%',fires:23,lastFired:'1h ago',tag:'Scaling',tagCol:'var(--green)'},
+  {id:'r3',name:'Low Spend Alert',enabled:true,trigger:'Spend',operator:'<',value:50,action:'Send Alert',actParam:'Slack',fires:8,lastFired:'4h ago',tag:'Alerts',tagCol:'var(--accent2)'},
+  {id:'r4',name:'CTR Drop — Reduce Bid',enabled:false,trigger:'CTR',operator:'<',value:1.2,action:'Decrease CPC',actParam:'-10%',fires:44,lastFired:'Yesterday',tag:'Bidding',tagCol:'var(--yellow)'},
+  {id:'r5',name:'Profit Milestone — Scale',enabled:true,trigger:'Profit',operator:'>',value:500,action:'Increase Budget',actParam:'+20%',fires:6,lastFired:'3d ago',tag:'Scaling',tagCol:'var(--green)'},
+  {id:'r6',name:'Budget Exhausted Alert',enabled:true,trigger:'Budget Used',operator:'>',value:90,action:'Send Alert',actParam:'Email + Slack',fires:19,lastFired:'6h ago',tag:'Alerts',tagCol:'var(--accent2)'},
+];
+const AUTO_LOG=[
+  {time:'2m ago',rule:'CPA Guard — Pause on Spike',camp:'Keto ClickBank US',action:'Campaign Paused',result:'success',metric:'CPA $48.20'},
+  {time:'1h ago',rule:'ROAS Scale-Up',camp:'GoGo Bid Main',action:'Budget +15%',result:'success',metric:'ROAS 3.82×'},
+  {time:'3h ago',rule:'Low Spend Alert',camp:'ClickBank Brazil',action:'Slack Sent',result:'success',metric:'Spend $31.40'},
+  {time:'4h ago',rule:'Budget Exhausted Alert',camp:'Keto ClickBank US',action:'Email Sent',result:'success',metric:'Budget 92%'},
+  {time:'6h ago',rule:'CPA Guard — Pause on Spike',camp:'GoGo Bid Main',action:'Evaluated — No Action',result:'skip',metric:'CPA $38.10'},
+  {time:'8h ago',rule:'ROAS Scale-Up',camp:'Weight Loss Nutra',action:'Budget +15%',result:'success',metric:'ROAS 4.12×'},
+  {time:'12h ago',rule:'Low Spend Alert',camp:'ClickBank Brazil',action:'Slack Sent',result:'success',metric:'Spend $22.80'},
+  {time:'Yesterday',rule:'CTR Drop — Reduce Bid',camp:'Keto ClickBank US',action:'CPC −10%',result:'success',metric:'CTR 0.98%'},
+];
+const AUTO_TEMPLATES=[
+  {icon:'🛡',name:'CPA Guard',desc:'Auto-pause any campaign when CPA exceeds your target by 20%.',tag:'Protection',rule:'CPA > Target+20%',action:'Pause Campaign'},
+  {icon:'🚀',name:'ROAS Scale Booster',desc:'Automatically increase budget when ROAS is strong for 3 consecutive hours.',tag:'Scaling',rule:'ROAS > 3.0 for 3h',action:'Budget +15%'},
+  {icon:'🔔',name:'Budget Burn Alert',desc:'Notify you when daily budget hits 80% before noon.',tag:'Alerts',rule:'Budget Used > 80% before 12pm',action:'Alert via Slack'},
+  {icon:'📉',name:'CTR Decay Biddown',desc:'Reduce CPC when CTR drops below 1% for 2+ hours.',tag:'Bidding',rule:'CTR < 1% for 2h',action:'CPC −10%'},
+  {icon:'💰',name:'Profit Milestone Scaler',desc:'Aggressively scale budget when daily profit exceeds $500.',tag:'Scaling',rule:'Profit > $500/day',action:'Budget +25%'},
+  {icon:'⏰',name:'Day-Parting Scheduler',desc:'Pause campaigns during low-conversion hours (midnight–6am).',tag:'Scheduling',rule:'Time between 00:00–06:00',action:'Pause Campaign'},
+];
+function autoToggle(id){const r=AUTOMATION_RULES.find(x=>x.id===id);if(r){r.enabled=!r.enabled;renderAutomation($('page-automation'));toast(r.enabled?'Rule Enabled':'Rule Disabled',r.name,r.enabled?'success':'info',2000);}}
+function autoDelete(id){AUTOMATION_RULES=AUTOMATION_RULES.filter(x=>x.id!==id);renderAutomation($('page-automation'));toast('Rule Deleted','Automation rule removed.','info',2000);}
+function autoApplyTemplate(name){
+  const t=AUTO_TEMPLATES.find(x=>x.name===name);if(!t)return;
+  const id='r'+(Date.now()%10000);
+  AUTOMATION_RULES.push({id,name:t.name,enabled:true,trigger:t.rule.split(' ')[0],operator:'>',value:0,action:t.action,actParam:'',fires:0,lastFired:'Never',tag:t.tag,tagCol:t.tag==='Protection'?'var(--red)':t.tag==='Scaling'?'var(--green)':t.tag==='Alerts'?'var(--accent2)':'var(--yellow)'});
+  _autoTab='rules';renderAutomation($('page-automation'));
+  toast('✓ Template Applied',t.name+' rule added and enabled.','success',3000);
+}
+function renderAutomation(el){
+  const activeRules=AUTOMATION_RULES.filter(r=>r.enabled).length;
+  const totalFires=AUTOMATION_RULES.reduce((n,r)=>n+r.fires,0);
   el.innerHTML=`
 <div class="page-hdr">
-  <div><div class="page-title">Integrations</div><div class="page-sub">${c.name} · ${intg.platform}</div></div>
-  <button class="btn btn-outline btn-sm" onclick="openQS()">Switch ⌘J</button>
+  <div>
+    <div class="page-title">Automation Engine</div>
+    <div class="page-sub">Rule-based campaign automation — set triggers, conditions, and actions</div>
+  </div>
+  <div class="flex gap8">
+    <button class="btn btn-outline btn-sm" onclick="_autoTab='log';renderAutomation($('page-automation'))">📋 Execution Log</button>
+    <button class="btn btn-primary btn-sm" onclick="_autoTab='builder';renderAutomation($('page-automation'))">+ New Rule</button>
+  </div>
 </div>
-<div class="alert alert-${intg.syncStatus==='error'?'red':intg.syncStatus==='live'?'green':'blue'} mb16">
-  <div class="alert-title">${intg.platform} · Sync: ${intg.syncStatus.toUpperCase()}</div>
-  <div class="alert-text">Account: ${intg.accountId} · Last sync: ${intg.lastSync}</div>
+<div class="g4 mb20">
+  ${[['Active Rules',activeRules,'var(--green)','⚡'],['Total Rules',AUTOMATION_RULES.length,'var(--accent2)','📋'],['Triggers Today',totalFires,'var(--yellow)','🔥'],['Actions Saved','$2,840','var(--green)','💰']].map(([l,v,col,icon])=>`
+  <div class="card kpi" style="border-color:${col}22">
+    <div class="kpi-label">${icon} ${l}</div>
+    <div class="kpi-val" style="font-size:22px;color:${col}">${v}</div>
+  </div>`).join('')}
 </div>
-<div class="g2 mb16">
-  <div class="card">
-    <div class="card-hdr"><div class="card-title">Traffic Sources</div></div>
-    ${[{name:'Facebook Ads',key:'meta'},{name:'Google Ads',key:'google'},{name:'TikTok Ads',key:'tiktok'},{name:'Native Ads',key:'native'},{name:'Push Notifications',key:'push'}].map(p=>`
-    <div class="flex items-center justify-between" style="padding:12px 16px;border-bottom:1px solid var(--border)">
-      <div class="flex items-center gap12"><span style="font-size:20px">${PE[p.key]||'📊'}</span>
-      <div><div style="font-weight:600;font-size:13px">${p.name}</div>
-      <div class="text-xs text-muted">${p.key===c.traffic.sourceKey?'Active for '+c.name:'Not connected'}</div></div></div>
-      ${p.key===c.traffic.sourceKey?'<span class="badge badge-green">Connected</span>':'<button class="btn btn-outline btn-xs">Connect</button>'}
+<div class="int-tab-bar mb16">
+  ${[['rules','⚡ Active Rules'],['templates','📦 Templates'],['builder','🔧 Rule Builder'],['log','📋 Execution Log'],['schedule','🕐 Schedule']].map(([k,l])=>`<div class="int-tab${_autoTab===k?' active':''}" onclick="_autoTab='${k}';renderAutomation($('page-automation'))">${l}</div>`).join('')}
+</div>
+<div id="auto-body">${_autoTab==='rules'?_autoRules():_autoTab==='templates'?_autoTemplates():_autoTab==='builder'?_autoBuilder():_autoTab==='log'?_autoLog():_autoSchedule()}</div>`;
+}
+function _autoRules(){
+  if(!AUTOMATION_RULES.length) return`<div class="card" style="text-align:center;padding:40px;color:var(--muted)"><div style="font-size:32px;margin-bottom:12px">⚡</div><div style="font-size:14px;font-weight:600">No Rules Yet</div><div class="text-xs mt8">Start with a template or build a custom rule.</div><button class="btn btn-primary btn-sm mt16" onclick="_autoTab='templates';renderAutomation($('page-automation'))">Browse Templates</button></div>`;
+  return`<div class="card">
+  <div class="card-hdr"><div class="card-title">Automation Rules</div><div class="card-desc">${AUTOMATION_RULES.filter(r=>r.enabled).length} of ${AUTOMATION_RULES.length} active</div></div>
+  <div style="overflow:hidden">
+    <div style="display:grid;grid-template-columns:1fr 180px 140px 100px 80px 90px;gap:0;padding:9px 16px;background:var(--bg3);font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;border-bottom:1px solid var(--border)">
+      <div>Rule</div><div>Trigger Condition</div><div>Action</div><div style="text-align:center">Fires</div><div style="text-align:center">Status</div><div></div>
+    </div>
+    ${AUTOMATION_RULES.map(r=>`
+    <div style="display:grid;grid-template-columns:1fr 180px 140px 100px 80px 90px;gap:0;padding:13px 16px;border-bottom:1px solid var(--border);align-items:center;${r.enabled?'':'opacity:.55'}">
+      <div>
+        <div style="font-size:12px;font-weight:700;margin-bottom:3px">${r.name}</div>
+        <div style="display:flex;gap:6px;align-items:center">
+          <span style="font-size:9px;font-weight:700;padding:2px 7px;border-radius:4px;background:${r.tagCol}18;color:${r.tagCol};border:1px solid ${r.tagCol}30">${r.tag}</span>
+          <span style="font-size:10px;color:var(--muted)">Last: ${r.lastFired}</span>
+        </div>
+      </div>
+      <div style="font-size:11px;font-family:var(--mono);color:var(--accent2)">${r.trigger} ${r.operator} ${r.value}${r.trigger==='Budget Used'?'%':r.trigger==='CTR'||r.trigger==='ROAS'?'×':''}</div>
+      <div>
+        <div style="font-size:11px;font-weight:600">${r.action}</div>
+        ${r.actParam?`<div style="font-size:10px;color:var(--muted);font-family:var(--mono)">${r.actParam}</div>`:''}
+      </div>
+      <div style="text-align:center;font-size:13px;font-weight:700;font-family:var(--mono);color:var(--yellow)">${r.fires}</div>
+      <div style="text-align:center">
+        <button class="acc-toggle${r.enabled?' on':''}" onclick="autoToggle('${r.id}')"></button>
+      </div>
+      <div style="display:flex;gap:6px;justify-content:flex-end">
+        <button class="btn btn-ghost btn-xs" onclick="toast('Edit Rule','Rule editor coming soon.','info')">Edit</button>
+        <button class="btn btn-ghost btn-xs" style="color:var(--red)" onclick="autoDelete('${r.id}')">✕</button>
+      </div>
     </div>`).join('')}
   </div>
-  <div class="card">
-    <div class="card-hdr"><div class="card-title">Trackers & Analytics</div></div>
-    ${[['Voluum',intg.trackerName==='Voluum'],['RedTrack',false],['Binom',intg.trackerName==='Binom'],['Google Analytics',false],['Hyros',false]].map(([n,st])=>`
-    <div class="flex items-center justify-between" style="padding:12px 16px;border-bottom:1px solid var(--border)">
-      <div><div style="font-weight:600;font-size:13px">${n}</div>${st&&intg.postbackUrl?`<div class="text-xs text-muted" style="font-family:var(--mono);margin-top:2px">${intg.postbackUrl.slice(0,40)}…</div>`:''}
+</div>`;
+}
+function _autoTemplates(){
+  return`<div class="g2">
+  ${AUTO_TEMPLATES.map(t=>`
+  <div class="card" style="position:relative">
+    <div style="display:flex;align-items:flex-start;gap:12px;margin-bottom:12px">
+      <div style="font-size:28px;line-height:1;flex-shrink:0">${t.icon}</div>
+      <div>
+        <div style="font-size:13px;font-weight:800;margin-bottom:4px">${t.name}</div>
+        <div style="font-size:11px;color:var(--muted);line-height:1.5">${t.desc}</div>
       </div>
-      ${st?'<span class="badge badge-green">Connected</span>':'<button class="btn btn-outline btn-xs">Connect</button>'}
+    </div>
+    <div style="background:var(--bg3);border-radius:8px;padding:10px 12px;margin-bottom:12px">
+      <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">Rule</div>
+      <div style="font-size:11px;font-family:var(--mono);color:var(--accent2)">${t.rule}</div>
+      <div style="font-size:10px;color:var(--muted);margin-top:6px">→ <span style="color:var(--green);font-weight:700">${t.action}</span></div>
+    </div>
+    <div style="display:flex;align-items:center;justify-content:space-between">
+      <span style="font-size:10px;font-weight:700;padding:3px 8px;border-radius:5px;background:rgba(79,110,247,.1);color:var(--accent2)">${t.tag}</span>
+      <button class="btn btn-primary btn-xs" onclick="autoApplyTemplate('${t.name}')">Apply Template →</button>
+    </div>
+  </div>`).join('')}
+</div>`;
+}
+function _autoBuilder(){
+  const triggers=['CPA','ROAS','CTR','CVR','Spend','Revenue','Profit','Budget Used','CPC','Impressions'];
+  const operators=['>','<','>=','<=','='];
+  const actions=['Pause Campaign','Resume Campaign','Increase Budget','Decrease Budget','Decrease CPC','Increase CPC','Send Alert','Apply Bid Rule','Tag Campaign'];
+  return`<div class="g2">
+  <div class="card">
+    <div class="card-hdr"><div class="card-title">🔧 Rule Builder</div><div class="card-desc">Define a custom automation rule</div></div>
+    <div class="card-body">
+      <div class="field"><label>Rule Name</label><div class="input-wrap"><input type="text" placeholder="e.g. CPA Guard v2" id="rb-name"></div></div>
+      <div class="field"><label>Campaign Scope</label>
+        <select id="rb-scope"><option>All Campaigns</option><option>Active Campaigns Only</option><option>Specific Campaign…</option></select>
+      </div>
+      <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);margin:14px 0 8px">Trigger Condition</div>
+      <div style="display:grid;grid-template-columns:1fr auto 1fr;gap:8px;align-items:end;margin-bottom:14px">
+        <div class="field" style="margin:0"><label>Metric</label><select id="rb-trigger">${triggers.map(t=>`<option>${t}</option>`).join('')}</select></div>
+        <div class="field" style="margin:0"><label>Is</label><select id="rb-op">${operators.map(o=>`<option>${o}</option>`).join('')}</select></div>
+        <div class="field" style="margin:0"><label>Value</label><div class="input-wrap"><input type="number" id="rb-val" placeholder="0" value="45"></div></div>
+      </div>
+      <div class="field">
+        <label>Duration (apply only if true for…)</label>
+        <select><option>Immediately</option><option>1 hour</option><option>2 hours</option><option>3 hours</option><option>6 hours</option></select>
+      </div>
+      <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);margin:14px 0 8px">Action</div>
+      <div class="field"><label>Action Type</label><select id="rb-action">${actions.map(a=>`<option>${a}</option>`).join('')}</select></div>
+      <div class="field"><label>Action Parameter (optional)</label><div class="input-wrap"><input type="text" id="rb-param" placeholder="+15% or slack-channel-name"></div></div>
+      <div class="field">
+        <label>Cooldown (don't re-trigger within…)</label>
+        <select><option>No cooldown</option><option>30 minutes</option><option>1 hour</option><option>4 hours</option><option>24 hours</option></select>
+      </div>
+      <div style="display:flex;gap:10px;margin-top:8px">
+        <button class="btn btn-primary btn-sm" onclick="(function(){
+          const name=$('rb-name')?.value?.trim()||'New Rule';
+          const trigger=$('rb-trigger')?.value||'CPA';
+          const op=$('rb-op')?.value||'>';
+          const val=parseFloat($('rb-val')?.value)||0;
+          const action=$('rb-action')?.value||'Pause Campaign';
+          const param=$('rb-param')?.value||'';
+          const tagMap={'Pause Campaign':'Protection','Resume Campaign':'Scheduling','Increase Budget':'Scaling','Decrease Budget':'Protection','Decrease CPC':'Bidding','Increase CPC':'Bidding','Send Alert':'Alerts','Apply Bid Rule':'Bidding','Tag Campaign':'Alerts'};
+          const colMap={'Protection':'var(--red)','Scaling':'var(--green)','Alerts':'var(--accent2)','Bidding':'var(--yellow)','Scheduling':'var(--muted)'};
+          const tag=tagMap[action]||'Custom';
+          AUTOMATION_RULES.push({id:'r'+Date.now(),name,enabled:true,trigger,operator:op,value:val,action,actParam:param,fires:0,lastFired:'Never',tag,tagCol:colMap[tag]||'var(--muted)'});
+          _autoTab='rules';renderAutomation($('page-automation'));
+          toast('✓ Rule Created',name+' is now active.','success',3000);
+        })()">✓ Create Rule</button>
+        <button class="btn btn-outline btn-sm" onclick="_autoTab='rules';renderAutomation($('page-automation'))">Cancel</button>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-hdr"><div class="card-title">Rule Preview</div><div class="card-desc">How your rule will behave</div></div>
+    <div class="card-body">
+      <div style="background:var(--bg3);border-radius:10px;padding:16px;margin-bottom:16px;font-size:12px;line-height:1.9">
+        <div style="color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Rule Logic</div>
+        <div><span style="color:var(--accent2);font-weight:700">IF</span> <span style="font-family:var(--mono);color:var(--text)">CPA &gt; 45</span></div>
+        <div><span style="color:var(--accent2);font-weight:700">AND</span> campaign is <span style="font-family:var(--mono)">active</span></div>
+        <div><span style="color:var(--green);font-weight:700">THEN</span> pause campaign</div>
+        <div><span style="color:var(--muted);font-weight:700">WITH</span> 1h cooldown</div>
+      </div>
+      <div style="font-size:11px;font-weight:700;color:var(--muted);margin-bottom:8px">Evaluation Frequency</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        ${['Every 5 min','Every 15 min','Every 1h','Every 6h','Daily'].map((f,i)=>`<div style="padding:5px 12px;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;${i===0?'background:var(--accent2);color:#fff':'background:var(--bg3);color:var(--muted);border:1px solid var(--border)'}">${f}</div>`).join('')}
+      </div>
+      <div style="margin-top:16px;padding:12px;border-radius:8px;background:rgba(15,186,129,.07);border:1px solid rgba(15,186,129,.2)">
+        <div style="font-size:11px;font-weight:700;color:var(--green);margin-bottom:6px">✦ AI Recommendation</div>
+        <div style="font-size:11px;color:var(--muted);line-height:1.6">Based on your campaign data, a CPA threshold of <strong style="color:var(--text)">$42–$48</strong> would have triggered 127 times this month, saving an estimated <strong style="color:var(--green)">$1,240</strong>.</div>
+      </div>
+    </div>
+  </div>
+</div>`;
+}
+function _autoLog(){
+  return`<div class="card">
+  <div class="card-hdr">
+    <div class="card-title">📋 Execution Log</div>
+    <div class="card-desc">${AUTO_LOG.length} events today</div>
+    <div style="display:flex;gap:6px;margin-left:auto">
+      ${['All','Success','Skipped'].map((f,i)=>`<button class="btn btn-${i===0?'outline':'ghost'} btn-xs">${f}</button>`).join('')}
+    </div>
+  </div>
+  <div style="overflow:hidden">
+    <div style="display:grid;grid-template-columns:80px 1fr 160px 120px 100px 70px;gap:0;padding:9px 16px;background:var(--bg3);font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;border-bottom:1px solid var(--border)">
+      <div>Time</div><div>Rule</div><div>Campaign</div><div>Action</div><div>Metric</div><div>Result</div>
+    </div>
+    ${AUTO_LOG.map(e=>`
+    <div style="display:grid;grid-template-columns:80px 1fr 160px 120px 100px 70px;gap:0;padding:11px 16px;border-bottom:1px solid var(--border);align-items:center">
+      <div style="font-size:10px;color:var(--muted);font-family:var(--mono)">${e.time}</div>
+      <div style="font-size:11px;font-weight:600">${e.rule}</div>
+      <div style="font-size:11px;color:var(--muted)">${e.camp}</div>
+      <div style="font-size:11px;font-family:var(--mono);color:var(--accent2)">${e.action}</div>
+      <div style="font-size:11px;font-family:var(--mono)">${e.metric}</div>
+      <div><span style="font-size:9px;font-weight:700;padding:2px 7px;border-radius:4px;background:${e.result==='success'?'rgba(15,186,129,.15)':e.result==='skip'?'rgba(92,92,133,.15)':'rgba(240,82,82,.15)'};color:${e.result==='success'?'var(--green)':e.result==='skip'?'var(--muted)':'var(--red)'}">${e.result==='success'?'✓ Done':e.result==='skip'?'— Skip':'✕ Fail'}</span></div>
     </div>`).join('')}
+  </div>
+</div>`;
+}
+function _autoSchedule(){
+  const days=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+  const hours=Array.from({length:24},(_,i)=>i);
+  return`<div class="card mb16">
+  <div class="card-hdr"><div class="card-title">🕐 Day-Parting Schedule</div><div class="card-desc">Set active hours for your campaigns</div></div>
+  <div class="card-body">
+    <div style="overflow-x:auto">
+      <div style="display:grid;grid-template-columns:40px repeat(24,1fr);gap:3px;min-width:600px">
+        <div></div>
+        ${hours.map(h=>`<div style="font-size:9px;text-align:center;color:var(--muted);font-family:var(--mono)">${h}</div>`).join('')}
+        ${days.map(d=>`
+          <div style="font-size:10px;font-weight:700;color:var(--muted);display:flex;align-items:center">${d}</div>
+          ${hours.map(h=>{const on=!(h<6)&&!(h>22)&&!(d==='Sun'&&h<10);return`<div style="height:20px;border-radius:3px;cursor:pointer;background:${on?'rgba(79,110,247,.4)':'var(--bg3)'};border:1px solid ${on?'rgba(79,110,247,.3)':'var(--border)'}" onclick="this.style.background=this.style.background.includes('79')?'var(--bg3)':'rgba(79,110,247,.4)'"></div>`}).join('')}
+        `).join('')}
+      </div>
+      <div style="display:flex;align-items:center;gap:12px;margin-top:12px;font-size:11px">
+        <div style="display:flex;align-items:center;gap:6px"><div style="width:16px;height:16px;border-radius:3px;background:rgba(79,110,247,.4)"></div> Active</div>
+        <div style="display:flex;align-items:center;gap:6px"><div style="width:16px;height:16px;border-radius:3px;background:var(--bg3);border:1px solid var(--border)"></div> Paused</div>
+      </div>
+    </div>
+    <button class="btn btn-primary btn-sm mt16">Save Schedule</button>
   </div>
 </div>
 <div class="card">
-  <div class="card-hdr"><div class="card-title">Postback & Webhook Configuration</div></div>
+  <div class="card-hdr"><div class="card-title">Timezone Settings</div></div>
   <div class="card-body">
-    <div class="field"><label>S2S Postback URL</label><div class="input-wrap"><input type="text" value="${intg.postbackUrl||''}" placeholder="https://track.example.com/postback?cid={clickid}"></div></div>
-    <div class="field"><label>Webhook URL (outbound events)</label><div class="input-wrap"><input type="text" value="${intg.webhookUrl||''}" placeholder="https://your-endpoint.com/webhook"></div></div>
-    <button class="btn btn-primary btn-sm">Save Configuration</button>
+    <div class="g2">
+      <div class="field"><label>Campaign Timezone</label><select><option>UTC-5 (Eastern)</option><option>UTC-8 (Pacific)</option><option>UTC+0 (London)</option><option>UTC+1 (CET)</option></select></div>
+      <div class="field"><label>Apply To</label><select><option>All Campaigns</option><option>Active Campaign Only</option></select></div>
+    </div>
+    <button class="btn btn-primary btn-sm">Save</button>
   </div>
 </div>`;
 }
@@ -2944,9 +3483,9 @@ function stProfile(c){return`
     </div>
     <div class="flex items-center justify-between" style="padding:10px 0;border-bottom:1px solid var(--border);margin-bottom:14px">
       <div><div style="font-size:13px;font-weight:500">AutoPilot Mode</div><div class="text-xs text-muted">AI auto-applies bid suggestions without confirmation</div></div>
-      <label class="switch"><input type="checkbox" ${c.optimization.autoPilot?'checked':''}><span class="sw-sl"></span></label>
+      <label class="switch"><input type="checkbox" ${c.optimization.autoPilot?'checked':''} onchange="CS.active.optimization.autoPilot=this.checked;persistSave();toast('AutoPilot',CS.active.optimization.autoPilot?'Enabled — AI will auto-apply bid suggestions for '+CS.active.name+'.':'Disabled — suggestions now require manual approval.',CS.active.optimization.autoPilot?'success':'info')"><span class="sw-sl"></span></label>
     </div>
-    <button class="btn btn-primary btn-sm">Save Defaults</button>
+    <button class="btn btn-primary btn-sm" onclick="toast('Saved','Campaign defaults updated.','success')">Save Defaults</button>
   </div>
 </div>
 <button class="btn btn-primary btn-sm">Save Profile</button>`}
@@ -4308,7 +4847,7 @@ window.fetch=function(url,...args){
 // ═══════════════════════════════════════════════════
 // CAMPAIGN FILTER / SEARCH
 // ═══════════════════════════════════════════════════
-let _campFilter='',_campStatusFilter='all';
+let _campFilter='',_campStatusFilter='all',_campPage=1;const CAMP_PAGE_SIZE=8;
 
 // ═══════════════════════════════════════════════════
 // EXPORT UTILITIES
@@ -4346,7 +4885,7 @@ function renderGeo(el,c){
   const totSpend=geos.reduce((s,g)=>s+g.spend,0);
   el.innerHTML=`
 <div class="page-hdr">
-  <div><div class="page-title">GEO Analysis</div><div class="page-sub">Country-level performance — <strong style="color:var(--text)">${c.name}</strong></div></div>
+  <div><div class="page-title">GEO Analysis${tip('GEO Analysis','Breaks down spend, ROAS, and conversion rate by country to find your strongest markets.','Use to reallocate budget toward winning geos.')}</div><div class="page-sub">Country-level performance — <strong style="color:var(--text)">${c.name}</strong></div></div>
   <button class="btn btn-outline btn-sm" onclick="exportCSV()">⬇ Export CSV</button>
 </div>
 <div class="g4 mb16">
@@ -4398,19 +4937,25 @@ function renderGeo(el,c){
 // CREATIVE STUDIO PAGE
 // ═══════════════════════════════════════════════════
 function renderCreative(el,c){
-  const creatives=[
-    {id:'cr1',name:'VSL — Weight Loss Story',type:'Video',thumb:'🎬',bg:'rgba(79,110,247,.1)',score:92,ctr:3.8,cvr:5.2,spend:1840,roas:2.8,status:'winning',hook:'Real woman loses 47lbs...'},
-    {id:'cr2',name:'Before/After Carousel',type:'Image',thumb:'🖼',bg:'rgba(15,186,129,.1)',score:84,ctr:2.9,cvr:4.1,spend:920,roas:2.3,status:'active',hook:'Doctors hate this one trick...'},
-    {id:'cr3',name:'Testimonial Reel',type:'Video',thumb:'📹',bg:'rgba(139,92,246,.1)',score:78,ctr:2.4,cvr:3.8,spend:640,roas:2.0,status:'active',hook:'I lost 30lbs in 60 days...'},
-    {id:'cr4',name:'Static Benefit Ad',type:'Image',thumb:'🎨',bg:'rgba(245,166,35,.1)',score:55,ctr:1.2,cvr:2.1,spend:310,roas:1.3,status:'monitor',hook:'Burn fat while you sleep'},
-    {id:'cr5',name:'UGC Unboxing',type:'Video',thumb:'📦',bg:'rgba(233,30,99,.1)',score:41,ctr:0.9,cvr:1.4,spend:180,roas:0.8,status:'paused',hook:'Trying that supplement everyone…'},
-    {id:'cr6',name:'News-style Native',type:'Display',thumb:'📰',bg:'rgba(0,188,212,.1)',score:67,ctr:1.8,cvr:2.9,spend:420,roas:1.7,status:'active',hook:'Nutritionists share their secret...'},
+  const rnd=seedRand(c.id+'creative'),vert=c.offer.type.split(' /')[0],src=c.traffic.source;
+  const base=[
+    {id:'cr1',name:`VSL — ${vert} Story`,type:'Video',thumb:'🎬',bg:'rgba(79,110,247,.1)',hook:`Real customer wins big with ${c.offer.name}...`},
+    {id:'cr2',name:'Before/After Carousel',type:'Image',thumb:'🖼',bg:'rgba(15,186,129,.1)',hook:'Doctors hate this one trick...'},
+    {id:'cr3',name:'Testimonial Reel',type:'Video',thumb:'📹',bg:'rgba(139,92,246,.1)',hook:`I tried ${c.offer.name} for 30 days...`},
+    {id:'cr4',name:'Static Benefit Ad',type:'Image',thumb:'🎨',bg:'rgba(245,166,35,.1)',hook:`${vert} results, no gimmicks`},
+    {id:'cr5',name:'UGC Unboxing',type:'Video',thumb:'📦',bg:'rgba(233,30,99,.1)',hook:'Trying that product everyone…'},
+    {id:'cr6',name:`News-style Native (${src})`,type:'Display',thumb:'📰',bg:'rgba(0,188,212,.1)',hook:`Experts share their ${vert.toLowerCase()} secret...`},
   ];
+  const creatives=base.map((b,i)=>{
+    const score=Math.round(35+rnd()*60),ctr=+(0.8+rnd()*3.2).toFixed(1),cvr=+(1+rnd()*4.5).toFixed(1),spend=Math.round(150+rnd()*1900),roas=+(0.7+rnd()*2.5).toFixed(1);
+    const status=score>=85?'winning':score>=60?'active':score>=45?'monitor':'paused';
+    return {...b,score,ctr,cvr,spend,roas,status};
+  });
   const statusColor={winning:'var(--green)',active:'var(--accent2)',monitor:'var(--yellow)',paused:'var(--muted)'};
   const scoreColor=s=>s>=80?'var(--green)':s>=60?'var(--yellow)':'var(--red)';
   el.innerHTML=`
 <div class="page-hdr">
-  <div><div class="page-title">Creative Studio</div><div class="page-sub">Ad creative performance scoring — <strong style="color:var(--text)">${c.name}</strong></div></div>
+  <div><div class="page-title">Creative Studio${tip('Creative Studio','Scores ad creatives by engagement and conversion impact, and suggests fresh angles.','Use when creative fatigue is dragging down CTR or CVR.')}</div><div class="page-sub">Ad creative performance scoring — <strong style="color:var(--text)">${c.name}</strong></div></div>
   <div class="flex gap8">
     <button class="btn btn-outline btn-sm" onclick="toast('Upload','Creative upload coming with full backend integration.','info')">⬆ Upload Creative</button>
     <button class="btn btn-primary btn-sm" onclick="toast('AI Generator','AI creative generation — coming in v2.','info')">✦ AI Generate</button>
@@ -4444,10 +4989,12 @@ function renderCreative(el,c){
   </div>`).join('')}
 </div>
 <div class="card mt16">
-  <div class="card-hdr"><div class="card-title">✦ AI Creative Recommendations</div></div>
+  <div class="card-hdr"><div class="card-title">✦ AI Creative Recommendations</div><span class="badge badge-blue" style="font-size:9px">Bound to ${c.name}</span></div>
   <div class="card-body">
-    ${[['🏆','Winning creative "VSL — Weight Loss Story" drives 2.8× ROAS — increase budget allocation to 40% of total.'],['⚡','Pause "UGC Unboxing" — 0.8× ROAS for 7 days, burning $180 with no recoverable signal.'],['🎯','Test a new hook for "Static Benefit Ad" — CTR 1.2% is below platform average of 1.8%.'],['✦','Create a video version of "Before/After Carousel" — image-to-video uplift averages +34% CVR in Nutra vertical.']].map(([icon,rec])=>`
-    <div class="alert alert-blue mb12"><div class="flex gap8"><span style="font-size:16px">${icon}</span><div class="alert-text">${rec}</div></div></div>`).join('')}
+    <div class="alert-text mb12" style="color:var(--dim)">Generated from ${c.name}'s offer (${c.offer.name}), traffic source (${src}), and live creative performance — no manual campaign selection needed.</div>
+    ${(()=>{const top=creatives.reduce((a,b)=>b.score>a.score?b:a),worst=creatives.reduce((a,b)=>b.score<a.score?b:a),low=creatives.find(cr=>cr.ctr<2)||creatives[0];
+      return [['🏆',`Winning creative "${top.name}" drives ${top.roas}× ROAS — increase budget allocation to 40% of total.`],['⚡',`Pause "${worst.name}" — ${worst.roas}× ROAS, burning $${worst.spend} with no recoverable signal.`],['🎯',`Test a new hook for "${low.name}" — CTR ${low.ctr}% is below platform average.`],['✦',`Create a video version of your top image creative — image-to-video uplift averages +34% CVR in the ${vert} vertical.`]].map(([icon,rec])=>`
+    <div class="alert alert-blue mb12"><div class="flex gap8"><span style="font-size:16px">${icon}</span><div class="alert-text">${rec}</div></div></div>`).join('');})()}
   </div>
 </div>`;
 }
@@ -4456,23 +5003,30 @@ function renderCreative(el,c){
 // AUDIENCE BUILDER PAGE
 // ═══════════════════════════════════════════════════
 function renderAudience(el,c){
-  const audiences=[
-    {name:'Keto Buyers — High Intent',size:'2.8M',platform:'Meta',score:94,tags:['Weight Loss','Keto','Supplements','Health Conscious'],roas:'2.6×',cpa:'$7.80',status:'active'},
-    {name:'35-54 Female Health Seekers',size:'4.1M',platform:'Meta',score:88,tags:['Women 35-54','Health','Diet','Fitness'],roas:'2.4×',cpa:'$8.20',status:'active'},
-    {name:'Google Search — "keto supplement"',size:'18K/mo',platform:'Google',score:91,tags:['High Intent','Search','Commercial'],roas:'2.9×',cpa:'$6.90',status:'active'},
-    {name:'LTV Lookalike — Top 1%',size:'1.2M',platform:'Meta',score:82,tags:['Lookalike','LTV','Buyers'],roas:'2.2×',cpa:'$9.10',status:'suggested'},
-    {name:'Retargeting — Visitors 7d',size:'48K',platform:'Meta',score:79,tags:['Retarget','Warm','VSL Viewers'],roas:'3.1×',cpa:'$5.40',status:'suggested'},
-    {name:'TikTok — Gen Z Weight Loss',size:'6.7M',platform:'TikTok',score:61,tags:['Gen Z','18-28','Trending'],roas:'1.4×',cpa:'$14.20',status:'test'},
+  const rnd=seedRand(c.id+'audience'),vert=c.offer.type.split(' /')[0],src=c.traffic.source,plat=c.traffic.adNetwork||src;
+  const baseAud=[
+    {name:`${vert} Buyers — High Intent`,platform:plat,tags:[vert,'High Intent','Buyers','Health Conscious']},
+    {name:'35-54 Demographic Seekers',platform:plat,tags:['Demo 35-54',vert,'Engaged']},
+    {name:`Search — "${vert.toLowerCase()} ${c.offer.name.split(' ')[0].toLowerCase()}"`,platform:'Google',tags:['High Intent','Search','Commercial']},
+    {name:'LTV Lookalike — Top 1%',platform:plat,tags:['Lookalike','LTV','Buyers']},
+    {name:'Retargeting — Visitors 7d',platform:plat,tags:['Retarget','Warm',vert]},
+    {name:`${plat} — Gen Z ${vert}`,platform:plat,tags:['Gen Z','18-28','Trending']},
   ];
+  const audiences=baseAud.map(a=>{
+    const score=Math.round(40+rnd()*55),roas=(1+rnd()*2.2).toFixed(1)+'×',cpa='$'+(5+rnd()*10).toFixed(2),sizeN=Math.round(20+rnd()*600);
+    const status=score>=85?'active':score>=70?'suggested':'test';
+    return {...a,score,roas,cpa,status,size:sizeN>=1000?(sizeN/1000).toFixed(1)+'M':sizeN+'K'};
+  });
   const platColor={Meta:'rgba(24,119,242,.15)',Google:'rgba(66,133,244,.15)',TikTok:'rgba(254,44,85,.12)'};
   const statusColor={active:'badge-green',suggested:'badge-blue',test:'badge-yellow'};
   el.innerHTML=`
 <div class="page-hdr">
-  <div><div class="page-title">Audience Builder</div><div class="page-sub">AI-generated audience segments — <strong style="color:var(--text)">${c.name}</strong></div></div>
+  <div><div class="page-title">Audience Builder${tip('Audience Builder','Generates AI-recommended audience segments based on your best-converting traffic.','Use to expand reach without losing targeting quality.')}</div><div class="page-sub">AI-generated audience segments — <strong style="color:var(--text)">${c.name}</strong></div></div>
   <button class="btn btn-primary btn-sm" onclick="toast('AI Audiences','AI is generating new segments based on your converters…','info',5000)">✦ Generate New Segments</button>
 </div>
+<div class="alert-text mb12" style="color:var(--dim)">Generated from ${c.name}'s offer (${c.offer.name}), objective, and traffic source (${src}) — no manual campaign selection needed.</div>
 <div class="g4 mb16">
-  ${[['Active Audiences',audiences.filter(a=>a.status==='active').length,'var(--green)'],['AI Suggested',audiences.filter(a=>a.status==='suggested').length,'var(--accent2)'],['Best Segment','Retarget 7d','3.1× ROAS'],['Total Reach','~15M','combined reach']].map(([l,v,s])=>`
+  ${[['Active Audiences',audiences.filter(a=>a.status==='active').length,'var(--green)'],['AI Suggested',audiences.filter(a=>a.status==='suggested').length,'var(--accent2)'],['Best Segment',audiences.reduce((a,b)=>parseFloat(b.roas)>parseFloat(a.roas)?b:a).name.slice(0,16),audiences.reduce((a,b)=>parseFloat(b.roas)>parseFloat(a.roas)?b:a).roas+' ROAS'],['Total Reach','~15M','combined reach']].map(([l,v,s])=>`
   <div class="card kpi"><div class="kpi-label">${l}</div><div class="kpi-val" style="font-size:16px">${v}</div><div class="kpi-change neu">${s}</div></div>`).join('')}
 </div>
 <div class="g2 mb16">
@@ -4675,18 +5229,32 @@ document.addEventListener('click',e=>{if(!$('dr-wrap')?.contains(e.target))$('dr
 setInterval(()=>{const cl=$('tb-clock');if(cl)cl.textContent=new Date().toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'})},1000);
 
 // ═══════════════════════════════════════════════════
-// LIVE METRIC SIMULATION (every 28s)
+// LIVE METRIC SIMULATION — 4s ticks, smoother than the old 28s jumps
 // ═══════════════════════════════════════════════════
 setInterval(()=>{
   CS.camps.filter(c=>c.status==='active').forEach(c=>{
-    const j=v=>v!=null?Math.round(v*(1+(Math.random()-.5)*.015)*100)/100:v;
-    c.metrics.today.cpc=j(c.metrics.today.cpc);
-    c.metrics.today.spend+=Math.round(Math.random()*14);
-    c.metrics.today.revenue=Math.round((c.metrics.today.spend||0)*(c.metrics.today.roas||2));
-    c.metrics.today.profit=Math.round((c.metrics.today.revenue||0)-(c.metrics.today.spend||0));
+    const m=c.metrics.today;
+    const j=(v,pct)=>v!=null?Math.round(v*(1+(Math.random()-.5)*pct)*100)/100:v;
+    m.cpc=j(m.cpc,.006);
+    m.cvr=j(m.cvr,.01);
+    m.spend=+((m.spend||0)+Math.random()*2.2).toFixed(2);
+    m.revenue=+((m.spend||0)*(m.roas||2)).toFixed(2);
+    m.profit=Math.round((m.revenue||0)-(m.spend||0));
+    m.roas=m.spend>0?+(m.revenue/m.spend).toFixed(2):m.roas;
+    m.cpa=m.cvr>0&&m.cpc!=null?+(m.cpc/(m.cvr/100)).toFixed(2):m.cpa;
   });
   syncCtxBar();
-},28000);
+  const typing=document.activeElement&&['INPUT','TEXTAREA','SELECT'].includes(document.activeElement.tagName);
+  if(!typing&&['dashboard','hub'].includes(_page))renderPage(_page);
+},4000);
+
+// AutoPilot — auto-applies pending AI bid suggestions for campaigns with AutoPilot Mode enabled
+setInterval(()=>{
+  CS.camps.filter(c=>c.optimization.autoPilot).forEach(c=>{
+    const s=c.ai.bidSuggestions.find(x=>x.status==='pending');
+    if(s)autoApplyBid(c.id,s.id);
+  });
+},9000);
 
 // ═══════════════════════════════════════════════════
 // BOOT
@@ -4714,6 +5282,66 @@ setTimeout(()=>{
     toast('Activate AI Features 🔑','Add your Anthropic API key to use AI Copilot & Offer Analyzer.','info',8000);
   }
 },3500);
+</script>
+
+<!-- Floating AI Assistant -->
+<div id="ai-fab">
+  <div id="ai-quick-panel">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+      <div style="font-size:13px;font-weight:700;color:var(--text)">✦ AI Assistant</div>
+      <button onclick="toggleAIFab()" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:16px;line-height:1;padding:0">×</button>
+    </div>
+    <div style="font-size:11px;color:var(--muted);margin-bottom:10px">Quick actions for the current view</div>
+    <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px">
+      <button class="aiq-chip" onclick="aiqAction('analyze')">📊 Analyze performance</button>
+      <button class="aiq-chip" onclick="aiqAction('suggest')">💡 Suggest optimizations</button>
+      <button class="aiq-chip" onclick="aiqAction('anomaly')">⚠️ Check anomalies</button>
+      <button class="aiq-chip" onclick="aiqAction('forecast')">📈 Quick forecast</button>
+      <button class="aiq-chip" onclick="aiqAction('scale')">🚀 Scale opportunities</button>
+      <button class="aiq-chip" onclick="aiqAction('creative')">🎨 Creative ideas</button>
+    </div>
+    <div style="position:relative">
+      <input id="aiq-input" type="text" placeholder="Ask anything about your campaigns…" style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:8px 36px 8px 10px;font-size:12px;color:var(--text);outline:none;box-sizing:border-box" onkeydown="if(event.key==='Enter')aiqSend()">
+      <button onclick="aiqSend()" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--accent);cursor:pointer;font-size:14px;padding:0;line-height:1">→</button>
+    </div>
+    <div id="aiq-response" style="margin-top:10px;font-size:12px;color:var(--text);line-height:1.6;display:none;max-height:180px;overflow-y:auto;background:var(--bg3);border-radius:8px;padding:10px"></div>
+    <div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center">
+      <span style="font-size:10px;color:var(--muted)">Powered by Claude</span>
+      <button class="btn btn-ghost btn-sm" onclick="toggleAIFab();nav('copilot',document.querySelector('.nav-item[onclick*=copilot]'))">Full Copilot →</button>
+    </div>
+  </div>
+  <button id="ai-fab-btn" onclick="toggleAIFab()" title="AI Assistant">✦</button>
+</div>
+
+<script>
+function toggleAIFab(){
+  const p=$('ai-quick-panel');
+  p.classList.toggle('open');
+}
+function aiqAction(type){
+  const c=CS.active;
+  const prompts={
+    analyze:`Analyze campaign "${c.name}" performance. ROAS: ${c.metrics.today.roas}×, CPA: $${c.metrics.today.cpa}, Health: ${c.ai.healthScore}. Give 3 key insights.`,
+    suggest:`Campaign "${c.name}" has ROAS ${c.metrics.today.roas}×, target ${c.optimization.targetRoas}×. CPA $${c.metrics.today.cpa}, target $${c.optimization.targetCPA}. Suggest 3 specific bid/budget optimizations.`,
+    anomaly:`Campaign "${c.name}" health score: ${c.ai.healthScore}. Anomalies: ${c.ai.anomalies.map(a=>a.type).join(', ')||'none'}. Explain what could cause these issues.`,
+    forecast:`Forecast next 7-day performance for "${c.name}". Current daily spend $${c.metrics.today.spend}, ROAS ${c.metrics.today.roas}×. Estimate revenue range.`,
+    scale:`Campaign "${c.name}" is spending $${c.metrics.today.spend}/day at ROAS ${c.metrics.today.roas}×. Is this a good candidate to scale? What would you recommend?`,
+    creative:`Campaign "${c.name}" on ${c.traffic.source}. Suggest 3 creative angles to test to improve CVR ${c.metrics.today.cvr}%.`
+  };
+  $('aiq-input').value=prompts[type]||'';
+  aiqSend();
+}
+async function aiqSend(){
+  const inp=$('aiq-input'),resp=$('aiq-response');
+  const q=inp.value.trim();if(!q)return;
+  if(!_anthropicKey){resp.style.display='block';resp.innerHTML='<span style="color:var(--red)">Add your Anthropic API key in Settings to use the AI assistant.</span>';return;}
+  resp.style.display='block';resp.innerHTML='<span style="color:var(--muted)">Thinking…</span>';
+  try{
+    const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'x-api-key':_anthropicKey,'anthropic-version':'2023-06-01','content-type':'application/json','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:'claude-haiku-4-5-20251001',max_tokens:400,system:'You are GoGo Bid AI, a media buying optimization assistant. Be concise and actionable.',messages:[{role:'user',content:q}]})});
+    const d=await r.json();
+    resp.innerHTML=d.content?.[0]?.text?.replace(/\n/g,'<br>')||'No response';
+  }catch(e){resp.innerHTML='<span style="color:var(--red)">Error: '+e.message+'</span>';}
+}
 </script>
 </body>
 </html>

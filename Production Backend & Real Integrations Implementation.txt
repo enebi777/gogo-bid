@@ -1,0 +1,664 @@
+# GoGo Bid — Production Backend & Real Integrations Implementation
+
+## Objective
+
+Implement the complete production backend for GoGo Bid.
+
+This is **NOT** a demo, prototype, mock API, fake data, or frontend-only implementation.
+
+Every integration must use the official APIs, OAuth flows, webhooks, postbacks, and production authentication.
+
+The application must be production-ready, secure, scalable, and modular.
+
+---
+
+# Architecture Requirements
+
+Build a modern cloud architecture consisting of:
+
+* Frontend (existing UI)
+* Backend API
+* Database
+* Authentication Server
+* Queue Workers
+* Webhook Receiver
+* Scheduler/Cron Jobs
+* OAuth Service
+* AI Services
+* Analytics Engine
+
+Recommended stack:
+
+* Node.js + TypeScript
+* Fastify or NestJS
+* PostgreSQL
+* Redis
+* BullMQ
+* Prisma ORM
+* Docker
+* Cloudflare or Nginx
+* JWT Authentication
+* AES encrypted credentials
+* Background workers
+
+The backend must expose a REST API (and GraphQL if appropriate).
+
+---
+
+# OAuth & API Integrations
+
+Implement full OAuth authorization, token storage, refresh handling, reconnection, and account management.
+
+## Traffic Sources
+
+Support multiple connected accounts.
+
+### Meta Ads
+
+Implement:
+
+* Facebook Login OAuth
+* Business Manager selection
+* Ad Account selection
+* Campaign sync
+* Adset sync
+* Ads sync
+* Creatives
+* Insights API
+* Daily sync
+* Real-time refresh
+* Token refresh
+
+---
+
+### Google Ads
+
+Implement:
+
+* Google OAuth
+* MCC support
+* Customer selection
+* Campaigns
+* Ad Groups
+* Keywords
+* Search Terms
+* Metrics
+* Conversion data
+* Budget information
+
+---
+
+### TikTok Ads
+
+Implement:
+
+* OAuth
+* Advertiser selection
+* Campaign sync
+* Ad Groups
+* Ads
+* Creative data
+* Metrics
+* Conversion reporting
+
+---
+
+### Native Ads
+
+Create adapter architecture supporting:
+
+* Taboola
+* Outbrain
+* MGID
+
+---
+
+### Push Ads
+
+Create adapter architecture supporting:
+
+* PropellerAds
+* RichPush
+* Push.House
+* Zeropark
+
+---
+
+# Affiliate Networks
+
+Implement production API integrations.
+
+Support:
+
+* ClickBank
+* BuyGoods
+* Digistore24
+* MaxWeb
+* GuruMedia
+* TerraLeads
+* LeadRock
+* CPA House
+
+Each connector should support:
+
+* Authentication
+* Offers
+* Products
+* Transactions
+* Conversions
+* Refunds
+* Chargebacks
+* Earnings
+* Daily sync
+* Historical import
+
+---
+
+# Checkout Platforms
+
+Implement APIs for:
+
+* CartPanda
+* Hubla
+* Kiwify
+* Monetizze
+* Braip
+* Perfect Pay
+
+Import:
+
+* Orders
+* Payments
+* Upsells
+* Downsells
+* Refunds
+* Customers
+* Products
+* Revenue
+
+Implement webhook listeners whenever supported.
+
+---
+
+# Trackers
+
+Implement production integrations with:
+
+* Voluum
+* RedTrack
+* Binom
+* Bemob
+* Keitaro
+* Hyros
+
+Support:
+
+* Click data
+* Visits
+* Campaign IDs
+* Conversion IDs
+* Cost
+* Revenue
+* ROI
+* Postbacks
+* Webhooks
+
+Create a universal Postback Receiver.
+
+Example:
+
+/postback/{tracker}
+
+/postback/voluum
+
+/postback/redtrack
+
+/postback/binom
+
+etc.
+
+Support:
+
+GET
+
+POST
+
+JSON
+
+Query Parameters
+
+Signed requests
+
+Deduplication
+
+Retry handling
+
+---
+
+# Analytics
+
+Integrate:
+
+## Google Analytics 4
+
+Support:
+
+Measurement Protocol
+
+Realtime
+
+Conversions
+
+Events
+
+Users
+
+Traffic Sources
+
+Audience Data
+
+---
+
+## Mixpanel
+
+Support:
+
+Events
+
+Funnels
+
+Retention
+
+User Profiles
+
+Cohorts
+
+---
+
+## Amplitude
+
+Support:
+
+Events
+
+Behavior
+
+Retention
+
+Funnels
+
+Session Analytics
+
+---
+
+# Destinations
+
+Implement export connectors.
+
+## Google Sheets
+
+Automatic exports
+
+Live updates
+
+Scheduled sync
+
+Append mode
+
+Replace mode
+
+---
+
+## Looker Studio
+
+Create connector-ready datasets.
+
+---
+
+## Power BI
+
+Generate production-ready datasets.
+
+---
+
+# AI Engine
+
+Implement all AI modules as real backend services.
+
+## CPC Intelligence
+
+Predict CPC changes.
+
+Recommend bid adjustments.
+
+Estimate traffic changes.
+
+---
+
+## CPA Intelligence
+
+Predict CPA.
+
+Recommend optimization.
+
+Detect expensive traffic.
+
+---
+
+## Offer Analyzer
+
+Analyze:
+
+Conversion Rate
+
+EPC
+
+Average Order Value
+
+Refund Rate
+
+Profitability
+
+Scaling potential
+
+---
+
+## AI Copilot
+
+Connect to application context.
+
+Understand:
+
+Campaign
+
+Offers
+
+Traffic Source
+
+Tracker
+
+Checkout
+
+Affiliate Network
+
+Analytics
+
+Provide actionable recommendations.
+
+---
+
+## AI Simulator
+
+Simulate:
+
+Budget changes
+
+Bid changes
+
+CPA impact
+
+Revenue impact
+
+Scaling scenarios
+
+---
+
+## AI Forecasting
+
+Forecast:
+
+Clicks
+
+Conversions
+
+Revenue
+
+Profit
+
+ROAS
+
+CPA
+
+Daily
+
+Weekly
+
+Monthly
+
+---
+
+## Scaling Engine
+
+Automatically identify:
+
+Winning campaigns
+
+Scaling opportunities
+
+Budget recommendations
+
+Bid recommendations
+
+Traffic expansion
+
+Offer expansion
+
+---
+
+## Anomaly Detection
+
+Detect:
+
+Traffic drops
+
+CPA spikes
+
+Conversion drops
+
+Tracking failures
+
+API failures
+
+Revenue anomalies
+
+Send alerts immediately.
+
+---
+
+# Universal Campaign Context
+
+The selected Campaign is the application's primary context.
+
+Changing the campaign must automatically refresh every module.
+
+Modules include:
+
+* Dashboard
+* Intelligence
+* AI Tools
+* Analytics
+* Automation
+* Reports
+* Integrations
+* Forecasting
+* Copilot
+* Creative Studio
+* Audience Builder
+
+No additional campaign selection should ever be required.
+
+All APIs, queries, reports, dashboards, AI models, exports, and widgets must automatically use the active campaign context.
+
+---
+
+# Background Jobs
+
+Implement workers for:
+
+Data synchronization
+
+Token refresh
+
+Daily imports
+
+Historical imports
+
+AI processing
+
+Forecast calculations
+
+Anomaly detection
+
+Webhook retries
+
+Scheduled exports
+
+---
+
+# Security
+
+Implement production-grade security.
+
+* OAuth 2.0
+* PKCE where supported
+* JWT Authentication
+* Refresh Tokens
+* Encrypted API credentials (AES-256)
+* HTTPS only
+* CSRF protection
+* Rate limiting
+* Audit logs
+* Role-based permissions (RBAC)
+* Secrets stored in environment variables or a secrets manager
+* Secure webhook signature validation
+
+Never expose client secrets or access tokens to the frontend.
+
+---
+
+# Database
+
+Design normalized tables for:
+
+Users
+
+Organizations
+
+Accounts
+
+Campaigns
+
+Ad Sets
+
+Ads
+
+Offers
+
+Orders
+
+Conversions
+
+Trackers
+
+Clicks
+
+Costs
+
+Revenue
+
+Transactions
+
+Events
+
+AI Predictions
+
+Forecasts
+
+Alerts
+
+API Tokens
+
+Webhooks
+
+Audit Logs
+
+---
+
+# API Standards
+
+Every integration should expose standardized endpoints.
+
+Examples:
+
+GET /campaigns
+
+GET /campaigns/:id
+
+GET /campaigns/:id/performance
+
+GET /offers
+
+GET /trackers
+
+GET /analytics
+
+POST /oauth/connect
+
+POST /webhooks/meta
+
+POST /webhooks/tiktok
+
+POST /postback/voluum
+
+POST /postback/redtrack
+
+POST /postback/binom
+
+POST /exports/google-sheets
+
+POST /ai/forecast
+
+POST /ai/copilot
+
+---
+
+# Monitoring
+
+Implement:
+
+Health checks
+
+Logging
+
+Metrics
+
+Performance monitoring
+
+Retry queues
+
+Dead-letter queues
+
+API error reporting
+
+Webhook monitoring
+
+Token expiration alerts
+
+Background job monitoring
+
+---
+
+# Success Criteria
+
+The implementation is considered complete only when:
+
+* All listed integrations use official production APIs.
+* OAuth authentication is fully functional.
+* Tokens are securely stored and refreshed automatically.
+* Webhooks and postbacks are received, validated, processed, and retried if necessary.
+* Campaign context is synchronized across the entire application.
+* AI modules consume real production data.
+* Reports and dashboards update automatically.
+* Scheduled synchronization and exports operate without manual intervention.
+* The backend is production-ready, scalable, secure, and maintainable.
+* No mock APIs, placeholder data, fake responses, or simulated integrations remain in the codebase.

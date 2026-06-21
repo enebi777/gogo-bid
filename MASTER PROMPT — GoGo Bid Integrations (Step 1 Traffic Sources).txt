@@ -1,0 +1,794 @@
+Below is an optimized **master implementation prompt** you can paste directly into **Google AI Studio** or **Claude**. It is written as a senior product architect specification, focusing on enterprise UX, scalable architecture, and production-ready implementation.
+
+---
+
+# MASTER PROMPT — GoGo Bid Integrations (Step 1: Traffic Sources)
+
+## Role
+
+You are a Senior Product Designer, Senior SaaS Architect, UX Lead, and Senior Full-Stack Engineer.
+
+Design and implement the **GoGo Bid Integrations System** as a world-class enterprise integration platform inspired by the best concepts from Windsor.ai, HubSpot, Stripe, Linear, Notion, Vercel, and modern SaaS onboarding experiences.
+
+This is **NOT** a simple settings page.
+
+This is the central data connectivity platform for GoGo Bid.
+
+The UX must feel:
+
+* enterprise
+* modern
+* premium
+* intuitive
+* scalable
+* AI-first
+* affiliate marketing focused
+
+The architecture must support hundreds of integrations in the future without redesign.
+
+---
+
+# Product Vision
+
+GoGo Bid becomes the operating system for affiliate marketers.
+
+Users should be able to connect every marketing platform, tracking platform, affiliate network, and AI service from one unified place.
+
+Core philosophy:
+
+```
+Real Integrations
+        ↓
+Unified Data Layer
+        ↓
+AI Intelligence
+        ↓
+Automation
+```
+
+Everything in the platform depends on connected data.
+
+---
+
+# SETTINGS
+
+Implement:
+
+```
+Settings
+    └── Integrations
+```
+
+The Integrations page becomes the central integration hub.
+
+---
+
+# STEP 1 — TRAFFIC SOURCES
+
+When users first open Integrations, display a beautiful onboarding wizard.
+
+Header:
+
+```
+Traffic Sources
+```
+
+Subtitle:
+
+```
+Select the advertising platforms where you buy traffic.
+
+Connect your ad accounts to automatically import campaigns, spend, clicks, conversions and performance data.
+```
+
+Display large integration cards.
+
+Required cards:
+
+```
+Meta Ads
+
+Google Ads
+
+TikTok Ads
+
+Native Ads
+
+Push Ads
+```
+
+Cards should display:
+
+* official logo
+* provider name
+* short description
+* Connect button
+* connection status
+* number of connected accounts
+
+Example:
+
+```
+Meta Ads
+
+Connect Facebook Business Manager
+Import campaigns automatically
+
+[ Connect ]
+```
+
+---
+
+# QUICK SETUP WIZARD
+
+Implement a guided onboarding experience.
+
+```
+Step 1
+Traffic Sources
+```
+
+The wizard should support selecting multiple providers before connecting them.
+
+Example:
+
+✓ Meta Ads
+
+✓ Google Ads
+
+✓ TikTok Ads
+
+Next →
+
+---
+
+# TRAFFIC SOURCE SETUP WIZARDS
+
+Each platform must have its own enterprise onboarding flow.
+
+---
+
+## Meta Ads
+
+Wizard:
+
+```
+OAuth Login
+
+↓
+
+Business Manager Discovery
+
+↓
+
+Business Manager Selection
+
+↓
+
+Ad Account Discovery
+
+↓
+
+Ad Account Selection
+
+↓
+
+Pixel Discovery
+
+↓
+
+Conversion API Setup
+
+↓
+
+Campaign Import
+
+↓
+
+Initial Data Sync
+
+↓
+
+Sync Validation
+
+↓
+
+Completed
+```
+
+---
+
+## Google Ads
+
+Wizard:
+
+```
+OAuth Login
+
+↓
+
+Google Account
+
+↓
+
+MCC Discovery
+
+↓
+
+MCC Selection
+
+↓
+
+Child Account Discovery
+
+↓
+
+Account Selection
+
+↓
+
+Conversion Tracking
+
+↓
+
+Campaign Import
+
+↓
+
+Keyword Import
+
+↓
+
+Sync Validation
+
+↓
+
+Completed
+```
+
+---
+
+## TikTok Ads
+
+Wizard:
+
+```
+OAuth Login
+
+↓
+
+Business Center Discovery
+
+↓
+
+Business Center Selection
+
+↓
+
+Ad Account Selection
+
+↓
+
+Pixel Setup
+
+↓
+
+Campaign Import
+
+↓
+
+Initial Sync
+
+↓
+
+Validation
+
+↓
+
+Completed
+```
+
+---
+
+## Native Ads
+
+Display providers:
+
+```
+Taboola
+
+Outbrain
+
+MGID
+
+Revcontent
+
+RTB House
+```
+
+Each provider uses:
+
+```
+OAuth
+
+or
+
+API Key
+```
+
+depending on the provider.
+
+---
+
+## Push Ads
+
+Display providers:
+
+```
+PropellerAds
+
+RichPush
+
+ZeroPark
+
+Push.House
+```
+
+Support:
+
+```
+OAuth
+
+API Token
+
+API Key
+```
+
+---
+
+# MULTI-ACCOUNT MANAGEMENT
+
+Every integration must support unlimited accounts.
+
+Never assume one account.
+
+---
+
+## Meta
+
+Support:
+
+```
+Business Manager #1
+
+    Account A
+
+    Account B
+
+Business Manager #2
+
+    Account C
+
+Business Manager #3
+
+    Account D
+```
+
+Each account can have:
+
+* custom nickname
+* labels
+* tags
+* client
+* workspace
+* team
+
+---
+
+## Google Ads
+
+Support:
+
+```
+Google Account
+
+↓
+
+MCC
+
+↓
+
+Child Accounts
+```
+
+Multiple MCC accounts.
+
+Unlimited child accounts.
+
+---
+
+## TikTok
+
+Support:
+
+```
+Business Center
+
+↓
+
+Ad Accounts
+```
+
+Unlimited Business Centers.
+
+Unlimited Accounts.
+
+---
+
+## Affiliate Networks
+
+Support multiple accounts per network.
+
+Example:
+
+```
+ClickBank
+
+Account 1
+
+Account 2
+
+Account 3
+
+BuyGoods
+
+Account A
+
+Account B
+```
+
+---
+
+## Trackers
+
+Support:
+
+```
+Voluum
+
+Workspace A
+
+Workspace B
+
+Workspace C
+
+RedTrack
+
+Workspace A
+
+Workspace B
+```
+
+---
+
+# ACCOUNT ORGANIZATION
+
+Every connected account supports:
+
+```
+Tags
+
+Labels
+
+Groups
+
+Clients
+
+Teams
+
+Workspaces
+
+Notes
+```
+
+Users should easily organize dozens or hundreds of connected accounts.
+
+---
+
+# CONNECTION STATUS
+
+Every integration card displays live status.
+
+Example:
+
+```
+Connected
+
+3 Accounts
+
+Last Sync
+2 minutes ago
+
+Healthy
+```
+
+Possible statuses:
+
+* Connected
+* Syncing
+* Needs Attention
+* Token Expired
+* Error
+* Disconnected
+
+---
+
+# UNIVERSAL CONNECTOR LAYER
+
+Design the integration engine using a modular architecture.
+
+```
+Integration SDK
+
+↓
+
+OAuth Framework
+
+↓
+
+Connector Engine
+
+↓
+
+Sync Engine
+
+↓
+
+Field Mapping Engine
+
+↓
+
+Unified Data Layer
+```
+
+Each connector is independent and follows the same lifecycle.
+
+---
+
+# INTEGRATION DATABASE
+
+Design a scalable database schema.
+
+Core tables:
+
+```
+integrations
+
+integration_accounts
+
+oauth_tokens
+
+sync_jobs
+
+sync_logs
+
+connection_health
+
+field_mappings
+
+integration_settings
+
+webhooks
+
+sync_history
+```
+
+Each integration stores:
+
+* provider
+* account
+* credentials
+* scopes
+* permissions
+* sync schedule
+* health
+* metadata
+
+---
+
+# MULTI-ACCOUNT DATA MODEL
+
+Example:
+
+```
+Meta
+
+Business Manager
+
+↓
+
+Ad Account
+
+↓
+
+Campaign
+
+↓
+
+Ad Set
+
+↓
+
+Ads
+```
+
+Google:
+
+```
+Google User
+
+↓
+
+MCC
+
+↓
+
+Child Account
+
+↓
+
+Campaign
+
+↓
+
+Ad Group
+
+↓
+
+Ads
+```
+
+TikTok:
+
+```
+Business Center
+
+↓
+
+Ad Account
+
+↓
+
+Campaign
+
+↓
+
+Ad Group
+
+↓
+
+Ads
+```
+
+All providers should normalize into one unified internal schema.
+
+---
+
+# UNIFIED DATA LAYER
+
+Normalize all advertising platforms into common entities.
+
+Example:
+
+```
+Traffic Source
+
+Campaign
+
+Ad Group
+
+Ad
+
+Creative
+
+Spend
+
+Clicks
+
+Impressions
+
+CTR
+
+Conversions
+
+Revenue
+
+ROAS
+
+CPA
+
+Profit
+```
+
+The AI engine must never work directly with provider-specific APIs.
+
+It always consumes normalized data.
+
+---
+
+# AI INTELLIGENCE LAYER
+
+After synchronization, automatically enrich imported data.
+
+AI capabilities include:
+
+* Campaign health analysis
+* Spend anomaly detection
+* ROAS optimization
+* Budget recommendations
+* Scaling opportunities
+* Creative fatigue detection
+* Trend forecasting
+* Performance insights
+
+---
+
+# AUTOMATION LAYER
+
+Every connected platform should support automation.
+
+Examples:
+
+* Pause campaigns below target ROAS
+* Increase budgets on winning campaigns
+* Notify when spend spikes
+* Detect broken tracking
+* Detect conversion drops
+* Alert on expired tokens
+* Recommend scaling opportunities
+
+---
+
+# USER EXPERIENCE
+
+The interface should feel comparable to:
+
+* Stripe Dashboard
+* HubSpot Integrations
+* Windsor.ai
+* Linear
+* Notion
+* Vercel
+
+Characteristics:
+
+* clean
+* spacious
+* minimal
+* enterprise
+* responsive
+* fast
+* intuitive
+
+Avoid overwhelming users while still exposing advanced capabilities progressively.
+
+---
+
+# DESIGN PRINCIPLES
+
+* Mobile responsive
+* Dark mode support
+* Keyboard shortcuts
+* Progressive disclosure
+* Searchable integration lists
+* Bulk account management
+* Accessible (WCAG compliant)
+* Consistent component library
+* Reusable wizard framework
+* Extensible plugin architecture
+
+---
+
+# GOAL
+
+Build **GoGo Bid Integrations** as the foundation of an enterprise-grade marketing operating system where users can connect, organize, synchronize, analyze, and automate all traffic sources from a single, unified platform. The implementation must be modular, scalable, and ready to support hundreds of integrations, millions of synchronized records, and AI-driven automation without requiring future architectural redesign.

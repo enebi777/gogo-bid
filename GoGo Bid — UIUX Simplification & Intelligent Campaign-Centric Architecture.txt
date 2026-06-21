@@ -1,0 +1,634 @@
+# GoGo Bid — UI/UX Simplification & Intelligent Campaign-Centric Architecture
+
+You are the Lead Product Architect, Senior UX Designer, and Principal Software Engineer responsible for rebuilding GoGo Bid into an enterprise SaaS platform.
+
+Your objective is NOT to add more features.
+
+Your objective is to make an extremely powerful platform feel simple, intuitive, guided, and effortless.
+
+---
+
+# Primary UX Philosophy
+
+Every screen should answer these questions instantly:
+
+• What is this?
+• Why do I need it?
+• What should I do next?
+• What happens if I click this?
+• How does this affect my campaigns?
+
+Users should never feel overwhelmed.
+
+Complexity must exist in the backend—not in the interface.
+
+---
+
+# Campaign-Centric Architecture (Highest Priority)
+
+Everything in GoGo Bid revolves around Campaigns.
+
+A Campaign is the central object of the platform.
+
+Every Campaign must automatically connect to:
+
+• Advertising Accounts
+• Intelligence Engine
+• AI Assistants
+• AI Agents
+• Integrations
+• Tracking Systems
+• Analytics
+• Attribution
+• Pixel Data
+• Offers
+• Affiliate Networks
+• Landing Pages
+• Creative Assets
+• Budget Management
+• Automation Rules
+• Alerts
+• Optimization Models
+• Reporting
+• Destination Data
+• Data Warehouse
+• CRM Connections
+• ETL Pipelines
+
+The Campaign becomes the "single source of truth."
+
+Users should never manually reconnect the same resources repeatedly.
+
+Every feature should understand which Campaign it belongs to.
+
+---
+
+# UX Goals
+
+The application must feel like:
+
+• Notion
+• Linear
+• Stripe
+• Airtable
+• Figma
+• ClickUp (Simple Mode)
+
+NOT like:
+
+• Meta Business Manager
+• Google Ads Expert UI
+• Salesforce
+• Old Enterprise Dashboards
+
+The interface must feel:
+
+• Clean
+• Spacious
+• Minimal
+• Fast
+• Friendly
+• Guided
+• Modern
+• Professional
+
+---
+
+# Progressive Disclosure
+
+Never show every feature simultaneously.
+
+Show only what is necessary.
+
+Advanced functionality should appear:
+
+• when needed
+• when expanded
+• when enabled
+• when relevant
+
+Hide complexity until users request it.
+
+---
+
+# Intelligent Navigation
+
+Navigation should use logical groups:
+
+Workspace
+
+Campaigns
+
+Accounts
+
+Integrations
+
+Intelligence
+
+AI Tools
+
+Automations
+
+Analytics
+
+Reports
+
+Settings
+
+Each section should contain only the features relevant to that category.
+
+Avoid overwhelming sidebars.
+
+---
+
+# Feature Discoverability
+
+Every feature must include:
+
+✓ Tooltip
+
+✓ Short description
+
+✓ Learn More link
+
+✓ Example usage
+
+✓ Best Practice
+
+✓ Recommended use case
+
+Users should never wonder what a button does.
+
+---
+
+# Smart Tooltips
+
+Every action should explain:
+
+Purpose
+
+When to use it
+
+Expected outcome
+
+Potential risks
+
+Dependencies
+
+Example:
+
+"AI Budget Optimizer
+
+Automatically reallocates campaign budget based on historical performance, AI predictions, CPA targets and conversion probability."
+
+---
+
+# Empty States
+
+Never show blank pages.
+
+Every empty page should explain:
+
+What this feature is
+
+Why it matters
+
+How to start
+
+Estimated setup time
+
+Quick Start button
+
+Documentation link
+
+Example data (optional)
+
+---
+
+# Guided Onboarding
+
+First-time users should experience a guided setup wizard.
+
+Suggested flow:
+
+Step 1
+Create Workspace
+
+↓
+
+Step 2
+Connect Marketing Accounts
+
+↓
+
+Step 3
+Connect Affiliate Networks
+
+↓
+
+Step 4
+Connect Tracking Platform
+
+↓
+
+Step 5
+Import Campaigns
+
+↓
+
+Step 6
+Configure AI Intelligence
+
+↓
+
+Step 7
+Choose Automation Templates
+
+↓
+
+Step 8
+Review Configuration
+
+↓
+
+Launch Workspace
+
+---
+
+# Context Awareness
+
+Every screen should know:
+
+Current Workspace
+
+Current Campaign
+
+Current Account
+
+Current AI Model
+
+Current Intelligence
+
+Current Integrations
+
+Current User Permissions
+
+Avoid asking users to repeatedly select the same objects.
+
+---
+
+# AI Integration
+
+Every page should include contextual AI assistance.
+
+Examples:
+
+Explain this report
+
+Optimize this campaign
+
+Find performance issues
+
+Suggest improvements
+
+Generate automation
+
+Predict ROI
+
+Forecast spend
+
+Detect anomalies
+
+Explain metrics
+
+Create audience
+
+Generate creatives
+
+Recommend next actions
+
+AI should always understand the currently selected Campaign.
+
+---
+
+# Intelligent Recommendations
+
+The platform should proactively recommend:
+
+Missing integrations
+
+Unused features
+
+Optimization opportunities
+
+Automation suggestions
+
+Tracking issues
+
+Budget improvements
+
+Audience improvements
+
+Creative improvements
+
+Bidding improvements
+
+Performance alerts
+
+These recommendations should appear naturally without interrupting workflows.
+
+---
+
+# Consistent Design System
+
+Every page should use identical patterns.
+
+Cards
+
+Tables
+
+Forms
+
+Buttons
+
+Filters
+
+Tabs
+
+Search
+
+Dialogs
+
+Modals
+
+Icons
+
+Spacing
+
+Typography
+
+Colors
+
+Interaction behavior
+
+Consistency reduces learning time.
+
+---
+
+# Readability
+
+Prioritize readability above density.
+
+Requirements:
+
+Large headings
+
+Short paragraphs
+
+Good spacing
+
+Clear section dividers
+
+Readable typography
+
+High contrast
+
+Logical grouping
+
+Minimal visual noise
+
+No cluttered dashboards
+
+---
+
+# Smart Forms
+
+Long forms should be divided into sections.
+
+Use:
+
+Step-by-step wizards
+
+Accordion panels
+
+Grouped settings
+
+Auto-save
+
+Validation
+
+Inline explanations
+
+Recommended defaults
+
+Never present users with massive configuration pages.
+
+---
+
+# Dashboard Philosophy
+
+Dashboards should answer:
+
+How are my campaigns performing?
+
+What needs attention?
+
+What changed today?
+
+What should I do next?
+
+Use summaries first.
+
+Details on demand.
+
+---
+
+# Integrations Experience
+
+The Integrations section should function like Windsor.ai.
+
+Capabilities include:
+
+Unified Integration Hub
+
+One-click connectors
+
+Multi-account management
+
+Destination management
+
+Template library
+
+ETL pipelines
+
+Data synchronization
+
+Connection health
+
+Sync history
+
+Auto-refresh
+
+Credential management
+
+Field mapping
+
+Transformation rules
+
+Scheduling
+
+No-code onboarding
+
+However, present these capabilities in a much simpler and more intuitive experience.
+
+---
+
+# Automation Experience
+
+Users should create automations visually.
+
+Use:
+
+Drag-and-drop workflows
+
+Templates
+
+Conditions
+
+Triggers
+
+Actions
+
+Scheduling
+
+AI-generated workflows
+
+Avoid technical terminology whenever possible.
+
+---
+
+# Search Everywhere
+
+Global search should locate:
+
+Campaigns
+
+Accounts
+
+Reports
+
+Integrations
+
+Offers
+
+Networks
+
+Users
+
+AI Assistants
+
+Automation Rules
+
+Dashboards
+
+Settings
+
+Search should be instant.
+
+---
+
+# Notifications
+
+Notifications must be meaningful.
+
+Examples:
+
+Sync failed
+
+Campaign overspending
+
+AI recommendation available
+
+Tracking disconnected
+
+Automation completed
+
+Performance anomaly
+
+Budget forecast warning
+
+Avoid excessive notifications.
+
+---
+
+# Accessibility
+
+Support:
+
+Keyboard navigation
+
+Screen readers
+
+Color contrast compliance
+
+Responsive layouts
+
+Dark mode
+
+Light mode
+
+High readability
+
+---
+
+# Mobile Responsiveness
+
+The platform should remain fully usable on tablets and mobile devices.
+
+Critical actions should never require desktop access.
+
+---
+
+# Performance
+
+Pages should feel instantaneous.
+
+Implement:
+
+Lazy loading
+
+Incremental rendering
+
+Caching
+
+Background synchronization
+
+Skeleton loaders
+
+Optimistic updates
+
+Minimal loading states
+
+---
+
+# Design Rule
+
+Whenever a feature appears too complex:
+
+Simplify it.
+
+If simplification is impossible:
+
+Guide the user.
+
+If guidance is insufficient:
+
+Automate the process.
+
+The user should never feel that GoGo Bid is difficult to use.
+
+The platform should deliver enterprise-level capabilities with consumer-level simplicity.
+
+Final objective:
+
+"One place to connect, manage, analyze, optimize, automate, and grow every marketing campaign using AI, Intelligence, Integrations, and Automation—without overwhelming the user."

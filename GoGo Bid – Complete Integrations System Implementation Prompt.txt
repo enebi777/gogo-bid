@@ -1,0 +1,686 @@
+# GoGo Bid – Complete Integrations System Implementation Prompt
+
+You are a world-class SaaS Architect, Senior Product Designer, Staff Full-Stack Engineer, AI Systems Architect, Database Architect, and UX Specialist.
+
+# Project
+
+GoGo Bid
+
+An AI-Powered Affiliate Marketing, Media Buying, Attribution, Intelligence, and Campaign Optimization Operating System.
+
+---
+
+# CRITICAL REQUIREMENTS
+
+IMPORTANT!!!
+
+DO NOT break, remove, replace, overwrite, or negatively affect any existing application functionality.
+
+The current application structure must remain fully operational.
+
+Preserve:
+
+* Existing routes
+* Existing pages
+* Existing navigation
+* Existing database compatibility
+* Existing layouts
+* Existing components
+* Existing UI design system
+* Existing styling
+* Existing dashboards
+* Existing authentication
+* Existing state management
+
+All new functionality must be added incrementally and modularly.
+
+---
+
+# OBJECTIVE
+
+Implement a complete enterprise-grade Integrations Ecosystem inside:
+
+Settings → Integrations
+
+The experience must feel:
+
+* Simple
+* Modern
+* AI-native
+* Enterprise-grade
+* Beginner-friendly
+* Affiliate-focused
+* Media-buyer focused
+* Highly automated
+
+Users should feel:
+
+"Everything in my marketing stack is connected from one place."
+
+---
+
+# CORE GOGO BID DATA FLOW
+
+Design all integrations around this architecture:
+
+Traffic Source
+↓
+Affiliate Network
+↓
+Offer
+↓
+Checkout Platform
+↓
+Tracker & Attribution
+↓
+Campaign
+↓
+AI Intelligence
+↓
+Automation
+↓
+Reporting & Destinations
+
+Every integration must feed this intelligence pipeline.
+
+---
+
+# SETTINGS → INTEGRATIONS ARCHITECTURE
+
+Implement the following structure exactly:
+
+Integrations
+│
+├── Overview
+├── Quick Setup Wizard
+│
+├── Traffic Sources
+├── Affiliate Networks & Marketplaces
+├── Checkout & Payment Platforms
+├── Trackers & Attribution
+├── Analytics & Data
+├── CRM & Lead Management
+├── E-Commerce
+├── Email Marketing
+├── Communication & Alerts
+├── Destinations & Reporting
+├── Webhooks & Postbacks
+├── AI Integrations
+├── Network Marketplace
+├── Health Center
+│
+└── Advanced Settings
+
+---
+
+# OVERVIEW PAGE
+
+Create a centralized command center.
+
+Display:
+
+* Connected Platforms
+* Connected Ad Accounts
+* Connected Affiliate Networks
+* Connected Offers
+* Connected Trackers
+* Connected Destinations
+* Active Campaigns
+* Sync Status
+* API Health
+
+Provide:
+
+* Connect Platform
+* Launch Wizard
+* Run Health Check
+* Sync All
+* View Logs
+
+---
+
+# QUICK SETUP WIZARD
+
+Create a guided onboarding wizard.
+
+Step 1
+
+Traffic Sources
+
+* Meta Ads
+* Google Ads
+* TikTok Ads
+* Native Ads
+* Push Ads
+
+Step 2
+
+Affiliate Networks
+
+* ClickBank
+* BuyGoods
+* Digistore24
+* MaxWeb
+* GuruMedia
+* TerraLeads
+* LeadRock
+* CPA House
+
+Step 3
+
+Checkout Platforms
+
+* CartPanda
+* Hubla
+* Kiwify
+* Monetizze
+* Braip
+* Perfect Pay
+
+Step 4
+
+Trackers
+
+* Voluum
+* RedTrack
+* Binom
+* Bemob
+* Keitaro
+* Hyros
+
+Step 5
+
+Analytics
+
+* Google Analytics 4
+* Mixpanel
+* Amplitude
+
+Step 6
+
+Destinations
+
+* Google Sheets
+* Looker Studio
+* Power BI
+
+Step 7
+
+Activate AI
+
+* CPC Intelligence
+* CPA Intelligence
+* Offer Analyzer
+* AI Copilot
+* AI Simulator
+* AI Forecasting
+* Scaling Engine
+* Anomaly Detection
+
+Provide:
+
+* Save Progress
+* Resume Later
+* Auto Validation
+* AI Recommendations
+* Progress Indicators
+* Connection Health Checks
+
+---
+
+# TRAFFIC SOURCES MODULE
+
+Implement dedicated setup wizards for each platform.
+
+Meta Ads
+
+* OAuth Login
+* Business Manager Discovery
+* Ad Account Selection
+* Pixel Discovery
+* Conversion API Setup
+* Campaign Import
+* Sync Validation
+
+Google Ads
+
+* OAuth Login
+* MCC Discovery
+* Ad Account Selection
+* Conversion Tracking Setup
+* Campaign Import
+* Keyword Import
+* Sync Validation
+
+TikTok Ads
+
+* OAuth Login
+* Business Center Discovery
+* Account Selection
+* Pixel Setup
+* Campaign Import
+* Sync Validation
+
+Native Ads
+
+* Taboola
+* Outbrain
+* MGID
+* Revcontent
+* RTB House
+
+Push Ads
+
+* PropellerAds
+* RichPush
+* ZeroPark
+* Push.House
+
+---
+
+# AFFILIATE NETWORKS & MARKETPLACES
+
+Implement support for:
+
+Tier 1
+
+* ClickBank
+* BuyGoods
+* Digistore24
+* MaxWeb
+* GuruMedia
+* TerraLeads
+* LeadRock
+* CPA House
+* NutriProfits
+* Everad
+* Leadbit
+* Health Trader
+* SellHealth
+* WebVork
+* Traffic Light
+
+Tier 2
+
+* JVZoo
+* CPA Combo
+* Smart Adv
+* A1CallHub
+* Dr.cash
+* Ambalaya
+* Orbio
+* Vortex Alpha
+* Click Hunts
+* Easy Profits
+* LemonAD
+* MediaScalers
+* NetVork
+* Shakes.pro
+* Loazz
+
+Tier 3
+
+* Monetizze
+* Kiwify
+* Braip
+* Perfect Pay
+* CartPanda
+* Hubla
+* Giantmob
+* Melonfy
+* Smash Loud
+* Engaeli
+
+---
+
+# NETWORK MARKETPLACE
+
+Create a marketplace-style integration system.
+
+When user selects a network:
+
+Example:
+
+ClickBank
+
+Automatically load:
+
+* Click ID Parameter
+* Revenue Parameter
+* Transaction Parameter
+* Postback Templates
+* Webhook Templates
+* Tracking Templates
+
+No manual setup required.
+
+Implement:
+
+* Auto Parameter Mapping
+* Auto Postback Generation
+* Auto Conversion Mapping
+* Auto Revenue Mapping
+* Auto Attribution Setup
+
+---
+
+# CHECKOUT & PAYMENT PLATFORMS
+
+Checkout
+
+* CartPanda
+* Hubla
+* Kiwify
+* Monetizze
+* Braip
+* Perfect Pay
+
+Payments
+
+* Stripe
+* PayPal
+* Mercado Pago
+* Wise
+* Payoneer
+
+Sync:
+
+* Orders
+* Revenue
+* Refunds
+* Subscriptions
+* Customer Data
+
+---
+
+# TRACKERS & ATTRIBUTION
+
+Support:
+
+* Voluum
+* RedTrack
+* Binom
+* Bemob
+* Keitaro
+* Hyros
+* Everflow
+* ClickMagick
+* AppsFlyer
+* Adjust
+
+Features:
+
+* Click Tracking
+* Revenue Tracking
+* Conversion Tracking
+* Attribution Validation
+* Token Mapping
+* Postback Monitoring
+
+---
+
+# ANALYTICS & DATA
+
+Support:
+
+* Google Analytics 4
+* Mixpanel
+* Amplitude
+* PostHog
+* Matomo
+* Plausible
+
+Features:
+
+* Funnel Analysis
+* User Behavior
+* LTV Analysis
+* Session Quality
+* Attribution Insights
+
+---
+
+# CRM & LEAD MANAGEMENT
+
+Support:
+
+* HubSpot
+* Salesforce
+* GoHighLevel
+* Zoho CRM
+* Pipedrive
+* Close CRM
+
+Features:
+
+* Lead Sync
+* Offline Conversion Sync
+* Customer Attribution
+
+---
+
+# E-COMMERCE
+
+Support:
+
+* Shopify
+* WooCommerce
+* Magento
+* BigCommerce
+* Amazon
+
+Sync:
+
+* Orders
+* Products
+* Revenue
+* Refunds
+
+---
+
+# EMAIL MARKETING
+
+Support:
+
+* Klaviyo
+* Mailchimp
+* ActiveCampaign
+* ConvertKit
+* Omnisend
+* Brevo
+
+---
+
+# COMMUNICATION & ALERTS
+
+Support:
+
+* Slack
+* Discord
+* Telegram
+* Microsoft Teams
+* Twilio
+
+Use Cases:
+
+* AI Alerts
+* Campaign Alerts
+* Anomaly Alerts
+* Scaling Alerts
+
+---
+
+# DESTINATIONS & REPORTING
+
+BI Platforms
+
+* Looker Studio
+* Power BI
+* Tableau
+* Metabase
+
+Warehouses
+
+* BigQuery
+* Snowflake
+* Redshift
+* Databricks
+
+Databases
+
+* PostgreSQL
+* MySQL
+* MongoDB
+
+Exports
+
+* Google Sheets
+* Excel
+* CSV
+* JSON
+
+API Destinations
+
+* REST API
+* Webhooks
+* Custom Endpoints
+
+---
+
+# WEBHOOKS & POSTBACKS
+
+Implement:
+
+* Affiliate Postbacks
+* Tracker Postbacks
+* Custom Postbacks
+* S2S Tracking
+
+Events:
+
+* campaign.created
+* campaign.updated
+* campaign.paused
+* campaign.scaled
+* conversion.received
+* conversion.approved
+* forecast.generated
+* anomaly.detected
+
+---
+
+# AI INTEGRATIONS
+
+Connect all data into:
+
+* AI Copilot
+* AI Forecasting
+* AI Simulator
+* Offer Analyzer
+* CPC Intelligence
+* CPA Intelligence
+* Scaling Engine
+* Budget Optimizer
+* Anomaly Detection
+
+AI must understand:
+
+* Traffic Sources
+* Offers
+* Networks
+* Trackers
+* Campaigns
+* GEOs
+* Devices
+* Revenue
+* EPC
+* CPA
+* CPC
+* ROAS
+
+---
+
+# HEALTH CENTER
+
+Monitor:
+
+* API Health
+* Sync Health
+* Attribution Health
+* Tracking Health
+* Postback Health
+* AI Engine Health
+
+Provide:
+
+* Health Scores
+* Error Logs
+* Recommended Fixes
+* Reconnect Flows
+
+---
+
+# ADVANCED SETTINGS
+
+Provide:
+
+* API Keys
+* OAuth Tokens
+* Sync Frequency
+* Retry Policies
+* Debug Logs
+* Developer Mode
+* Webhook Logs
+
+---
+
+# DATABASE REQUIREMENTS
+
+Create scalable schemas for:
+
+* integrations
+* traffic_sources
+* affiliate_networks
+* checkout_platforms
+* payment_processors
+* trackers
+* offers
+* campaigns
+* postbacks
+* webhooks
+* destinations
+* sync_jobs
+* integration_health
+* network_templates
+
+Support:
+
+* Multi-user
+* Multi-workspace
+* Multi-account
+* Multi-network
+* Enterprise scalability
+
+---
+
+# FINAL DELIVERABLES
+
+Generate:
+
+1. Complete system architecture
+2. Folder structure
+3. Database schema
+4. API architecture
+5. Integration framework
+6. OAuth architecture
+7. Sync engine architecture
+8. Postback engine architecture
+9. Webhook engine architecture
+10. Network marketplace architecture
+11. Health monitoring architecture
+12. UI/UX wireframe structure
+13. Component hierarchy
+14. State management architecture
+15. Implementation roadmap
+
+Build this as a production-ready SaaS feature that feels comparable to Stripe, Vercel, Notion, Linear, and Windsor.ai while remaining focused on affiliate marketers, media buyers, and performance marketing teams.

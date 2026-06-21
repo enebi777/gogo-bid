@@ -1,0 +1,277 @@
+# Campaign Context System Enhancement – Creative Studio & Audience Builder Integration
+
+## Objective
+
+Enhance the GoGo Bid Campaign Context System so that **every feature in the application is automatically bound to the currently selected Campaign**. Users should never have to manually reselect a campaign when navigating between modules.
+
+The selected Campaign acts as the application's global workspace and serves as the single source of truth for all data, AI, analytics, creative assets, audience management, and automation.
+
+---
+
+# Global Campaign Context
+
+Implement a persistent global Campaign Context that is shared across the entire application.
+
+The active Campaign should always be visible in the top navigation and remain synchronized across every page.
+
+Example:
+
+```text
+Current Campaign
+
+Facebook • Nutra US • Spring 2026
+```
+
+or
+
+```text
+Campaign ▼
+Affiliate Max
+```
+
+Changing the active Campaign should instantly update every module without requiring a page refresh or additional user interaction.
+
+---
+
+# Campaign Context Architecture
+
+The currently selected Campaign must automatically provide context to every system and feature.
+
+```text
+Campaign
+│
+├── Intelligence
+│     • CPC Intelligence
+│     • CPA Intelligence
+│     • Offer Analyzer
+│     • GEO Analysis
+│     • Anomaly Detection
+│     • Benchmarks
+│
+├── AI Tools
+│     • AI Copilot
+│     • AI Forecasting
+│     • AI Simulator
+│     • Scaling Engine
+│     • Creative Studio
+│     • Audience Builder
+│
+├── Analytics
+│     • Budget Pacing
+│     • Attribution
+│     • Reports
+│
+└── Automate
+      • Automation
+      • Integrations
+```
+
+Every module automatically inherits the selected Campaign.
+
+---
+
+# Creative Studio Integration
+
+Creative Studio must be fully Campaign-aware.
+
+When the user changes the active Campaign, Creative Studio should immediately load:
+
+* Campaign creative assets
+* Ad creatives
+* Images
+* Videos
+* Headlines
+* Primary text
+* Descriptions
+* CTAs
+* Brand guidelines
+* Color palettes
+* Generated AI creatives
+* Creative performance metrics
+* Creative history
+* Creative versions
+* Creative recommendations
+* Creative testing results
+
+AI-generated creatives must always use the active Campaign's:
+
+* Offer
+* GEO
+* Audience
+* Objectives
+* Brand voice
+* Platform
+* Historical performance
+* Existing assets
+
+No manual Campaign selection should exist inside Creative Studio.
+
+---
+
+# Audience Builder Integration
+
+Audience Builder must also be fully Campaign-aware.
+
+Changing the active Campaign automatically refreshes:
+
+* Saved audiences
+* Lookalike audiences
+* Interest audiences
+* Behavioral audiences
+* GEO targeting
+* Demographics
+* Customer segments
+* Exclusions
+* Retargeting lists
+* AI-generated audiences
+* Audience performance
+* Audience recommendations
+* Audience expansion suggestions
+
+Every generated audience must inherit:
+
+* Campaign objectives
+* Offer
+* GEO
+* Platform
+* Vertical
+* Historical conversions
+* Performance signals
+
+Users should never select the Campaign again inside Audience Builder.
+
+---
+
+# Instant Global Synchronization
+
+Switching the Campaign must instantly refresh every connected module.
+
+This includes:
+
+* Intelligence
+* AI Tools
+* Analytics
+* Automation
+* Reports
+* Integrations
+* AI Forecasting
+* AI Copilot
+* Creative Studio
+* Audience Builder
+* Dashboards
+* Notifications
+* Recommendations
+* AI Insights
+* Performance Metrics
+* Live Data Streams
+
+All modules should update in real time while preserving their local view settings (such as filters, sorting, and layout) where appropriate.
+
+---
+
+# Shared AI Context
+
+Every AI system must share the same Campaign Context.
+
+This includes:
+
+* AI Copilot
+* Forecasting
+* Scaling Engine
+* Creative Studio AI
+* Audience Builder AI
+* Offer Analyzer
+* Benchmark Engine
+* Automation Engine
+
+For example:
+
+AI Copilot should understand:
+
+* Current Campaign
+* Offer
+* Traffic Source
+* GEO
+* Budget
+* Audience
+* Creatives
+* Integrations
+* Historical Performance
+* Active Automations
+
+No additional prompts or Campaign selection should be required.
+
+---
+
+# Unified Campaign Data Model
+
+Every Campaign should function as a centralized workspace containing all related resources.
+
+```text
+Campaign
+│
+├── Connected Accounts
+├── Tracking
+├── Offers
+├── Creatives
+├── Audiences
+├── AI Models
+├── Intelligence
+├── Reports
+├── Automations
+├── Integrations
+├── Performance History
+├── Notifications
+└── Forecasts
+```
+
+Each module reads from and writes to this unified Campaign data model.
+
+---
+
+# UX Requirements
+
+The user should always know which Campaign they are working on.
+
+Every page should display:
+
+* Active Campaign name
+* Platform icon
+* Status
+* Last synchronization time
+
+Example:
+
+```text
+Campaign
+
+Affiliate Max
+
+Meta Ads
+
+Synced 2 minutes ago
+```
+
+---
+
+# Performance Requirements
+
+Changing the active Campaign should:
+
+* Instantly update the application state.
+* Refresh all dependent modules.
+* Preserve unsaved work when possible.
+* Avoid unnecessary reloads.
+* Use cached data where appropriate.
+* Synchronize background API requests efficiently.
+* Deliver a seamless, real-time experience.
+
+---
+
+# Final Goal
+
+The Campaign Context System must become the foundation of the GoGo Bid platform.
+
+Every feature—including Intelligence, AI Tools, Analytics, Automation, Creative Studio, Audience Builder, Integrations, Reports, and AI assistants—must automatically operate within the currently selected Campaign.
+
+The result should be a unified, context-aware, AI-first experience where users interact with a single Campaign workspace instead of navigating disconnected modules or repeatedly selecting Campaigns.
