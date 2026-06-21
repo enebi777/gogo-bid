@@ -1551,6 +1551,9 @@ function confirmOk(){closeConfirm();if(_confirmCallback)_confirmCallback();}
 const qs = s => document.querySelector(s);
 const qsa = s => document.querySelectorAll(s);
 const $ = id => document.getElementById(id);
+function tip(title,desc,when){
+  return `<span class="tt" style="display:inline-block;margin-left:6px;vertical-align:middle"><span style="display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;border-radius:50%;background:rgba(79,110,247,.15);color:var(--accent2);font-size:10px;font-weight:700;cursor:help">i</span><span class="tt-box"><span class="tt-title">${title}</span><span class="tt-desc">${desc}</span>${when?`<span class="tt-when">⊙ ${when}</span>`:''}</span></span></span>`;
+}
 const PE = {meta:'📘',google:'🔍',tiktok:'🎵',native:'📰',push:'🔔'};
 const DAYS = ['Mon','Tue','Wed','Thu','Fri','Sat','Today'];
 
@@ -2572,7 +2575,7 @@ function renderCPC(el,c){
   const pend=c.ai.bidSuggestions.filter(s=>s.status==='pending'&&s.metric==='CPC');
   el.innerHTML=`
 <div class="page-hdr">
-  <div><div class="page-title">CPC Intelligence</div><div class="page-sub">Optimal bid targets — <strong style="color:var(--text)">${c.name}</strong></div></div>
+  <div><div class="page-title">CPC Intelligence${tip('CPC Intelligence','Analyzes your offer economics to recommend ideal, minimum, and break-even cost-per-click targets.','Use before raising bids to confirm you stay profitable.')}</div><div class="page-sub">Optimal bid targets — <strong style="color:var(--text)">${c.name}</strong></div></div>
   <button class="btn btn-outline btn-sm" onclick="openQS()">Switch ⌘J</button>
 </div>
 ${pend.length?`<div class="mb16" id="cpc-bsc"></div>`:''}
@@ -2617,7 +2620,7 @@ function renderCPA(el,c){
   const pend=c.ai.bidSuggestions.filter(s=>s.status==='pending'&&(s.metric==='CPA'||s.metric==='CPA Target'));
   el.innerHTML=`
 <div class="page-hdr">
-  <div><div class="page-title">CPA Intelligence</div><div class="page-sub">CPA targets — <strong style="color:var(--text)">${c.name}</strong></div></div>
+  <div><div class="page-title">CPA Intelligence${tip('CPA Intelligence','Analyzes historical CPA performance and predicts future acquisition costs.','Use to set acquisition targets before scaling spend.')}</div><div class="page-sub">CPA targets — <strong style="color:var(--text)">${c.name}</strong></div></div>
   <button class="btn btn-outline btn-sm" onclick="openQS()">Switch ⌘J</button>
 </div>
 ${pend.length?`<div class="mb16" id="cpa-bsc"></div>`:''}
@@ -2666,7 +2669,7 @@ function renderOffer(el,c){
   const o=c.offer;
   el.innerHTML=`
 <div class="page-hdr">
-  <div><div class="page-title">Offer Analyzer</div><div class="page-sub">AI Offer Forensics · linked to <strong style="color:var(--text)">${c.name}</strong></div></div>
+  <div><div class="page-title">Offer Analyzer${tip('Offer Analyzer','Scores affiliate offers using EPC, conversion rate, payout quality, and historical trends.','Use when deciding whether to keep, scale, or drop an offer.')}</div><div class="page-sub">AI Offer Forensics · linked to <strong style="color:var(--text)">${c.name}</strong></div></div>
   <button class="btn btn-outline btn-sm" onclick="openQS()">Switch ⌘J</button>
 </div>
 <div class="card mb16">
@@ -2879,7 +2882,7 @@ function renderAnomaly(el,c){
   const allAnom=all.flatMap(camp=>camp.ai.anomalies.map(a=>({...a,campId:camp.id,campName:camp.name,source:camp.traffic.source})));
   el.innerHTML=`
 <div class="page-hdr">
-  <div><div class="page-title">Anomaly Detection</div><div class="page-sub">AI monitors ${all.length} campaigns in real-time · ${allAnom.length} active alerts</div></div>
+  <div><div class="page-title">Anomaly Detection${tip('Anomaly Detection','Automatically identifies unusual changes in campaign performance.','Use to catch problems before they drain budget.')}</div><div class="page-sub">AI monitors ${all.length} campaigns in real-time · ${allAnom.length} active alerts</div></div>
   <button class="btn btn-outline btn-sm" onclick="openQS()">Switch ⌘J</button>
 </div>
 <div class="g4 mb16">
@@ -2918,7 +2921,7 @@ function renderBenchmarks(el,c){
   const m=c.metrics.today,b=c.metrics.bench;
   el.innerHTML=`
 <div class="page-hdr">
-  <div><div class="page-title">Benchmarks</div><div class="page-sub">${c.name} vs ${c.offer.type} industry averages</div></div>
+  <div><div class="page-title">Benchmarks${tip('Benchmarks','Compares your campaign metrics against industry averages for this offer type.','Use to gauge whether performance is competitive or lagging.')}</div><div class="page-sub">${c.name} vs ${c.offer.type} industry averages</div></div>
   <button class="btn btn-outline btn-sm" onclick="openQS()">Switch ⌘J</button>
 </div>
 <div class="g4 mb16">
@@ -2937,7 +2940,7 @@ function renderBenchmarks(el,c){
 function renderSimulator(el,c){
   el.innerHTML=`
 <div class="page-hdr">
-  <div><div class="page-title">AI Simulator</div><div class="page-sub">Scenario testing — <strong style="color:var(--text)">${c.name}</strong></div></div>
+  <div><div class="page-title">AI Simulator${tip('AI Simulator','Models "what-if" budget and bid scenarios to predict their impact before you spend.','Use to test a change risk-free before applying it live.')}</div><div class="page-sub">Scenario testing — <strong style="color:var(--text)">${c.name}</strong></div></div>
   <button class="btn btn-outline btn-sm" onclick="openQS()">Switch ⌘J</button>
 </div>
 <div class="g13 mb16">
@@ -2974,7 +2977,7 @@ let _chatHistory=[];
 function renderCopilot(el,c){
   el.innerHTML=`
 <div class="page-hdr">
-  <div><div class="page-title">AI Copilot</div><div class="page-sub">Context: <strong style="color:var(--text)">${c.name}</strong> · Health ${c.ai.healthScore}/100</div></div>
+  <div><div class="page-title">AI Copilot${tip('AI Copilot','A conversational assistant that answers questions and explains recommendations using your live campaign data.','Use whenever you want a plain-language answer instead of digging through reports.')}</div><div class="page-sub">Context: <strong style="color:var(--text)">${c.name}</strong> · Health ${c.ai.healthScore}/100</div></div>
   <button class="btn btn-outline btn-sm" onclick="openQS()">Switch ⌘J</button>
 </div>
 <div class="g31">
@@ -3039,7 +3042,7 @@ function renderForecasting(el,c){
   const projRev=projSp.map(s=>Math.round(s*fr));
   el.innerHTML=`
 <div class="page-hdr">
-  <div><div class="page-title">AI Forecasting</div><div class="page-sub">7-day projection — <strong style="color:var(--text)">${c.name}</strong> · ${c.ai.forecastConfidence}% confidence</div></div>
+  <div><div class="page-title">AI Forecasting${tip('AI Forecasting','Projects future spend, revenue, and ROAS based on recent trends.','Use to plan budget ahead of time and spot trajectory changes early.')}</div><div class="page-sub">7-day projection — <strong style="color:var(--text)">${c.name}</strong> · ${c.ai.forecastConfidence}% confidence</div></div>
   <button class="btn btn-outline btn-sm" onclick="openQS()">Switch ⌘J</button>
 </div>
 <div class="g4 mb16">
@@ -3063,7 +3066,7 @@ function renderScaling(el,c){
   const pendBudget=c.ai.bidSuggestions.filter(s=>s.status==='pending'&&s.metric==='Budget');
   el.innerHTML=`
 <div class="page-hdr">
-  <div><div class="page-title">Scaling Engine</div><div class="page-sub">Budget scaling calculator — <strong style="color:var(--text)">${c.name}</strong></div></div>
+  <div><div class="page-title">Scaling Engine${tip('Scaling Engine','Uses AI to recommend profitable budget increases.','Use once a campaign is stable and you want to grow spend without losing ROAS.')}</div><div class="page-sub">Budget scaling calculator — <strong style="color:var(--text)">${c.name}</strong></div></div>
   <button class="btn btn-outline btn-sm" onclick="openQS()">Switch ⌘J</button>
 </div>
 ${pendBudget.length?`<div class="mb16" id="sc-bsc"></div>`:''}
@@ -4848,7 +4851,7 @@ function renderGeo(el,c){
   const totSpend=geos.reduce((s,g)=>s+g.spend,0);
   el.innerHTML=`
 <div class="page-hdr">
-  <div><div class="page-title">GEO Analysis</div><div class="page-sub">Country-level performance — <strong style="color:var(--text)">${c.name}</strong></div></div>
+  <div><div class="page-title">GEO Analysis${tip('GEO Analysis','Breaks down spend, ROAS, and conversion rate by country to find your strongest markets.','Use to reallocate budget toward winning geos.')}</div><div class="page-sub">Country-level performance — <strong style="color:var(--text)">${c.name}</strong></div></div>
   <button class="btn btn-outline btn-sm" onclick="exportCSV()">⬇ Export CSV</button>
 </div>
 <div class="g4 mb16">
@@ -4912,7 +4915,7 @@ function renderCreative(el,c){
   const scoreColor=s=>s>=80?'var(--green)':s>=60?'var(--yellow)':'var(--red)';
   el.innerHTML=`
 <div class="page-hdr">
-  <div><div class="page-title">Creative Studio</div><div class="page-sub">Ad creative performance scoring — <strong style="color:var(--text)">${c.name}</strong></div></div>
+  <div><div class="page-title">Creative Studio${tip('Creative Studio','Scores ad creatives by engagement and conversion impact, and suggests fresh angles.','Use when creative fatigue is dragging down CTR or CVR.')}</div><div class="page-sub">Ad creative performance scoring — <strong style="color:var(--text)">${c.name}</strong></div></div>
   <div class="flex gap8">
     <button class="btn btn-outline btn-sm" onclick="toast('Upload','Creative upload coming with full backend integration.','info')">⬆ Upload Creative</button>
     <button class="btn btn-primary btn-sm" onclick="toast('AI Generator','AI creative generation — coming in v2.','info')">✦ AI Generate</button>
@@ -4970,7 +4973,7 @@ function renderAudience(el,c){
   const statusColor={active:'badge-green',suggested:'badge-blue',test:'badge-yellow'};
   el.innerHTML=`
 <div class="page-hdr">
-  <div><div class="page-title">Audience Builder</div><div class="page-sub">AI-generated audience segments — <strong style="color:var(--text)">${c.name}</strong></div></div>
+  <div><div class="page-title">Audience Builder${tip('Audience Builder','Generates AI-recommended audience segments based on your best-converting traffic.','Use to expand reach without losing targeting quality.')}</div><div class="page-sub">AI-generated audience segments — <strong style="color:var(--text)">${c.name}</strong></div></div>
   <button class="btn btn-primary btn-sm" onclick="toast('AI Audiences','AI is generating new segments based on your converters…','info',5000)">✦ Generate New Segments</button>
 </div>
 <div class="g4 mb16">
