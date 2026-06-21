@@ -1551,6 +1551,10 @@ function confirmOk(){closeConfirm();if(_confirmCallback)_confirmCallback();}
 const qs = s => document.querySelector(s);
 const qsa = s => document.querySelectorAll(s);
 const $ = id => document.getElementById(id);
+function seedRand(seed){
+  let h=0;for(let i=0;i<seed.length;i++){h=(h<<5)-h+seed.charCodeAt(i);h|=0;}
+  return ()=>{h=(h*1103515245+12345)&0x7fffffff;return (h%1000)/1000;};
+}
 function tip(title,desc,when){
   return `<span class="tt" style="display:inline-block;margin-left:6px;vertical-align:middle"><span style="display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;border-radius:50%;background:rgba(79,110,247,.15);color:var(--accent2);font-size:10px;font-weight:700;cursor:help">i</span><span class="tt-box"><span class="tt-title">${title}</span><span class="tt-desc">${desc}</span>${when?`<span class="tt-when">⊙ ${when}</span>`:''}</span></span></span>`;
 }
@@ -4903,14 +4907,20 @@ function renderGeo(el,c){
 // CREATIVE STUDIO PAGE
 // ═══════════════════════════════════════════════════
 function renderCreative(el,c){
-  const creatives=[
-    {id:'cr1',name:'VSL — Weight Loss Story',type:'Video',thumb:'🎬',bg:'rgba(79,110,247,.1)',score:92,ctr:3.8,cvr:5.2,spend:1840,roas:2.8,status:'winning',hook:'Real woman loses 47lbs...'},
-    {id:'cr2',name:'Before/After Carousel',type:'Image',thumb:'🖼',bg:'rgba(15,186,129,.1)',score:84,ctr:2.9,cvr:4.1,spend:920,roas:2.3,status:'active',hook:'Doctors hate this one trick...'},
-    {id:'cr3',name:'Testimonial Reel',type:'Video',thumb:'📹',bg:'rgba(139,92,246,.1)',score:78,ctr:2.4,cvr:3.8,spend:640,roas:2.0,status:'active',hook:'I lost 30lbs in 60 days...'},
-    {id:'cr4',name:'Static Benefit Ad',type:'Image',thumb:'🎨',bg:'rgba(245,166,35,.1)',score:55,ctr:1.2,cvr:2.1,spend:310,roas:1.3,status:'monitor',hook:'Burn fat while you sleep'},
-    {id:'cr5',name:'UGC Unboxing',type:'Video',thumb:'📦',bg:'rgba(233,30,99,.1)',score:41,ctr:0.9,cvr:1.4,spend:180,roas:0.8,status:'paused',hook:'Trying that supplement everyone…'},
-    {id:'cr6',name:'News-style Native',type:'Display',thumb:'📰',bg:'rgba(0,188,212,.1)',score:67,ctr:1.8,cvr:2.9,spend:420,roas:1.7,status:'active',hook:'Nutritionists share their secret...'},
+  const rnd=seedRand(c.id+'creative'),vert=c.offer.type.split(' /')[0],src=c.traffic.source;
+  const base=[
+    {id:'cr1',name:`VSL — ${vert} Story`,type:'Video',thumb:'🎬',bg:'rgba(79,110,247,.1)',hook:`Real customer wins big with ${c.offer.name}...`},
+    {id:'cr2',name:'Before/After Carousel',type:'Image',thumb:'🖼',bg:'rgba(15,186,129,.1)',hook:'Doctors hate this one trick...'},
+    {id:'cr3',name:'Testimonial Reel',type:'Video',thumb:'📹',bg:'rgba(139,92,246,.1)',hook:`I tried ${c.offer.name} for 30 days...`},
+    {id:'cr4',name:'Static Benefit Ad',type:'Image',thumb:'🎨',bg:'rgba(245,166,35,.1)',hook:`${vert} results, no gimmicks`},
+    {id:'cr5',name:'UGC Unboxing',type:'Video',thumb:'📦',bg:'rgba(233,30,99,.1)',hook:'Trying that product everyone…'},
+    {id:'cr6',name:`News-style Native (${src})`,type:'Display',thumb:'📰',bg:'rgba(0,188,212,.1)',hook:`Experts share their ${vert.toLowerCase()} secret...`},
   ];
+  const creatives=base.map((b,i)=>{
+    const score=Math.round(35+rnd()*60),ctr=+(0.8+rnd()*3.2).toFixed(1),cvr=+(1+rnd()*4.5).toFixed(1),spend=Math.round(150+rnd()*1900),roas=+(0.7+rnd()*2.5).toFixed(1);
+    const status=score>=85?'winning':score>=60?'active':score>=45?'monitor':'paused';
+    return {...b,score,ctr,cvr,spend,roas,status};
+  });
   const statusColor={winning:'var(--green)',active:'var(--accent2)',monitor:'var(--yellow)',paused:'var(--muted)'};
   const scoreColor=s=>s>=80?'var(--green)':s>=60?'var(--yellow)':'var(--red)';
   el.innerHTML=`
@@ -4949,10 +4959,12 @@ function renderCreative(el,c){
   </div>`).join('')}
 </div>
 <div class="card mt16">
-  <div class="card-hdr"><div class="card-title">✦ AI Creative Recommendations</div></div>
+  <div class="card-hdr"><div class="card-title">✦ AI Creative Recommendations</div><span class="badge badge-blue" style="font-size:9px">Bound to ${c.name}</span></div>
   <div class="card-body">
-    ${[['🏆','Winning creative "VSL — Weight Loss Story" drives 2.8× ROAS — increase budget allocation to 40% of total.'],['⚡','Pause "UGC Unboxing" — 0.8× ROAS for 7 days, burning $180 with no recoverable signal.'],['🎯','Test a new hook for "Static Benefit Ad" — CTR 1.2% is below platform average of 1.8%.'],['✦','Create a video version of "Before/After Carousel" — image-to-video uplift averages +34% CVR in Nutra vertical.']].map(([icon,rec])=>`
-    <div class="alert alert-blue mb12"><div class="flex gap8"><span style="font-size:16px">${icon}</span><div class="alert-text">${rec}</div></div></div>`).join('')}
+    <div class="alert-text mb12" style="color:var(--dim)">Generated from ${c.name}'s offer (${c.offer.name}), traffic source (${src}), and live creative performance — no manual campaign selection needed.</div>
+    ${(()=>{const top=creatives.reduce((a,b)=>b.score>a.score?b:a),worst=creatives.reduce((a,b)=>b.score<a.score?b:a),low=creatives.find(cr=>cr.ctr<2)||creatives[0];
+      return [['🏆',`Winning creative "${top.name}" drives ${top.roas}× ROAS — increase budget allocation to 40% of total.`],['⚡',`Pause "${worst.name}" — ${worst.roas}× ROAS, burning $${worst.spend} with no recoverable signal.`],['🎯',`Test a new hook for "${low.name}" — CTR ${low.ctr}% is below platform average.`],['✦',`Create a video version of your top image creative — image-to-video uplift averages +34% CVR in the ${vert} vertical.`]].map(([icon,rec])=>`
+    <div class="alert alert-blue mb12"><div class="flex gap8"><span style="font-size:16px">${icon}</span><div class="alert-text">${rec}</div></div></div>`).join('');})()}
   </div>
 </div>`;
 }
@@ -4961,14 +4973,20 @@ function renderCreative(el,c){
 // AUDIENCE BUILDER PAGE
 // ═══════════════════════════════════════════════════
 function renderAudience(el,c){
-  const audiences=[
-    {name:'Keto Buyers — High Intent',size:'2.8M',platform:'Meta',score:94,tags:['Weight Loss','Keto','Supplements','Health Conscious'],roas:'2.6×',cpa:'$7.80',status:'active'},
-    {name:'35-54 Female Health Seekers',size:'4.1M',platform:'Meta',score:88,tags:['Women 35-54','Health','Diet','Fitness'],roas:'2.4×',cpa:'$8.20',status:'active'},
-    {name:'Google Search — "keto supplement"',size:'18K/mo',platform:'Google',score:91,tags:['High Intent','Search','Commercial'],roas:'2.9×',cpa:'$6.90',status:'active'},
-    {name:'LTV Lookalike — Top 1%',size:'1.2M',platform:'Meta',score:82,tags:['Lookalike','LTV','Buyers'],roas:'2.2×',cpa:'$9.10',status:'suggested'},
-    {name:'Retargeting — Visitors 7d',size:'48K',platform:'Meta',score:79,tags:['Retarget','Warm','VSL Viewers'],roas:'3.1×',cpa:'$5.40',status:'suggested'},
-    {name:'TikTok — Gen Z Weight Loss',size:'6.7M',platform:'TikTok',score:61,tags:['Gen Z','18-28','Trending'],roas:'1.4×',cpa:'$14.20',status:'test'},
+  const rnd=seedRand(c.id+'audience'),vert=c.offer.type.split(' /')[0],src=c.traffic.source,plat=c.traffic.adNetwork||src;
+  const baseAud=[
+    {name:`${vert} Buyers — High Intent`,platform:plat,tags:[vert,'High Intent','Buyers','Health Conscious']},
+    {name:'35-54 Demographic Seekers',platform:plat,tags:['Demo 35-54',vert,'Engaged']},
+    {name:`Search — "${vert.toLowerCase()} ${c.offer.name.split(' ')[0].toLowerCase()}"`,platform:'Google',tags:['High Intent','Search','Commercial']},
+    {name:'LTV Lookalike — Top 1%',platform:plat,tags:['Lookalike','LTV','Buyers']},
+    {name:'Retargeting — Visitors 7d',platform:plat,tags:['Retarget','Warm',vert]},
+    {name:`${plat} — Gen Z ${vert}`,platform:plat,tags:['Gen Z','18-28','Trending']},
   ];
+  const audiences=baseAud.map(a=>{
+    const score=Math.round(40+rnd()*55),roas=(1+rnd()*2.2).toFixed(1)+'×',cpa='$'+(5+rnd()*10).toFixed(2),sizeN=Math.round(20+rnd()*600);
+    const status=score>=85?'active':score>=70?'suggested':'test';
+    return {...a,score,roas,cpa,status,size:sizeN>=1000?(sizeN/1000).toFixed(1)+'M':sizeN+'K'};
+  });
   const platColor={Meta:'rgba(24,119,242,.15)',Google:'rgba(66,133,244,.15)',TikTok:'rgba(254,44,85,.12)'};
   const statusColor={active:'badge-green',suggested:'badge-blue',test:'badge-yellow'};
   el.innerHTML=`
@@ -4976,8 +4994,9 @@ function renderAudience(el,c){
   <div><div class="page-title">Audience Builder${tip('Audience Builder','Generates AI-recommended audience segments based on your best-converting traffic.','Use to expand reach without losing targeting quality.')}</div><div class="page-sub">AI-generated audience segments — <strong style="color:var(--text)">${c.name}</strong></div></div>
   <button class="btn btn-primary btn-sm" onclick="toast('AI Audiences','AI is generating new segments based on your converters…','info',5000)">✦ Generate New Segments</button>
 </div>
+<div class="alert-text mb12" style="color:var(--dim)">Generated from ${c.name}'s offer (${c.offer.name}), objective, and traffic source (${src}) — no manual campaign selection needed.</div>
 <div class="g4 mb16">
-  ${[['Active Audiences',audiences.filter(a=>a.status==='active').length,'var(--green)'],['AI Suggested',audiences.filter(a=>a.status==='suggested').length,'var(--accent2)'],['Best Segment','Retarget 7d','3.1× ROAS'],['Total Reach','~15M','combined reach']].map(([l,v,s])=>`
+  ${[['Active Audiences',audiences.filter(a=>a.status==='active').length,'var(--green)'],['AI Suggested',audiences.filter(a=>a.status==='suggested').length,'var(--accent2)'],['Best Segment',audiences.reduce((a,b)=>parseFloat(b.roas)>parseFloat(a.roas)?b:a).name.slice(0,16),audiences.reduce((a,b)=>parseFloat(b.roas)>parseFloat(a.roas)?b:a).roas+' ROAS'],['Total Reach','~15M','combined reach']].map(([l,v,s])=>`
   <div class="card kpi"><div class="kpi-label">${l}</div><div class="kpi-val" style="font-size:16px">${v}</div><div class="kpi-change neu">${s}</div></div>`).join('')}
 </div>
 <div class="g2 mb16">
