@@ -19,25 +19,27 @@ This scaffold is architecturally real — the database schema, queues, auth, enc
 | OAuth connect/callback flow for Meta, Google Ads, TikTok Ads — real authorization URLs and token-exchange endpoints | ✅ Wired, ⛔ needs real app credentials to complete a live handshake |
 | **Google Ads vertical slice** — OAuth, ad-account listing + selection endpoint, real GAQL-based `syncDaily`/`syncHistorical` upserting Campaign/Cost/Revenue, token-refresh worker handler, daily scheduler (`scheduler.main.ts`, BullMQ repeatable jobs at 06:00 UTC + 6h token-refresh sweep) | ✅ Code-complete end-to-end, ⛔ never executed — needs `GOOGLE_CLIENT_ID/SECRET`, an approved `GOOGLE_ADS_DEVELOPER_TOKEN`, and the `google-ads-api` npm package installed to verify |
 | **Meta Ads vertical slice** — OAuth, `/me/adaccounts` listing + selection endpoint, real Insights API `syncDaily`/`syncHistorical` upserting Campaign/Cost/Revenue (cost from `spend`, revenue from `action_values[purchase]`), shares the token-refresh worker | ✅ Code-complete end-to-end, ⛔ never executed — needs `META_APP_ID/SECRET` with Marketing API access approved by Meta App Review |
+| **TikTok Ads vertical slice** — OAuth, advertiser listing + selection endpoint, real Integrated Reporting API `syncDaily`/`syncHistorical` upserting Campaign/Cost/Revenue (cost from `spend`, revenue derived from `complete_payment_roas`); token-refresh worker explicitly skips TikTok since its tokens are long-lived with no refresh cycle | ✅ Code-complete end-to-end, ⛔ never executed — needs `TIKTOK_APP_ID/SECRET` with Marketing API app approval |
 | Universal postback receiver `/postback/:tracker` (GET+POST, shared-secret validation, dedup, queued processing) | ✅ Complete as a receiver; field mapping covers Voluum/RedTrack/Binom/Bemob/Keitaro/Hyros |
 | Meta + TikTok webhook receivers with signature verification | ✅ Wired (Meta's HMAC check needs raw-body middleware added before production use — noted in code) |
 | ClickBank adapter (INS signature check + Reporting API shape) | ✅ Wired, ⛔ needs CLICKBANK_DEV_KEY/CLERK_KEY |
 | Health check endpoint | ✅ Complete |
 
-## Google Ads / Meta Ads slices — what to do once you have credentials
+## Google Ads / Meta Ads / TikTok Ads slices — what to do once you have credentials
 
-Both follow the same shape: connect → list accounts → (optionally) select one → scheduler → worker.
+All three follow the same shape: connect → list accounts → (optionally) select one → scheduler → worker.
 
 1. **Google**: create a Google Cloud OAuth 2.0 client (Web application type), add `GOOGLE_REDIRECT_URI` as an authorized redirect URI, and apply for a Google Ads developer token at https://ads.google.com/aw/apicenter — "test account" level works immediately against a Google Ads **test manager account** (free, no real spend); "basic"/"standard" requires Google's review for real accounts. Fill `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `GOOGLE_ADS_DEVELOPER_TOKEN`, `GOOGLE_ADS_LOGIN_CUSTOMER_ID` into `.env`.
 2. **Meta**: create an app at https://developers.facebook.com/apps, add the Marketing API product, and submit for `ads_management`/`ads_read` permissions via App Review (a Development-mode app can self-test against ad accounts you personally own without review). Fill `META_APP_ID`, `META_APP_SECRET`, `META_REDIRECT_URI` into `.env`.
-3. `npm install` (pulls in `google-ads-api`), then hit `GET /api/oauth/google/connect` or `GET /api/oauth/meta/connect` while logged in — it redirects through the provider's consent screen, exchanges the code, lists accessible accounts, and stores the connection.
-4. If there's more than one accessible account, call `PATCH /api/oauth/:provider/:integrationAccountId/select-account` with `{ "accountId": "..." }` — defaults to the first one otherwise.
-5. Run `npm run scheduler` once to register the daily sync job, then `npm run worker:dev` to execute it. `GoogleAdsAdapter.runSync`/`MetaAdapter.runSync` query campaign-level cost/conversion metrics and upsert `Campaign`/`Cost`/`Revenue` rows.
-6. **Known rough edge, flagged in code on both adapters**: campaign matching uses `(integrationAccountId, name)` since the schema has no dedicated `externalId` column on `Campaign` yet — fine for a first real test, but add a unique `externalId` column before relying on this with campaigns that get renamed.
+3. **TikTok**: register an app at https://ads.tiktok.com/marketing_api/apps, request Reporting + Campaign Management scopes. Fill `TIKTOK_APP_ID`, `TIKTOK_APP_SECRET`, `TIKTOK_REDIRECT_URI` into `.env`. Note TikTok access tokens don't expire on a refresh cycle (no `refresh_token` flow) — the token-refresh worker explicitly skips `TIKTOK_ADS`; reconnect via OAuth again if access is ever revoked.
+4. `npm install` (pulls in `google-ads-api`), then hit `GET /api/oauth/google/connect`, `GET /api/oauth/meta/connect`, or `GET /api/oauth/tiktok/connect` while logged in — each redirects through the provider's consent screen, exchanges the code, lists accessible accounts, and stores the connection.
+5. If there's more than one accessible account, call `PATCH /api/oauth/:provider/:integrationAccountId/select-account` with `{ "accountId": "..." }` — defaults to the first one otherwise.
+6. Run `npm run scheduler` once to register the daily sync job, then `npm run worker:dev` to execute it. `GoogleAdsAdapter.runSync`/`MetaAdapter.runSync`/`TikTokAdsAdapter.runSync` query campaign-level cost/conversion metrics and upsert `Campaign`/`Cost`/`Revenue` rows.
+7. **Known rough edge, flagged in code on all three adapters**: campaign matching uses `(integrationAccountId, name)` since the schema has no dedicated `externalId` column on `Campaign` yet — fine for a first real test, but add a unique `externalId` column before relying on this with campaigns that get renamed.
 
 ## What's scaffolded as a TODO, not built yet
 
-- **Sync logic** inside `syncDaily`/`syncHistorical` for TikTok — currently throws until credentials exist; follow the pattern now built out for Google Ads and Meta Ads (see above) once there's a real account to test against.
+- All three ad-platform adapters (Meta, Google, TikTok) are now code-complete vertical slices — the next integration category to build is affiliate networks beyond ClickBank, or checkout platforms, following the same `OAuthAdapter`/`SyncAdapter` interface.
 - **Native ads** (Taboola, Outbrain, MGID), **push ads** (PropellerAds, RichPush, Push.House, Zeropark) — not started. Same adapter pattern as Meta/Google, lower priority per your stack.
 - **Affiliate networks** beyond ClickBank (BuyGoods, Digistore24, MaxWeb, GuruMedia, TerraLeads, LeadRock, CPA House) — not started.
 - **Checkout platforms** (CartPanda, Hubla, Kiwify, Monetizze, Braip, Perfect Pay) — not started; these are mostly webhook-driven (orders/refunds), same shape as the webhooks module.

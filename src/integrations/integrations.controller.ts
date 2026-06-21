@@ -39,10 +39,10 @@ export class IntegrationsController {
     const adapter = new entry.adapter();
     const result = await adapter.exchangeCodeForToken(code);
 
-    // Neither Google nor Meta's token exchange returns a single "account" —
-    // the same identity can manage multiple ad accounts, so we list them and
-    // let the user pick one before sync can run. TikTok's exchange does
-    // return an advertiser_id directly (see TikTokAdsAdapter), so it skips this.
+    // None of the three platforms' token exchanges reliably return a single
+    // "the" account — the same identity can manage multiple ad accounts, so
+    // we list them and let the user pick one before sync can run (defaulting
+    // to the first one so a single-account connection works with zero extra steps).
     let externalAccountId = result.accountId ?? 'pending';
     let availableAccounts: { id: string; name?: string }[] | undefined;
 
@@ -53,6 +53,10 @@ export class IntegrationsController {
     }
     if (provider === 'meta') {
       availableAccounts = await adapter.listAccessibleAdAccounts(result.accessToken);
+      externalAccountId = availableAccounts[0]?.id ?? 'pending';
+    }
+    if (provider === 'tiktok' && result.advertiserIds?.length) {
+      availableAccounts = await adapter.listAccessibleAdvertisers(result.accessToken, result.advertiserIds);
       externalAccountId = availableAccounts[0]?.id ?? 'pending';
     }
 

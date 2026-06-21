@@ -46,6 +46,7 @@ new Worker(
   async (job) => {
     const account = await prisma.integrationAccount.findUnique({ where: { id: job.data.integrationAccountId } });
     if (!account) return;
+    if (account.provider === 'TIKTOK_ADS') return; // long-lived token, no refresh cycle — re-auth instead if revoked
     const adapter = adapters[account.provider];
     if (!adapter?.refreshAccessToken) return;
     if (!account.refreshTokenEnc) throw new Error(`IntegrationAccount ${account.id} has no refresh token stored.`);
