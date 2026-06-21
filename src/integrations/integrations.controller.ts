@@ -39,14 +39,21 @@ export class IntegrationsController {
     const adapter = new entry.adapter();
     const result = await adapter.exchangeCodeForToken(code);
 
-    // Google Ads has no single "account" returned by the token exchange —
-    // the same Google identity can manage multiple ad accounts (customer
-    // IDs), so we list them and let the user pick one before sync can run.
+    // Neither Google nor Meta's token exchange returns a single "account" —
+    // the same identity can manage multiple ad accounts, so we list them and
+    // let the user pick one before sync can run. TikTok's exchange does
+    // return an advertiser_id directly (see TikTokAdsAdapter), so it skips this.
     let externalAccountId = result.accountId ?? 'pending';
-    let availableCustomers: string[] | undefined;
+    let availableAccounts: { id: string; name?: string }[] | undefined;
+
     if (provider === 'google' && result.refreshToken) {
-      availableCustomers = await adapter.listAccessibleCustomers(result.accessToken, result.refreshToken);
-      externalAccountId = availableCustomers[0] ?? 'pending';
+      const customerIds: string[] = await adapter.listAccessibleCustomers(result.accessToken, result.refreshToken);
+      availableAccounts = customerIds.map((id) => ({ id }));
+      externalAccountId = customerIds[0] ?? 'pending';
+    }
+    if (provider === 'meta') {
+      availableAccounts = await adapter.listAccessibleAdAccounts(result.accessToken);
+      externalAccountId = availableAccounts[0]?.id ?? 'pending';
     }
 
     const account = await this.prisma.integrationAccount.create({
@@ -58,38 +65,44 @@ export class IntegrationsController {
         refreshTokenEnc: result.refreshToken ? this.encryption.encrypt(result.refreshToken) : null,
         tokenExpiresAt: result.expiresIn ? new Date(Date.now() + result.expiresIn * 1000) : null,
         status: externalAccountId === 'pending' ? 'ERROR' : 'CONNECTED',
-        metadata: availableCustomers ? { availableCustomers } : undefined,
+        metadata: availableAccounts ? { availableAccounts } : undefined,
       },
     });
 
     return {
       status: account.status === 'CONNECTED' ? 'connected' : 'needs_account_selection',
       integrationAccountId: account.id,
-      availableCustomers,
+      availableAccounts,
     };
   }
 
-  /** Google Ads only: switch which customer (ad account) this connection syncs. */
+  /** Google Ads / Meta Ads: switch which ad account this connection syncs. */
   @UseGuards(JwtAuthGuard)
-  @Patch('google/:integrationAccountId/select-customer')
-  async selectGoogleCustomer(
+  @Patch(':provider/:integrationAccountId/select-account')
+  async selectAccount(
     @Req() req: any,
+    @Param('provider') provider: string,
     @Param('integrationAccountId') integrationAccountId: string,
-    @Body() body: { customerId: string },
+    @Body() body: { accountId: string },
   ) {
-    const account = await this.prisma.integrationAccount.findFirst({
-      where: { id: integrationAccountId, organizationId: req.user.organizationId, provider: 'GOOGLE_ADS' },
-    });
-    if (!account) throw new NotFoundException('Google Ads integration account not found.');
+    const entry = ADAPTERS[provider];
+    if (!entry) throw new BadRequestException(`Unknown provider "${provider}"`);
 
-    const available = (account.metadata as any)?.availableCustomers as string[] | undefined;
-    if (available && !available.includes(body.customerId)) {
-      throw new BadRequestException(`Customer ${body.customerId} is not accessible on this connection. Available: ${available.join(', ')}`);
+    const account = await this.prisma.integrationAccount.findFirst({
+      where: { id: integrationAccountId, organizationId: req.user.organizationId, provider: entry.provider },
+    });
+    if (!account) throw new NotFoundException(`${entry.provider} integration account not found.`);
+
+    const available = (account.metadata as any)?.availableAccounts as { id: string }[] | undefined;
+    if (available && !available.some((a) => a.id === body.accountId)) {
+      throw new BadRequestException(
+        `Account ${body.accountId} is not accessible on this connection. Available: ${available.map((a) => a.id).join(', ')}`,
+      );
     }
 
     return this.prisma.integrationAccount.update({
       where: { id: account.id },
-      data: { externalAccountId: body.customerId, status: 'CONNECTED' },
+      data: { externalAccountId: body.accountId, status: 'CONNECTED' },
     });
   }
 }
