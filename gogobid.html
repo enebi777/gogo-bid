@@ -2037,9 +2037,22 @@ function renderBSC(container,campId){
   }).join('');
 }
 function acceptBid(campId,suggId){
-  const card=$('bsc-'+suggId);if(card)card.style.transition='all .3s';
+  const camp=CS.getById(campId);if(!camp)return;
+  const s=camp.ai.bidSuggestions.find(x=>x.id===suggId);if(!s)return;
+  const apply=()=>{
+    const card=$('bsc-'+suggId);if(card)card.style.transition='all .3s';
+    CS.acceptBid(campId,suggId);
+    setTimeout(()=>renderPage(_page),320);
+  };
+  if(camp.optimization.autoPilot){apply();return;}
+  const chg=s.metric==='Budget'?`Budget +$${s.change}/day ($${s.from}→$${s.to})`:`${s.action} ${s.metric} $${Math.abs(s.change).toFixed(2)} ($${s.from}→$${s.to})`;
+  openConfirm('Apply Bid Suggestion',`${camp.name}: ${chg}. Projected ROAS ${s.projRoas}, profit ${s.projProfit}. Apply this change now?`,'✓ Apply',apply,'var(--green)');
+}
+function autoApplyBid(campId,suggId){
+  const camp=CS.getById(campId);if(!camp)return;
   CS.acceptBid(campId,suggId);
-  setTimeout(()=>renderPage(_page),320);
+  toast('AutoPilot',`${camp.name}: AI suggestion auto-applied without confirmation.`,'success');
+  if(_page==='dashboard'||_page==='hub'||_page==='campaigns')renderPage(_page);
 }
 function dismissBid(campId,suggId){
   const card=$('bsc-'+suggId);
@@ -2484,6 +2497,7 @@ function renderCampaignHub(el){
 
 function renderCampaigns(el){
   const all=CS.camps,c=CS.active;
+  if(!all.length){el.innerHTML=`<div class="empty-state"><div class="empty-icon">📭</div><div class="empty-title">No Campaigns Yet</div><div class="empty-desc">Create your first campaign to start tracking performance, bids, and AI recommendations.</div><div class="empty-actions"><button class="btn btn-primary" onclick="openCreateCamp()">+ New Campaign</button></div></div>`;return;}
   const totSpend=all.reduce((n,x)=>n+(x.metrics.today.spend||0),0);
   const totProfit=all.reduce((n,x)=>n+(x.metrics.today.profit||0),0);
   const pendBids=all.reduce((n,x)=>n+x.ai.bidSuggestions.filter(s=>s.status==='pending').length,0);
@@ -2496,8 +2510,8 @@ function renderCampaigns(el){
   </div>
 </div>
 <div class="camp-filter-bar">
-  <input type="text" placeholder="🔍  Search campaigns…" oninput="_campFilter=this.value;renderPage('campaigns')" value="${_campFilter}">
-  ${['all','active','paused','stopped'].map(s=>`<div class="filter-chip${_campStatusFilter===s?' active-chip':''}" onclick="_campStatusFilter='${s}';renderPage('campaigns')">${s==='all'?'All':s.charAt(0).toUpperCase()+s.slice(1)}</div>`).join('')}
+  <input type="text" placeholder="🔍  Search campaigns…" oninput="_campFilter=this.value;_campPage=1;renderPage('campaigns')" value="${_campFilter}">
+  ${['all','active','paused','stopped'].map(s=>`<div class="filter-chip${_campStatusFilter===s?' active-chip':''}" onclick="_campStatusFilter='${s}';_campPage=1;renderPage('campaigns')">${s==='all'?'All':s.charAt(0).toUpperCase()+s.slice(1)}</div>`).join('')}
 </div>
 <div class="g5 mb16">
   <div class="card kpi"><div class="kpi-label">Active</div><div class="kpi-val pos">${all.filter(x=>x.status==='active').length}</div></div>
@@ -2511,12 +2525,19 @@ function renderCampaigns(el){
     <table>
       <thead><tr><th>Campaign</th><th>Platform</th><th>Status</th><th>Budget/d</th><th>Spend</th><th>CVR</th><th>CPC</th><th>CPA</th><th>ROAS</th><th>Profit</th><th>Health</th><th></th></tr></thead>
       <tbody>
-        ${all.filter(camp=>{
-          const flt=_campFilter.toLowerCase();
-          const matchSearch=!flt||camp.name.toLowerCase().includes(flt)||camp.offer.type.toLowerCase().includes(flt)||camp.traffic.source.toLowerCase().includes(flt);
-          const matchStatus=_campStatusFilter==='all'||camp.status===_campStatusFilter;
-          return matchSearch&&matchStatus;
-        }).map(camp=>{
+        ${(()=>{
+          const filtered=all.filter(camp=>{
+            const flt=_campFilter.toLowerCase();
+            const matchSearch=!flt||camp.name.toLowerCase().includes(flt)||camp.offer.type.toLowerCase().includes(flt)||camp.traffic.source.toLowerCase().includes(flt);
+            const matchStatus=_campStatusFilter==='all'||camp.status===_campStatusFilter;
+            return matchSearch&&matchStatus;
+          });
+          const totalPages=Math.max(1,Math.ceil(filtered.length/CAMP_PAGE_SIZE));
+          if(_campPage>totalPages)_campPage=totalPages;
+          window._campPageRows=filtered.slice((_campPage-1)*CAMP_PAGE_SIZE,_campPage*CAMP_PAGE_SIZE);
+          window._campPageMeta={total:filtered.length,totalPages};
+          return window._campPageRows;
+        })().map(camp=>{
           const m=camp.metrics.today,isSel=camp.id===c.id;
           const sc={active:'badge-green',paused:'badge-yellow',stopped:'badge-red'}[camp.status];
           const rc=(m.roas||0)>=1.5?'var(--green)':'var(--red)';
@@ -2544,6 +2565,15 @@ function renderCampaigns(el){
       </tbody>
     </table>
   </div>
+  ${window._campPageMeta&&window._campPageMeta.totalPages>1?`
+  <div class="flex items-center justify-between" style="padding:12px 4px 2px;border-top:1px solid var(--border);margin-top:8px">
+    <span style="font-size:11px;color:var(--muted)">Showing ${(_campPage-1)*CAMP_PAGE_SIZE+1}–${Math.min(_campPage*CAMP_PAGE_SIZE,window._campPageMeta.total)} of ${window._campPageMeta.total}</span>
+    <div class="flex gap6">
+      <button class="btn btn-outline btn-xs" ${_campPage<=1?'disabled':''} onclick="_campPage--;renderPage('campaigns')">‹ Prev</button>
+      <span style="font-size:11px;color:var(--muted);padding:4px 8px">Page ${_campPage} / ${window._campPageMeta.totalPages}</span>
+      <button class="btn btn-outline btn-xs" ${_campPage>=window._campPageMeta.totalPages?'disabled':''} onclick="_campPage++;renderPage('campaigns')">Next ›</button>
+    </div>
+  </div>`:''}
 </div>
 <div class="g2 mb16">
   <div class="card">
@@ -3453,9 +3483,9 @@ function stProfile(c){return`
     </div>
     <div class="flex items-center justify-between" style="padding:10px 0;border-bottom:1px solid var(--border);margin-bottom:14px">
       <div><div style="font-size:13px;font-weight:500">AutoPilot Mode</div><div class="text-xs text-muted">AI auto-applies bid suggestions without confirmation</div></div>
-      <label class="switch"><input type="checkbox" ${c.optimization.autoPilot?'checked':''}><span class="sw-sl"></span></label>
+      <label class="switch"><input type="checkbox" ${c.optimization.autoPilot?'checked':''} onchange="CS.active.optimization.autoPilot=this.checked;persistSave();toast('AutoPilot',CS.active.optimization.autoPilot?'Enabled — AI will auto-apply bid suggestions for '+CS.active.name+'.':'Disabled — suggestions now require manual approval.',CS.active.optimization.autoPilot?'success':'info')"><span class="sw-sl"></span></label>
     </div>
-    <button class="btn btn-primary btn-sm">Save Defaults</button>
+    <button class="btn btn-primary btn-sm" onclick="toast('Saved','Campaign defaults updated.','success')">Save Defaults</button>
   </div>
 </div>
 <button class="btn btn-primary btn-sm">Save Profile</button>`}
@@ -4817,7 +4847,7 @@ window.fetch=function(url,...args){
 // ═══════════════════════════════════════════════════
 // CAMPAIGN FILTER / SEARCH
 // ═══════════════════════════════════════════════════
-let _campFilter='',_campStatusFilter='all';
+let _campFilter='',_campStatusFilter='all',_campPage=1;const CAMP_PAGE_SIZE=8;
 
 // ═══════════════════════════════════════════════════
 // EXPORT UTILITIES
@@ -5199,18 +5229,32 @@ document.addEventListener('click',e=>{if(!$('dr-wrap')?.contains(e.target))$('dr
 setInterval(()=>{const cl=$('tb-clock');if(cl)cl.textContent=new Date().toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'})},1000);
 
 // ═══════════════════════════════════════════════════
-// LIVE METRIC SIMULATION (every 28s)
+// LIVE METRIC SIMULATION — 4s ticks, smoother than the old 28s jumps
 // ═══════════════════════════════════════════════════
 setInterval(()=>{
   CS.camps.filter(c=>c.status==='active').forEach(c=>{
-    const j=v=>v!=null?Math.round(v*(1+(Math.random()-.5)*.015)*100)/100:v;
-    c.metrics.today.cpc=j(c.metrics.today.cpc);
-    c.metrics.today.spend+=Math.round(Math.random()*14);
-    c.metrics.today.revenue=Math.round((c.metrics.today.spend||0)*(c.metrics.today.roas||2));
-    c.metrics.today.profit=Math.round((c.metrics.today.revenue||0)-(c.metrics.today.spend||0));
+    const m=c.metrics.today;
+    const j=(v,pct)=>v!=null?Math.round(v*(1+(Math.random()-.5)*pct)*100)/100:v;
+    m.cpc=j(m.cpc,.006);
+    m.cvr=j(m.cvr,.01);
+    m.spend=+((m.spend||0)+Math.random()*2.2).toFixed(2);
+    m.revenue=+((m.spend||0)*(m.roas||2)).toFixed(2);
+    m.profit=Math.round((m.revenue||0)-(m.spend||0));
+    m.roas=m.spend>0?+(m.revenue/m.spend).toFixed(2):m.roas;
+    m.cpa=m.cvr>0&&m.cpc!=null?+(m.cpc/(m.cvr/100)).toFixed(2):m.cpa;
   });
   syncCtxBar();
-},28000);
+  const typing=document.activeElement&&['INPUT','TEXTAREA','SELECT'].includes(document.activeElement.tagName);
+  if(!typing&&['dashboard','hub'].includes(_page))renderPage(_page);
+},4000);
+
+// AutoPilot — auto-applies pending AI bid suggestions for campaigns with AutoPilot Mode enabled
+setInterval(()=>{
+  CS.camps.filter(c=>c.optimization.autoPilot).forEach(c=>{
+    const s=c.ai.bidSuggestions.find(x=>x.status==='pending');
+    if(s)autoApplyBid(c.id,s.id);
+  });
+},9000);
 
 // ═══════════════════════════════════════════════════
 // BOOT
