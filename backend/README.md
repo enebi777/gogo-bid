@@ -3,9 +3,9 @@
 Real production architecture for GoGo Bid: NestJS + TypeScript, PostgreSQL (Prisma), Redis + BullMQ, JWT auth, AES-256-GCM credential encryption, OAuth, webhooks, and a universal postback receiver.
 
 **Honest status check (read this before assuming anything below is "live"):**
-This scaffold is architecturally real — the database schema, queues, auth, encryption, and HTTP routes are production-shaped code, not mocks. But it has never been run, because this environment has no Node.js/Docker installed and no third-party API credentials exist yet. Two different things are true at once:
-- The *shape* of the system (schema, modules, queues, security) is real and ready to run.
-- Every external integration (Meta, Google, TikTok, ClickBank, trackers, checkout platforms, analytics, AI) needs real developer credentials before it does anything beyond throwing a clear "not configured" error. None of them return fabricated numbers — they fail loudly instead, by design, so nothing downstream can mistake a stub for live data.
+The core app — Postgres/Prisma, JWT auth, campaign CRUD + performance aggregation, the postback receiver, and the BullMQ worker process — **has now actually been run and verified** against real Docker containers (`docker compose up`, `prisma migrate dev`, `nest build`, then exercised with curl: register → login → create/list campaigns → performance → signed/unsigned postback). That run caught and fixed three real TypeScript errors in the Google Ads adapter and the OAuth controller that no amount of reading would have surfaced — see the git history for `verify-backend-locally`.
+
+What's still unverified: every *external* integration (Meta, Google, TikTok, ClickBank, trackers, checkout platforms, analytics, AI). They need real developer credentials before they do anything beyond throwing a clear "not configured" error — none of them return fabricated numbers, by design, so nothing downstream can mistake a stub for live data.
 
 ## What's actually implemented
 
@@ -17,9 +17,9 @@ This scaffold is architecturally real — the database schema, queues, auth, enc
 | Campaign CRUD + `/campaigns/:id/performance` (the Campaign Context aggregation every module should read from) | ✅ Complete |
 | BullMQ queues + standalone worker process, retry/backoff, dead-letter via BullMQ's failed-job set | ✅ Complete |
 | OAuth connect/callback flow for Meta, Google Ads, TikTok Ads — real authorization URLs and token-exchange endpoints | ✅ Wired, ⛔ needs real app credentials to complete a live handshake |
-| **Google Ads vertical slice** — OAuth, ad-account listing + selection endpoint, real GAQL-based `syncDaily`/`syncHistorical` upserting Campaign/Cost/Revenue, token-refresh worker handler, daily scheduler (`scheduler.main.ts`, BullMQ repeatable jobs at 06:00 UTC + 6h token-refresh sweep) | ✅ Code-complete end-to-end, ⛔ never executed — needs `GOOGLE_CLIENT_ID/SECRET`, an approved `GOOGLE_ADS_DEVELOPER_TOKEN`, and the `google-ads-api` npm package installed to verify |
-| **Meta Ads vertical slice** — OAuth, `/me/adaccounts` listing + selection endpoint, real Insights API `syncDaily`/`syncHistorical` upserting Campaign/Cost/Revenue (cost from `spend`, revenue from `action_values[purchase]`), shares the token-refresh worker | ✅ Code-complete end-to-end, ⛔ never executed — needs `META_APP_ID/SECRET` with Marketing API access approved by Meta App Review |
-| **TikTok Ads vertical slice** — OAuth, advertiser listing + selection endpoint, real Integrated Reporting API `syncDaily`/`syncHistorical` upserting Campaign/Cost/Revenue (cost from `spend`, revenue derived from `complete_payment_roas`); token-refresh worker explicitly skips TikTok since its tokens are long-lived with no refresh cycle | ✅ Code-complete end-to-end, ⛔ never executed — needs `TIKTOK_APP_ID/SECRET` with Marketing API app approval |
+| **Google Ads vertical slice** — OAuth, ad-account listing + selection endpoint, real GAQL-based `syncDaily`/`syncHistorical` upserting Campaign/Cost/Revenue, token-refresh worker handler, daily scheduler (`scheduler.main.ts`, BullMQ repeatable jobs at 06:00 UTC + 6h token-refresh sweep) | ✅ Code-complete end-to-end, ⛔ OAuth/sync calls themselves still untested — needs `GOOGLE_CLIENT_ID/SECRET` and an approved `GOOGLE_ADS_DEVELOPER_TOKEN` to verify against a real account (the app around it is now verified running) |
+| **Meta Ads vertical slice** — OAuth, `/me/adaccounts` listing + selection endpoint, real Insights API `syncDaily`/`syncHistorical` upserting Campaign/Cost/Revenue (cost from `spend`, revenue from `action_values[purchase]`), shares the token-refresh worker | ✅ Code-complete end-to-end, ⛔ OAuth/sync calls themselves still untested — needs `META_APP_ID/SECRET` with Marketing API access approved by Meta App Review |
+| **TikTok Ads vertical slice** — OAuth, advertiser listing + selection endpoint, real Integrated Reporting API `syncDaily`/`syncHistorical` upserting Campaign/Cost/Revenue (cost from `spend`, revenue derived from `complete_payment_roas`); token-refresh worker explicitly skips TikTok since its tokens are long-lived with no refresh cycle | ✅ Code-complete end-to-end, ⛔ OAuth/sync calls themselves still untested — needs `TIKTOK_APP_ID/SECRET` with Marketing API app approval |
 | Universal postback receiver `/postback/:tracker` (GET+POST, shared-secret validation, dedup, queued processing) | ✅ Complete as a receiver; field mapping covers Voluum/RedTrack/Binom/Bemob/Keitaro/Hyros |
 | Meta + TikTok webhook receivers with signature verification | ✅ Wired (Meta's HMAC check needs raw-body middleware added before production use — noted in code) |
 | ClickBank adapter (INS signature check + Reporting API shape) | ✅ Wired, ⛔ needs CLICKBANK_DEV_KEY/CLERK_KEY |
@@ -51,19 +51,32 @@ All three follow the same shape: connect → list accounts → (optionally) sele
 
 Meta, Google, and TikTok each require you to register a real app in their developer console and get it approved for ads/marketing API scopes — that's an external, manual process tied to your business identity, not something achievable from code. The code here builds the *correct* authorization URL and does the *correct* token exchange call shape per each platform's docs, so once you create the app and drop `META_APP_ID`/`META_APP_SECRET` (etc.) into `.env`, the connect → callback → token-storage flow should work without further code changes — that's the point of building it this way now.
 
-## Running it (once Node + Docker are available)
+## Running it — verified steps
+
+This exact sequence was run for real (Node v24.17.0, Docker 29.5.3) and confirmed working:
 
 ```bash
-cp .env.example .env          # fill in real secrets as you get them
-docker compose up -d          # postgres + redis
+cp .env.example .env           # fill in JWT_SECRET, JWT_REFRESH_SECRET, POSTBACK_SHARED_SECRET, and
+                                # CREDENTIALS_ENCRYPTION_KEY (openssl rand -base64 32) at minimum —
+                                # everything else can stay blank until you add a real integration
+docker compose up -d           # postgres + redis
 npm install
 npm run prisma:generate
-npm run prisma:migrate
-npm run start:dev             # API on :4000
-npm run worker:dev            # separate process, in another terminal
+npx prisma migrate dev --name init   # creates prisma/migrations/, applies schema
+npm run build
+npm run start                  # API on :4000 — in a separate terminal: npm run worker
 ```
 
-`GET /api/health` should return `{ "status": "ok" }` once Postgres is reachable.
+Confirmed working end-to-end:
+- `GET /api/health` → `{"status":"ok","db":"up"}`
+- `POST /api/auth/register` → issues access + refresh JWTs
+- `POST /api/auth/login` → same
+- `GET/POST /api/campaigns` (JWT-protected) → create + list round-trip against real Postgres
+- `GET /api/campaigns/:id/performance` → correctly returns zeros for a campaign with no cost/revenue rows yet (no fabricated numbers)
+- `GET /api/postback/voluum` → 400 without `?secret=`, 200 + `WebhookEvent` row created with the correct shared secret
+- `npm run worker` → connects to Redis/Postgres and idles cleanly, no crash
+
+Not yet exercised: anything requiring real third-party credentials (OAuth connect/callback for Meta/Google/TikTok, ClickBank, webhook signature verification against real payloads) — see the integration table above for what's still pending external credentials.
 
 ## Connecting the frontend
 
