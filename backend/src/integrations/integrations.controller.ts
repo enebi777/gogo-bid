@@ -48,16 +48,19 @@ export class IntegrationsController {
 
     if (provider === 'google' && result.refreshToken) {
       const customerIds: string[] = await adapter.listAccessibleCustomers(result.accessToken, result.refreshToken);
-      availableAccounts = customerIds.map((id) => ({ id }));
-      externalAccountId = customerIds[0] ?? 'pending';
+      const accounts = customerIds.map((id) => ({ id }));
+      availableAccounts = accounts;
+      externalAccountId = accounts[0]?.id ?? 'pending';
     }
     if (provider === 'meta') {
-      availableAccounts = await adapter.listAccessibleAdAccounts(result.accessToken);
-      externalAccountId = availableAccounts[0]?.id ?? 'pending';
+      const accounts: { id: string; name?: string }[] = await adapter.listAccessibleAdAccounts(result.accessToken);
+      availableAccounts = accounts;
+      externalAccountId = accounts[0]?.id ?? 'pending';
     }
     if (provider === 'tiktok' && result.advertiserIds?.length) {
-      availableAccounts = await adapter.listAccessibleAdvertisers(result.accessToken, result.advertiserIds);
-      externalAccountId = availableAccounts[0]?.id ?? 'pending';
+      const accounts: { id: string; name?: string }[] = await adapter.listAccessibleAdvertisers(result.accessToken, result.advertiserIds);
+      availableAccounts = accounts;
+      externalAccountId = accounts[0]?.id ?? 'pending';
     }
 
     const account = await this.prisma.integrationAccount.create({
