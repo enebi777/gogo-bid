@@ -109,30 +109,32 @@ export class GoogleAdsAdapter implements OAuthAdapter, SyncAdapter {
 
     for (const row of rows) {
       const externalId = String(row.campaign?.id ?? '');
-      if (!externalId) continue;
+      const campaignName = row.campaign?.name;
+      const campaignDate = row.segments?.date;
+      if (!externalId || !campaignName || !campaignDate) continue;
+      const status = this.mapStatus(row.campaign?.status ?? '');
 
-      const campaign = await ctx.prisma.campaign.upsert({
-        where: {
-          // No natural unique constraint on (integrationAccountId, externalId) in the
-          // current schema beyond `id` — matching by name+account here; recommend
-          // adding a dedicated externalId column + unique index before relying on
-          // this in production with renamed campaigns.
-          id: (await ctx.prisma.campaign.findFirst({
-            where: { integrationAccountId, name: row.campaign.name },
-            select: { id: true },
-          }))?.id ?? '__none__',
-        },
-        update: { status: this.mapStatus(row.campaign.status) },
-        create: {
-          organizationId: account.organizationId,
-          integrationAccountId,
-          name: row.campaign.name,
-          status: this.mapStatus(row.campaign.status),
-          dailyBudget: row.campaign_budget?.amount_micros ? Number(row.campaign_budget.amount_micros) / 1_000_000 : null,
-        },
+      // No natural unique constraint on (integrationAccountId, externalId) in the
+      // current schema beyond `id` — matching by name+account here; recommend
+      // adding a dedicated externalId column + unique index before relying on
+      // this in production with renamed campaigns.
+      const existing = await ctx.prisma.campaign.findFirst({
+        where: { integrationAccountId, name: campaignName },
+        select: { id: true },
       });
+      const campaign = existing
+        ? await ctx.prisma.campaign.update({ where: { id: existing.id }, data: { status } })
+        : await ctx.prisma.campaign.create({
+            data: {
+              organizationId: account.organizationId,
+              integrationAccountId,
+              name: campaignName,
+              status,
+              dailyBudget: row.campaign_budget?.amount_micros ? Number(row.campaign_budget.amount_micros) / 1_000_000 : null,
+            },
+          });
 
-      const date = new Date(`${row.segments.date}T00:00:00.000Z`);
+      const date = new Date(`${campaignDate}T00:00:00.000Z`);
       const costAmount = Number(row.metrics?.cost_micros ?? 0) / 1_000_000;
       const revenueAmount = Number(row.metrics?.conversions_value ?? 0);
 
