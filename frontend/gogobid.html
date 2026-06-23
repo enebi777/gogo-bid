@@ -1347,16 +1347,56 @@ canvas{max-width:100%}
 
 <script>
 // ═══════════════════════════════════════════════════
-// AUTH SYSTEM
+// API CLIENT — talks to the real gogo-bid-backend (NestJS) at API_BASE.
+// Falls back gracefully (with a toast) if the backend isn't reachable —
+// nothing here should hard-crash the app if the API is down.
+// ═══════════════════════════════════════════════════
+const API_BASE = (window.GOGOBID_API_BASE) || 'http://localhost:4000/api';
+function getAccessToken(){return localStorage.getItem('gb_access_token')||'';}
+function getRefreshToken(){return localStorage.getItem('gb_refresh_token')||'';}
+function setTokens(accessToken,refreshToken){
+  if(accessToken)localStorage.setItem('gb_access_token',accessToken);
+  if(refreshToken)localStorage.setItem('gb_refresh_token',refreshToken);
+}
+function clearTokens(){
+  localStorage.removeItem('gb_access_token');
+  localStorage.removeItem('gb_refresh_token');
+}
+class ApiError extends Error{constructor(message,status){super(message);this.status=status;}}
+async function apiFetch(path,opts={}){
+  const headers={'Content-Type':'application/json',...(opts.headers||{})};
+  const token=getAccessToken();
+  if(token)headers['Authorization']='Bearer '+token;
+  let res;
+  try{
+    res=await fetch(API_BASE+path,{...opts,headers});
+  }catch(networkErr){
+    throw new ApiError('Could not reach the GoGo Bid API at '+API_BASE+'. Is the backend running?',0);
+  }
+  const isJson=(res.headers.get('content-type')||'').includes('application/json');
+  const body=isJson?await res.json().catch(()=>null):null;
+  if(!res.ok){
+    if(res.status===401){clearTokens();}
+    throw new ApiError((body&&body.message)||('Request failed with status '+res.status),res.status);
+  }
+  return body;
+}
+
+// ═══════════════════════════════════════════════════
+// AUTH SYSTEM — register/login hit the real backend (JWT access+refresh
+// tokens persisted in localStorage; the email/name/plan shown in the UI is
+// a local display cache, not the source of truth for whether you're
+// authenticated — that's the JWT, validated server-side on every request).
 // ═══════════════════════════════════════════════════
 let _authUser = null;
 function authInit(){
   const raw=localStorage.getItem('gb_user');
   if(raw){try{_authUser=JSON.parse(raw);}catch(e){}}
-  if(_authUser&&_authUser.loggedIn){
+  if(_authUser&&_authUser.loggedIn&&getAccessToken()){
     hideAuthOverlay();
     applySidebarUser();
   } else {
+    clearTokens();
     showAuthOverlay('login');
   }
 }
@@ -1398,45 +1438,81 @@ function renderAuthForm(mode){
   }
 }
 function authShowError(msg){const e=$('auth-err');if(e){e.textContent=msg;e.classList.add('show');}}
-function authLogin(){
+function authSetBusy(btnSelector,busy,busyLabel){
+  const btn=qs(btnSelector);if(!btn)return;
+  if(busy){btn.dataset.origLabel=btn.textContent;btn.textContent=busyLabel||'Please wait…';btn.disabled=true;}
+  else{if(btn.dataset.origLabel)btn.textContent=btn.dataset.origLabel;btn.disabled=false;}
+}
+function authPersistSession(email,name,plan,isNew,accessToken,refreshToken){
+  _authUser={email,name,plan,loggedIn:true,isNew};
+  localStorage.setItem('gb_user',JSON.stringify(_authUser));
+  setTokens(accessToken,refreshToken);
+}
+async function authLogin(){
   const email=($('auth-email')?.value||'').trim();
   const pass=($('auth-pass')?.value||'').trim();
   if(!email){authShowError('Please enter your email address.');return;}
   if(!pass||pass.length<6){authShowError('Please enter your password (6+ chars).');return;}
-  // Accept demo creds or any valid-format login for prototype
-  if(email&&pass.length>=6){
-    _authUser={email,name:email.split('@')[0].replace(/[._]/g,' ').replace(/\b\w/g,c=>c.toUpperCase()),plan:'Pro',loggedIn:true,isNew:false};
-    localStorage.setItem('gb_user',JSON.stringify(_authUser));
+  authSetBusy('.auth-btn-primary',true,'Logging in…');
+  try{
+    const {accessToken,refreshToken}=await apiFetch('/auth/login',{method:'POST',body:JSON.stringify({email,password:pass})});
+    const name=email.split('@')[0].replace(/[._]/g,' ').replace(/\b\w/g,c=>c.toUpperCase());
+    authPersistSession(email,name,'Pro',false,accessToken,refreshToken);
     hideAuthOverlay();
     applySidebarUser();
-    toast('Welcome back, '+_authUser.name.split(' ')[0]+' 👋','GoGo Bid loaded — '+CS.camps.filter(c=>c.status==='active').length+' campaigns active.','success',4500);
-  } else {
-    authShowError('Invalid email or password. Try demo@gogobid.com / demo1234');
+    toast('Welcome back, '+name.split(' ')[0]+' 👋','GoGo Bid loaded — '+CS.camps.filter(c=>c.status==='active').length+' campaigns active.','success',4500);
+  }catch(err){
+    authShowError(err.status===401?'Invalid email or password.':err.message);
+  }finally{
+    authSetBusy('.auth-btn-primary',false);
   }
 }
-function authSignup(){
+async function authSignup(){
   const name=($('auth-name')?.value||'').trim();
   const email=($('auth-email')?.value||'').trim();
   const pass=($('auth-pass')?.value||'').trim();
   if(!name){authShowError('Please enter your full name.');return;}
   if(!email||!email.includes('@')){authShowError('Please enter a valid email address.');return;}
   if(!pass||pass.length<8){authShowError('Password must be at least 8 characters.');return;}
-  _authUser={email,name,plan:'Free Trial',loggedIn:true,isNew:true};
-  localStorage.setItem('gb_user',JSON.stringify(_authUser));
-  hideAuthOverlay();
-  applySidebarUser();
-  setTimeout(()=>startOnboarding(),600);
+  authSetBusy('.auth-btn-primary',true,'Creating account…');
+  try{
+    const {accessToken,refreshToken}=await apiFetch('/auth/register',{method:'POST',body:JSON.stringify({email,password:pass,orgName:name+"'s Organization"})});
+    authPersistSession(email,name,'Free Trial',true,accessToken,refreshToken);
+    hideAuthOverlay();
+    applySidebarUser();
+    setTimeout(()=>startOnboarding(),600);
+  }catch(err){
+    authShowError(err.status===409?'That email is already registered — try logging in instead.':err.message);
+  }finally{
+    authSetBusy('.auth-btn-primary',false);
+  }
 }
-function authDemo(){
-  _authUser={email:'demo@gogobid.com',name:'Demo User',plan:'Pro',loggedIn:true,isNew:false};
-  localStorage.setItem('gb_user',JSON.stringify(_authUser));
-  hideAuthOverlay();
-  applySidebarUser();
-  toast('Demo mode active 🚀','Explore GoGo Bid with live sample campaign data.','success',4000);
+async function authDemo(){
+  authSetBusy('.auth-btn-ghost',true,'Loading demo…');
+  const email='demo@gogobid.com',pass='demo1234';
+  try{
+    let tokens;
+    try{
+      tokens=await apiFetch('/auth/login',{method:'POST',body:JSON.stringify({email,password:pass})});
+    }catch(loginErr){
+      if(loginErr.status===401){
+        tokens=await apiFetch('/auth/register',{method:'POST',body:JSON.stringify({email,password:pass,orgName:"Demo Organization"})});
+      } else throw loginErr;
+    }
+    authPersistSession(email,'Demo User','Pro',false,tokens.accessToken,tokens.refreshToken);
+    hideAuthOverlay();
+    applySidebarUser();
+    toast('Demo mode active 🚀','Explore GoGo Bid with live sample campaign data.','success',4000);
+  }catch(err){
+    authShowError(err.message);
+  }finally{
+    authSetBusy('.auth-btn-ghost',false);
+  }
 }
 function authLogout(){
   openConfirm('Log Out','Are you sure you want to log out of GoGo Bid?','Log Out',()=>{
     localStorage.removeItem('gb_user');
+    clearTokens();
     _authUser=null;
     showAuthOverlay('login');
     toast('Logged out','See you next time!','info',3000);
@@ -1543,7 +1619,7 @@ function openConfirm(title,msg,okLabel='Confirm',cb=null,okColor='var(--accent)'
   $('confirm-overlay').classList.add('open');
 }
 function closeConfirm(){$('confirm-overlay')?.classList.remove('open');_confirmCallback=null;}
-function confirmOk(){closeConfirm();if(_confirmCallback)_confirmCallback();}
+function confirmOk(){const cb=_confirmCallback;closeConfirm();if(cb)cb();}
 
 // ═══════════════════════════════════════════════════
 // UTILITIES
