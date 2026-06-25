@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Patch, Post, UseGuards, Req } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, UseGuards, Req } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { CampaignsService } from './campaigns.service';
 
@@ -35,5 +35,10 @@ export class CampaignsController {
   @Patch(':id/archive')
   archive(@Req() req: any, @Param('id') id: string) {
     return this.campaigns.archive(req.user.organizationId, id);
+  }
+
+  @Delete(':id')
+  delete(@Req() req: any, @Param('id') id: string) {
+    return this.campaigns.delete(req.user.organizationId, id);
   }
 }

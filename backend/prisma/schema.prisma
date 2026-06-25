@@ -120,6 +120,12 @@ model Campaign {
   dailyBudget          Decimal?
   offerId              String?
   offer                Offer?   @relation(fields: [offerId], references: [id])
+  // Frontend-managed nested fields (offer details, traffic source, targeting,
+  // metrics snapshot, AI scores/recommendations, optimization settings) that
+  // haven't been normalized into their own tables yet. name/status/dailyBudget
+  // above stay first-class columns for querying; `data` is the source of truth
+  // for everything the frontend's richer campaign object carries today.
+  data                 Json?
   createdAt            DateTime @default(now())
   updatedAt            DateTime @updatedAt
 
@@ -136,7 +142,7 @@ model Campaign {
 model AdSet {
   id         String   @id @default(cuid())
   campaignId String
-  campaign   Campaign @relation(fields: [campaignId], references: [id])
+  campaign   Campaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
   name       String
   externalId String?
   ads        Ad[]
@@ -189,7 +195,7 @@ model Order {
 model Click {
   id           String   @id @default(cuid())
   campaignId   String
-  campaign     Campaign @relation(fields: [campaignId], references: [id])
+  campaign     Campaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
   tracker      IntegrationProvider
   clickId      String
   cost         Decimal?
@@ -203,7 +209,7 @@ model Click {
 model Conversion {
   id           String   @id @default(cuid())
   campaignId   String
-  campaign     Campaign @relation(fields: [campaignId], references: [id])
+  campaign     Campaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
   tracker      IntegrationProvider
   clickId      String?
   conversionId String
@@ -218,7 +224,7 @@ model Conversion {
 model Cost {
   id         String   @id @default(cuid())
   campaignId String
-  campaign   Campaign @relation(fields: [campaignId], references: [id])
+  campaign   Campaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
   date       DateTime
   amount     Decimal
   source     IntegrationProvider
@@ -229,7 +235,7 @@ model Cost {
 model Revenue {
   id         String   @id @default(cuid())
   campaignId String
-  campaign   Campaign @relation(fields: [campaignId], references: [id])
+  campaign   Campaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
   date       DateTime
   amount     Decimal
   source     IntegrationProvider
@@ -242,7 +248,7 @@ model Revenue {
 model AiPrediction {
   id         String   @id @default(cuid())
   campaignId String
-  campaign   Campaign @relation(fields: [campaignId], references: [id])
+  campaign   Campaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
   type       String   // 'cpc' | 'cpa' | 'scaling' | 'anomaly' | ...
   input      Json
   output     Json
@@ -253,7 +259,7 @@ model AiPrediction {
 model Forecast {
   id         String   @id @default(cuid())
   campaignId String
-  campaign   Campaign @relation(fields: [campaignId], references: [id])
+  campaign   Campaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
   horizon    String   // 'daily' | 'weekly' | 'monthly'
   metrics    Json     // { clicks, conversions, revenue, profit, roas, cpa }
   generatedAt DateTime @default(now())
@@ -262,7 +268,7 @@ model Forecast {
 model Alert {
   id         String   @id @default(cuid())
   campaignId String
-  campaign   Campaign @relation(fields: [campaignId], references: [id])
+  campaign   Campaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
   type       String   // 'traffic_drop' | 'cpa_spike' | 'conversion_drop' | 'tracking_failure' | 'api_failure' | 'revenue_anomaly'
   severity   String   @default("warning")
   message    String

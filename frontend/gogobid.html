@@ -1395,6 +1395,7 @@ function authInit(){
   if(_authUser&&_authUser.loggedIn&&getAccessToken()){
     hideAuthOverlay();
     applySidebarUser();
+    campaignsBoot();
   } else {
     clearTokens();
     showAuthOverlay('login');
@@ -1460,6 +1461,7 @@ async function authLogin(){
     authPersistSession(email,name,'Pro',false,accessToken,refreshToken);
     hideAuthOverlay();
     applySidebarUser();
+    await campaignsBoot();
     toast('Welcome back, '+name.split(' ')[0]+' 👋','GoGo Bid loaded — '+CS.camps.filter(c=>c.status==='active').length+' campaigns active.','success',4500);
   }catch(err){
     authShowError(err.status===401?'Invalid email or password.':err.message);
@@ -1480,6 +1482,7 @@ async function authSignup(){
     authPersistSession(email,name,'Free Trial',true,accessToken,refreshToken);
     hideAuthOverlay();
     applySidebarUser();
+    await campaignsBoot();
     setTimeout(()=>startOnboarding(),600);
   }catch(err){
     authShowError(err.status===409?'That email is already registered — try logging in instead.':err.message);
@@ -1502,6 +1505,7 @@ async function authDemo(){
     authPersistSession(email,'Demo User','Pro',false,tokens.accessToken,tokens.refreshToken);
     hideAuthOverlay();
     applySidebarUser();
+    await campaignsBoot();
     toast('Demo mode active 🚀','Explore GoGo Bid with live sample campaign data.','success',4000);
   }catch(err){
     authShowError(err.message);
@@ -1765,19 +1769,42 @@ const _CAMPS = [
 ];
 
 // ═══════════════════════════════════════════════════
-// DATA PERSISTENCE
+// DATA PERSISTENCE — synced to the real backend (POST/PATCH/DELETE
+// /api/campaigns), not localStorage. The backend's Campaign row keeps
+// name/status/dailyBudget as real columns and stores everything else
+// (offer, traffic, targeting, metrics, ai, optimization, etc.) in a
+// `data` JSON column — see backend/prisma/schema.prisma.
 // ═══════════════════════════════════════════════════
 function persistSave(){
-  try{localStorage.setItem('gb_camps',JSON.stringify(_CAMPS));}catch(e){}
   const ind=$('save-indicator');
   if(ind){ind.style.opacity='1';setTimeout(()=>{ind.style.opacity='0';},1800);}
+  if(!getAccessToken())return; // not logged in yet — nothing to sync to
+  _CAMPS.forEach(c=>{
+    apiFetch('/campaigns/'+c.id,{method:'PATCH',body:JSON.stringify({name:c.name,status:c.status,dailyBudget:c.budget?.daily,data:c})})
+      .catch(err=>console.warn('persistSave: failed to sync campaign',c.id,err));
+  });
 }
-function persistLoad(){
+/** Loads this org's real campaigns from the backend on login. Seeds the backend with the in-memory demo set on a brand-new account so there's something to look at. */
+async function campaignsBoot(){
   try{
-    const raw=localStorage.getItem('gb_camps');
-    if(raw){const saved=JSON.parse(raw);if(Array.isArray(saved)&&saved.length){_CAMPS.length=0;saved.forEach(c=>_CAMPS.push(c));return true;}}
-  }catch(e){}
-  return false;
+    const rows=await apiFetch('/campaigns');
+    if(Array.isArray(rows)&&rows.length){
+      const mapped=rows.map(r=>({...(r.data||{}),id:r.id,name:r.name,status:r.status}));
+      _CAMPS.length=0;mapped.forEach(c=>_CAMPS.push(c));
+    } else {
+      const seeded=[];
+      for(const c of _CAMPS){
+        const created=await apiFetch('/campaigns',{method:'POST',body:JSON.stringify({name:c.name,status:c.status,dailyBudget:c.budget?.daily,data:c})});
+        seeded.push({...c,id:created.id});
+      }
+      _CAMPS.length=0;seeded.forEach(c=>_CAMPS.push(c));
+    }
+    CS._activeId=_CAMPS[0]?.id||'';
+    syncCtxBar();renderDrop('');updateBadges();renderPage(_page);
+  }catch(err){
+    console.warn('campaignsBoot: could not reach backend, using local demo data',err);
+    toast('Offline mode','Could not reach the GoGo Bid API — showing local demo data.','warning',5000);
+  }
 }
 
 // ═══════════════════════════════════════════════════
@@ -1813,21 +1840,30 @@ const CS = {
     if(idx===-1)return;
     this._camps.splice(idx,1);
     if(this._activeId===id)this._activeId=this._camps[0]?.id||'';
-    persistSave();
+    if(getAccessToken())apiFetch('/campaigns/'+id,{method:'DELETE'}).catch(err=>console.warn('deleteCamp: backend delete failed',id,err));
     syncCtxBar();renderPage(_page);renderDrop('');updateBadges();
   },
-  duplicateCamp(id){
+  async duplicateCamp(id){
     const src=this._camps.find(x=>x.id===id);if(!src)return;
     const clone=JSON.parse(JSON.stringify(src));
-    clone.id='c'+Date.now();
     clone.name='Copy of '+src.name;
     clone.status='paused';
     clone.scalingStatus='review';
     clone.ai.bidSuggestions=[];
     clone.ai.anomalies=[];
     clone.metrics.today={...src.metrics.today,spend:0,revenue:0,profit:0,impressions:0,clicks:0,conversions:0};
+    if(getAccessToken()){
+      try{
+        const created=await apiFetch('/campaigns',{method:'POST',body:JSON.stringify({name:clone.name,status:clone.status,dailyBudget:clone.budget?.daily,data:clone})});
+        clone.id=created.id;
+      }catch(err){
+        console.warn('duplicateCamp: backend create failed, keeping local-only copy',err);
+        clone.id='local_'+Date.now();
+      }
+    } else {
+      clone.id='local_'+Date.now();
+    }
     this._camps.push(clone);
-    persistSave();
     toast('Campaign duplicated','Copy of "'+src.name+'" created as paused.','success');
     renderPage(_page);renderDrop('');updateBadges();
   }
@@ -1882,7 +1918,7 @@ function openEditCamp(campId){
 }
 // Override ccLaunch for edit mode
 const _origCcLaunch=window.ccLaunch;
-function ccLaunch(){
+async function ccLaunch(){
   if(_ccData._editId){
     // Save edits back to existing campaign
     const c=CS.getById(_ccData._editId);
@@ -1927,8 +1963,16 @@ function ccLaunch(){
     optimizationHistory:[],
     timestamps:{created:new Date().toISOString(),updated:new Date().toISOString(),lastSync:new Date().toISOString(),pausedAt:null,stoppedAt:null}
   };
+  if(getAccessToken()){
+    try{
+      const created=await apiFetch('/campaigns',{method:'POST',body:JSON.stringify({name:newCamp.name,status:newCamp.status,dailyBudget:newCamp.budget.daily,data:newCamp})});
+      newCamp.id=created.id;
+    }catch(err){
+      console.warn('ccLaunch: backend create failed, keeping local-only campaign',err);
+    }
+  }
   CS._camps.push(newCamp);
-  CS.select(id);
+  CS.select(newCamp.id);
   persistSave();
   closeCreateCamp();
   updateBadges();renderDrop('');
@@ -5336,7 +5380,10 @@ setInterval(()=>{
 // BOOT
 // ═══════════════════════════════════════════════════
 // ── BOOT ──
-persistLoad(); // restore saved campaigns before anything
+// Renders once with the in-memory demo campaigns (visible behind the auth
+// overlay, if shown). Real campaigns load from the backend via
+// campaignsBoot(), called from authInit()/authLogin/authSignup/authDemo
+// once we know who's logged in.
 syncCtxBar();
 renderDrop('');
 updateBadges();
