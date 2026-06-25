@@ -55,15 +55,23 @@ export class CampaignsService {
     };
   }
 
-  create(organizationId: string, data: { name: string; offerId?: string; dailyBudget?: number; integrationAccountId?: string }) {
+  create(organizationId: string, data: { name: string; offerId?: string; dailyBudget?: number; integrationAccountId?: string; status?: string; data?: any }) {
     return this.prisma.campaign.create({ data: { organizationId, ...data } });
   }
 
-  update(organizationId: string, id: string, data: Partial<{ name: string; status: string; dailyBudget: number }>) {
+  async update(organizationId: string, id: string, data: Partial<{ name: string; status: string; dailyBudget: number; data: any }>) {
+    await this.getOrThrow(organizationId, id); // throws 404 if this org doesn't own the campaign
     return this.prisma.campaign.update({ where: { id }, data });
   }
 
-  archive(organizationId: string, id: string) {
+  async archive(organizationId: string, id: string) {
+    await this.getOrThrow(organizationId, id);
     return this.prisma.campaign.update({ where: { id }, data: { status: 'archived' } });
+  }
+
+  async delete(organizationId: string, id: string) {
+    await this.getOrThrow(organizationId, id);
+    await this.prisma.campaign.delete({ where: { id } });
+    return { status: 'deleted', id };
   }
 }
