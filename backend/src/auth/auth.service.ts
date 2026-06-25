@@ -30,6 +30,18 @@ export class AuthService {
     return this.issueTokens(user.id, user.organizationId, user.role);
   }
 
+  async refresh(refreshToken: string) {
+    let payload: { sub: string; organizationId: string; role: string };
+    try {
+      payload = this.jwt.verify(refreshToken, { secret: process.env.JWT_REFRESH_SECRET });
+    } catch {
+      throw new UnauthorizedException('Invalid or expired refresh token.');
+    }
+    const user = await this.prisma.user.findUnique({ where: { id: payload.sub } });
+    if (!user) throw new UnauthorizedException('Invalid or expired refresh token.');
+    return this.issueTokens(user.id, user.organizationId, user.role);
+  }
+
   private issueTokens(userId: string, organizationId: string, role: string) {
     const payload = { sub: userId, organizationId, role };
     return {

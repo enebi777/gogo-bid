@@ -1363,7 +1363,24 @@ function clearTokens(){
   localStorage.removeItem('gb_refresh_token');
 }
 class ApiError extends Error{constructor(message,status){super(message);this.status=status;}}
-async function apiFetch(path,opts={}){
+let _refreshInFlight=null;
+async function refreshAccessToken(){
+  const rt=getRefreshToken();
+  if(!rt)return false;
+  if(!_refreshInFlight){
+    _refreshInFlight=fetch(API_BASE+'/auth/refresh',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({refreshToken:rt})})
+      .then(async res=>{
+        if(!res.ok){clearTokens();return false;}
+        const {accessToken,refreshToken}=await res.json();
+        setTokens(accessToken,refreshToken);
+        return true;
+      })
+      .catch(()=>false)
+      .finally(()=>{_refreshInFlight=null;});
+  }
+  return _refreshInFlight;
+}
+async function apiFetch(path,opts={},_retried){
   const headers={'Content-Type':'application/json',...(opts.headers||{})};
   const token=getAccessToken();
   if(token)headers['Authorization']='Bearer '+token;
@@ -1373,10 +1390,14 @@ async function apiFetch(path,opts={}){
   }catch(networkErr){
     throw new ApiError('Could not reach the GoGo Bid API at '+API_BASE+'. Is the backend running?',0);
   }
+  if(res.status===401&&!_retried&&path!=='/auth/refresh'&&path!=='/auth/login'){
+    const refreshed=await refreshAccessToken();
+    if(refreshed)return apiFetch(path,opts,true);
+    clearTokens();
+  }
   const isJson=(res.headers.get('content-type')||'').includes('application/json');
   const body=isJson?await res.json().catch(()=>null):null;
   if(!res.ok){
-    if(res.status===401){clearTokens();}
     throw new ApiError((body&&body.message)||('Request failed with status '+res.status),res.status);
   }
   return body;
@@ -1916,8 +1937,6 @@ function openEditCamp(campId){
   overlay?.classList.add('open');
   ccRender();
 }
-// Override ccLaunch for edit mode
-const _origCcLaunch=window.ccLaunch;
 async function ccLaunch(){
   if(_ccData._editId){
     // Save edits back to existing campaign
@@ -4907,36 +4926,13 @@ function ccRender(){
     </div>
     <div class="alert alert-blue mt16"><div class="alert-title">✦ AI will analyze your campaign</div><div class="alert-text">After launch, GoGo Bid AI will calculate optimal CPC/CPA targets, generate bid suggestions, and start anomaly monitoring within 60 seconds.</div></div>`;
 }
-function ccLaunch(){
-  if(!_ccData.platform){toast('Select a platform','Choose your traffic source first.','warning');_ccStep=1;ccRender();return;}
-  if(!_ccData.name&&!_ccData.offerUrl){toast('Add offer details','Enter a campaign name and offer URL.','warning');_ccStep=2;ccRender();return;}
-  const colors=['#6366f1','#ec4899','#14b8a6','#f97316','#8b5cf6','#0ea5e9'];
-  const id='c'+(CS.camps.length+1);
-  const budget=parseFloat(_ccData.budget)||300;
-  const newCamp={
-    id,name:_ccData.name||(_ccData.vertical||'New Campaign')+' — '+(_ccData.platform||'Traffic'),
-    color:colors[CS.camps.length%colors.length],status:'active',scalingStatus:'review',tags:['new'],
-    offer:{id:'of_new_'+id,name:_ccData.name||'New Offer',url:_ccData.offerUrl||'',type:_ccData.vertical||'General',network:_ccData.network||'Custom',payout:parseFloat(_ccData.payout)||0,payoutType:'CPA',epc:0,aov:0,refundRate:0,upsells:0,funnelStructure:'Landing → Order → Thank You'},
-    traffic:{source:_ccData.platform||'Custom',sourceKey:_ccData.platformKey||'custom',adNetwork:_ccData.platform||'Custom',accountId:_ccData.accountId||'—',bidStrategy:'Manual',buyingType:'auction',ctrMultiplier:1.0},
-    targeting:{geos:(_ccData.geos||'US').split(',').map(g=>g.trim()),devices:_ccData.devices==='mobile'?['mobile']:_ccData.devices==='desktop'?['desktop']:['mobile','desktop'],deviceBreakdown:{mobile:60,desktop:40,tablet:0},ageRange:[18,65],gender:'all',interests:[],placements:[]},
-    metrics:{today:{impressions:0,clicks:0,conversions:0,spend:0,revenue:0,profit:0,roi:0,margin:0,ctr:null,cpc:null,cpa:null,cvr:null,roas:null,epc:null,frequency:null,reach:null,qualityScore:null,avgPosition:null},yesterday:{impressions:0,clicks:0,conversions:0,spend:0,revenue:0,profit:0,roi:0,margin:0,ctr:null,cpc:null,cpa:null,cvr:null,roas:null,epc:null},week:{cpc:null,cpa:null,roas:null,cvr:null,ctr:null,spend:0,revenue:0,profit:0,roi:0,margin:0},month:{cpc:null,cpa:null,roas:null,cvr:null,ctr:null,spend:0,revenue:0,profit:0,roi:0,margin:0},hist:{cpc:[],cpa:[],ctr:[],roas:[],cvr:[],spend:[0,0,0,0,0,0,0],profit:[0,0,0,0,0,0,0],roi:[]},bench:{cpc:0.50,cpa:10.0,roas:2.0,cvr:3.5,ctr:1.5,percentileRank:50}},
-    budget:{daily:budget,weekly:budget*7,monthly:budget*30,lifetime:null,remaining:budget,velocity:0,pacing:'standard'},
-    ai:{healthScore:60,anomalyScore:0,scalingScore:20,scalingReady:false,forecastRoas:0,forecastConfidence:50,forecastRevenue7d:0,forecastProfit7d:0,recommendations:['Campaign just launched — AI is gathering data','Set your tracking pixel and postback URL','Monitor first 50 clicks before scaling'],bidSuggestions:[],anomalies:[],lastAiUpdate:new Date().toISOString()},
-    integration:{platform:_ccData.platform||'Custom',accountId:_ccData.accountId||'—',syncStatus:'pending',lastSync:'Just now',trackerName:_ccData.tracker||null,postbackUrl:null,webhookUrl:null,externalId:'',trackerCampId:''},
-    optimization:{targetCPA:parseFloat(_ccData.targetCPA)||10,targetRoas:parseFloat(_ccData.targetRoas)||2.0,targetCVR:3.0,maxCPC:2.0,minCPC:0.1,bidStrategy:'Manual',scalingMode:_ccData.scalingMode||'Moderate',autoPilot:false},
-    optimizationHistory:[],
-    timestamps:{created:new Date().toISOString(),updated:new Date().toISOString(),lastSync:new Date().toISOString(),pausedAt:null,stoppedAt:null}
-  };
-  CS._camps.push(newCamp);
-  CS.select(id);
-  closeCreateCamp();
-  updateBadges();
-  renderDrop('');
-  toast('Campaign launched! 🚀',newCamp.name+' is now active. AI monitoring started.','success',5000);
-  _notifications.unshift({id:'nn'+Date.now(),icon:'🚀',iconBg:'rgba(15,186,129,.15)',title:'New campaign launched',sub:newCamp.name+' is now active and being monitored.',time:'Just now',unread:true,page:'campaigns'});
-  updateNotifBadge();
-  nav('campaigns',qs('.nav-item[onclick*=campaigns]'));
-}
+// NOTE: the real ccLaunch() (handles both edit-mode and new-campaign +
+// backend POST) lives earlier in this file, right after openEditCamp().
+// A duplicate `function ccLaunch(){}` used to be defined here too — since
+// both were plain function declarations in the same top-level scope, this
+// later one silently won (function-declaration hoisting: last in source
+// order wins), which meant editing a campaign always created a new one
+// instead of saving in place. Removed; see the comment there for detail.
 
 // ═══════════════════════════════════════════════════
 // ANTHROPIC API KEY MANAGEMENT
