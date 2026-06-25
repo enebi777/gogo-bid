@@ -18,4 +18,11 @@ export class AuthController {
   login(@Body() body: { email: string; password: string }) {
     return this.auth.login(body.email, body.password);
   }
+
+  @Post('refresh')
+  @HttpCode(200)
+  @Throttle({ default: { limit: 20, ttl: 60_000 } })
+  refresh(@Body() body: { refreshToken: string }) {
+    return this.auth.refresh(body.refreshToken);
+  }
 }
