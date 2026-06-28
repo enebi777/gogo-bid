@@ -3,6 +3,11 @@ import { GenericTrackerAdapter } from '../../integrations/adapters/tracker.adapt
 
 const trackerAdapter = new GenericTrackerAdapter();
 
+/** Minimal shape of a BullMQ Queue we need — kept narrow so tests can pass a plain mock. */
+export interface AutomationQueueLike {
+  add(name: string, data: Record<string, unknown>): Promise<unknown>;
+}
+
 /**
  * Turns a received postback WebhookEvent into a Conversion row.
  *
@@ -17,8 +22,16 @@ const trackerAdapter = new GenericTrackerAdapter();
  * — that's a permanent failure (retrying won't make the click materialize),
  * so we mark the event FAILED and return rather than throwing, which would
  * otherwise make BullMQ retry it forever.
+ *
+ * `automationQueue` is optional so existing callers/tests that don't care
+ * about automation keep working — pass the real automation-evaluation
+ * Queue in production to fire `conversion.received` for the rule engine.
  */
-export async function processPostbackEvent(event: WebhookEvent, prisma: PrismaClient): Promise<void> {
+export async function processPostbackEvent(
+  event: WebhookEvent,
+  prisma: PrismaClient,
+  automationQueue?: AutomationQueueLike,
+): Promise<void> {
   const tracker = event.provider.toLowerCase();
   const payload = event.payload as Record<string, unknown>;
   const normalized = trackerAdapter.normalize(tracker, payload);
@@ -65,6 +78,21 @@ export async function processPostbackEvent(event: WebhookEvent, prisma: PrismaCl
         payout: normalized.payout,
       },
     });
+
+    if (automationQueue) {
+      const campaign = await prisma.campaign.findUnique({ where: { id: campaignId }, select: { organizationId: true } });
+      if (campaign) {
+        const automationEvent = await prisma.event.create({
+          data: {
+            organizationId: campaign.organizationId,
+            type: 'conversion.received',
+            campaignId,
+            payload: { tracker: event.provider, conversionId: normalized.conversionId, revenue: normalized.revenue, payout: normalized.payout },
+          },
+        });
+        await automationQueue.add('evaluate', { eventId: automationEvent.id });
+      }
+    }
   }
 
   await prisma.webhookEvent.update({

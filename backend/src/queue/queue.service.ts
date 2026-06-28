@@ -9,6 +9,7 @@ export const QUEUE_NAMES = {
   POSTBACK_PROCESSING: 'postback-processing',
   AI: 'ai',
   EXPORTS: 'exports',
+  AUTOMATION_EVALUATION: 'automation-evaluation',
 } as const;
 
 @Injectable()
@@ -69,5 +70,9 @@ export class QueueService implements OnModuleDestroy {
 
   enqueueExport(campaignId: string, destination: string) {
     return this.queues[QUEUE_NAMES.EXPORTS].add('export', { campaignId, destination }, { attempts: 3 });
+  }
+
+  enqueueAutomationEvaluation(eventId: string) {
+    return this.queues[QUEUE_NAMES.AUTOMATION_EVALUATION].add('evaluate', { eventId }, { attempts: 3 });
   }
 }

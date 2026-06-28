@@ -1540,6 +1540,7 @@ function authLogout(){
     localStorage.removeItem('gb_user');
     clearTokens();
     _authUser=null;
+    _autoRulesCache=[];_autoExecCache=[];_autoLoaded=false;
     showAuthOverlay('login');
     toast('Logged out','See you next time!','info',3000);
   },'var(--red)');
@@ -3346,24 +3347,44 @@ function renderIntegrations(el){
 // AUTOMATION ENGINE
 // ═══════════════════════════════════════════════════
 let _autoTab='rules',_autoBuilderOpen=false;
-let AUTOMATION_RULES=[
-  {id:'r1',name:'CPA Guard — Pause on Spike',enabled:true,trigger:'CPA',operator:'>',value:45,action:'Pause Campaign',actParam:'',fires:127,lastFired:'2m ago',tag:'Protection',tagCol:'var(--red)'},
-  {id:'r2',name:'ROAS Scale-Up',enabled:true,trigger:'ROAS',operator:'>',value:3.5,action:'Increase Budget',actParam:'+15%',fires:23,lastFired:'1h ago',tag:'Scaling',tagCol:'var(--green)'},
-  {id:'r3',name:'Low Spend Alert',enabled:true,trigger:'Spend',operator:'<',value:50,action:'Send Alert',actParam:'Slack',fires:8,lastFired:'4h ago',tag:'Alerts',tagCol:'var(--accent2)'},
-  {id:'r4',name:'CTR Drop — Reduce Bid',enabled:false,trigger:'CTR',operator:'<',value:1.2,action:'Decrease CPC',actParam:'-10%',fires:44,lastFired:'Yesterday',tag:'Bidding',tagCol:'var(--yellow)'},
-  {id:'r5',name:'Profit Milestone — Scale',enabled:true,trigger:'Profit',operator:'>',value:500,action:'Increase Budget',actParam:'+20%',fires:6,lastFired:'3d ago',tag:'Scaling',tagCol:'var(--green)'},
-  {id:'r6',name:'Budget Exhausted Alert',enabled:true,trigger:'Budget Used',operator:'>',value:90,action:'Send Alert',actParam:'Email + Slack',fires:19,lastFired:'6h ago',tag:'Alerts',tagCol:'var(--accent2)'},
-];
-const AUTO_LOG=[
-  {time:'2m ago',rule:'CPA Guard — Pause on Spike',camp:'Keto ClickBank US',action:'Campaign Paused',result:'success',metric:'CPA $48.20'},
-  {time:'1h ago',rule:'ROAS Scale-Up',camp:'GoGo Bid Main',action:'Budget +15%',result:'success',metric:'ROAS 3.82×'},
-  {time:'3h ago',rule:'Low Spend Alert',camp:'ClickBank Brazil',action:'Slack Sent',result:'success',metric:'Spend $31.40'},
-  {time:'4h ago',rule:'Budget Exhausted Alert',camp:'Keto ClickBank US',action:'Email Sent',result:'success',metric:'Budget 92%'},
-  {time:'6h ago',rule:'CPA Guard — Pause on Spike',camp:'GoGo Bid Main',action:'Evaluated — No Action',result:'skip',metric:'CPA $38.10'},
-  {time:'8h ago',rule:'ROAS Scale-Up',camp:'Weight Loss Nutra',action:'Budget +15%',result:'success',metric:'ROAS 4.12×'},
-  {time:'12h ago',rule:'Low Spend Alert',camp:'ClickBank Brazil',action:'Slack Sent',result:'success',metric:'Spend $22.80'},
-  {time:'Yesterday',rule:'CTR Drop — Reduce Bid',camp:'Keto ClickBank US',action:'CPC −10%',result:'success',metric:'CTR 0.98%'},
-];
+// Real backend vocabulary (see backend/src/automation/automation.constants.ts) —
+// this minimal event-driven loop supports exactly these triggers/actions today.
+const AUTO_TRIGGER_TYPES=[['campaign.created','Campaign Created'],['campaign.paused','Campaign Paused'],['conversion.received','Conversion Received']];
+const AUTO_ACTIONS=[['pause_campaign','Pause Campaign'],['resume_campaign','Resume Campaign'],['notify_slack','Notify Slack']];
+const AUTO_OP_LABELS={gt:'>',gte:'≥',lt:'<',lte:'≤',eq:'=',neq:'≠'};
+let _autoRulesCache=[],_autoExecCache=[],_autoLoaded=false;
+async function autoLoadAll(){
+  if(!getAccessToken())return;
+  try{
+    const [rules,executions]=await Promise.all([apiFetch('/automation/rules'),apiFetch('/automation/executions?limit=100')]);
+    _autoRulesCache=rules;_autoExecCache=executions;_autoLoaded=true;
+    if(_page==='automation')renderAutomation($('page-automation'));
+  }catch(err){console.warn('autoLoadAll: failed to load automation data',err);}
+}
+function autoStatsFor(ruleId){
+  const hits=_autoExecCache.filter(e=>e.ruleId===ruleId&&e.status==='SUCCESS');
+  return {fires:hits.length,lastFired:hits[0]?new Date(hits[0].executedAt).toLocaleString():'Never'};
+}
+async function autoToggle(id){
+  const r=_autoRulesCache.find(x=>x.id===id);if(!r)return;
+  try{
+    await apiFetch('/automation/rules/'+id,{method:'PATCH',body:JSON.stringify({enabled:!r.enabled})});
+    r.enabled=!r.enabled;renderAutomation($('page-automation'));
+    toast(r.enabled?'Rule Enabled':'Rule Disabled',r.name,r.enabled?'success':'info',2000);
+  }catch(err){toast('Could not update rule',err.message,'error',3000);}
+}
+async function autoDelete(id){
+  const r=_autoRulesCache.find(x=>x.id===id);
+  try{
+    await apiFetch('/automation/rules/'+id,{method:'DELETE'});
+    _autoRulesCache=_autoRulesCache.filter(x=>x.id!==id);
+    renderAutomation($('page-automation'));
+    toast('Rule Deleted',(r?.name||'Automation rule')+' removed.','info',2000);
+  }catch(err){toast('Could not delete rule',err.message,'error',3000);}
+}
+function autoApplyTemplate(name){
+  toast('Not wired yet','Templates are a preview — build this as a custom rule below for now.','warning',4000);
+}
 const AUTO_TEMPLATES=[
   {icon:'🛡',name:'CPA Guard',desc:'Auto-pause any campaign when CPA exceeds your target by 20%.',tag:'Protection',rule:'CPA > Target+20%',action:'Pause Campaign'},
   {icon:'🚀',name:'ROAS Scale Booster',desc:'Automatically increase budget when ROAS is strong for 3 consecutive hours.',tag:'Scaling',rule:'ROAS > 3.0 for 3h',action:'Budget +15%'},
@@ -3372,23 +3393,17 @@ const AUTO_TEMPLATES=[
   {icon:'💰',name:'Profit Milestone Scaler',desc:'Aggressively scale budget when daily profit exceeds $500.',tag:'Scaling',rule:'Profit > $500/day',action:'Budget +25%'},
   {icon:'⏰',name:'Day-Parting Scheduler',desc:'Pause campaigns during low-conversion hours (midnight–6am).',tag:'Scheduling',rule:'Time between 00:00–06:00',action:'Pause Campaign'},
 ];
-function autoToggle(id){const r=AUTOMATION_RULES.find(x=>x.id===id);if(r){r.enabled=!r.enabled;renderAutomation($('page-automation'));toast(r.enabled?'Rule Enabled':'Rule Disabled',r.name,r.enabled?'success':'info',2000);}}
-function autoDelete(id){AUTOMATION_RULES=AUTOMATION_RULES.filter(x=>x.id!==id);renderAutomation($('page-automation'));toast('Rule Deleted','Automation rule removed.','info',2000);}
-function autoApplyTemplate(name){
-  const t=AUTO_TEMPLATES.find(x=>x.name===name);if(!t)return;
-  const id='r'+(Date.now()%10000);
-  AUTOMATION_RULES.push({id,name:t.name,enabled:true,trigger:t.rule.split(' ')[0],operator:'>',value:0,action:t.action,actParam:'',fires:0,lastFired:'Never',tag:t.tag,tagCol:t.tag==='Protection'?'var(--red)':t.tag==='Scaling'?'var(--green)':t.tag==='Alerts'?'var(--accent2)':'var(--yellow)'});
-  _autoTab='rules';renderAutomation($('page-automation'));
-  toast('✓ Template Applied',t.name+' rule added and enabled.','success',3000);
-}
 function renderAutomation(el){
-  const activeRules=AUTOMATION_RULES.filter(r=>r.enabled).length;
-  const totalFires=AUTOMATION_RULES.reduce((n,r)=>n+r.fires,0);
+  if(!_autoLoaded){autoLoadAll();}
+  const activeRules=_autoRulesCache.filter(r=>r.enabled).length;
+  const todayStr=new Date().toDateString();
+  const triggersToday=_autoExecCache.filter(e=>new Date(e.executedAt).toDateString()===todayStr).length;
+  const failedTotal=_autoExecCache.filter(e=>e.status==='FAILED').length;
   el.innerHTML=`
 <div class="page-hdr">
   <div>
     <div class="page-title">Automation Engine</div>
-    <div class="page-sub">Rule-based campaign automation — set triggers, conditions, and actions</div>
+    <div class="page-sub">Event-driven automation — campaign/conversion triggers, conditions, and actions</div>
   </div>
   <div class="flex gap8">
     <button class="btn btn-outline btn-sm" onclick="_autoTab='log';renderAutomation($('page-automation'))">📋 Execution Log</button>
@@ -3396,7 +3411,7 @@ function renderAutomation(el){
   </div>
 </div>
 <div class="g4 mb20">
-  ${[['Active Rules',activeRules,'var(--green)','⚡'],['Total Rules',AUTOMATION_RULES.length,'var(--accent2)','📋'],['Triggers Today',totalFires,'var(--yellow)','🔥'],['Actions Saved','$2,840','var(--green)','💰']].map(([l,v,col,icon])=>`
+  ${[['Active Rules',activeRules,'var(--green)','⚡'],['Total Rules',_autoRulesCache.length,'var(--accent2)','📋'],['Fired Today',triggersToday,'var(--yellow)','🔥'],['Failed Actions',failedTotal,failedTotal>0?'var(--red)':'var(--green)','⚠']].map(([l,v,col,icon])=>`
   <div class="card kpi" style="border-color:${col}22">
     <div class="kpi-label">${icon} ${l}</div>
     <div class="kpi-val" style="font-size:22px;color:${col}">${v}</div>
@@ -3406,43 +3421,44 @@ function renderAutomation(el){
   ${[['rules','⚡ Active Rules'],['templates','📦 Templates'],['builder','🔧 Rule Builder'],['log','📋 Execution Log'],['schedule','🕐 Schedule']].map(([k,l])=>`<div class="int-tab${_autoTab===k?' active':''}" onclick="_autoTab='${k}';renderAutomation($('page-automation'))">${l}</div>`).join('')}
 </div>
 <div id="auto-body">${_autoTab==='rules'?_autoRules():_autoTab==='templates'?_autoTemplates():_autoTab==='builder'?_autoBuilder():_autoTab==='log'?_autoLog():_autoSchedule()}</div>`;
+  if(_autoTab==='builder')setTimeout(rbUpdatePreview,30);
 }
 function _autoRules(){
-  if(!AUTOMATION_RULES.length) return`<div class="card" style="text-align:center;padding:40px;color:var(--muted)"><div style="font-size:32px;margin-bottom:12px">⚡</div><div style="font-size:14px;font-weight:600">No Rules Yet</div><div class="text-xs mt8">Start with a template or build a custom rule.</div><button class="btn btn-primary btn-sm mt16" onclick="_autoTab='templates';renderAutomation($('page-automation'))">Browse Templates</button></div>`;
+  if(!_autoLoaded) return`<div class="card" style="text-align:center;padding:40px;color:var(--muted)">Loading rules…</div>`;
+  if(!_autoRulesCache.length) return`<div class="card" style="text-align:center;padding:40px;color:var(--muted)"><div style="font-size:32px;margin-bottom:12px">⚡</div><div style="font-size:14px;font-weight:600">No Rules Yet</div><div class="text-xs mt8">Build a custom rule to get started.</div><button class="btn btn-primary btn-sm mt16" onclick="_autoTab='builder';renderAutomation($('page-automation'))">+ New Rule</button></div>`;
+  const triggerLabel=t=>(AUTO_TRIGGER_TYPES.find(x=>x[0]===t)||[t,t])[1];
+  const actionLabel=a=>(AUTO_ACTIONS.find(x=>x[0]===a)||[a,a])[1];
   return`<div class="card">
-  <div class="card-hdr"><div class="card-title">Automation Rules</div><div class="card-desc">${AUTOMATION_RULES.filter(r=>r.enabled).length} of ${AUTOMATION_RULES.length} active</div></div>
+  <div class="card-hdr"><div class="card-title">Automation Rules</div><div class="card-desc">${_autoRulesCache.filter(r=>r.enabled).length} of ${_autoRulesCache.length} active</div></div>
   <div style="overflow:hidden">
-    <div style="display:grid;grid-template-columns:1fr 180px 140px 100px 80px 90px;gap:0;padding:9px 16px;background:var(--bg3);font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;border-bottom:1px solid var(--border)">
-      <div>Rule</div><div>Trigger Condition</div><div>Action</div><div style="text-align:center">Fires</div><div style="text-align:center">Status</div><div></div>
+    <div style="display:grid;grid-template-columns:1fr 200px 140px 80px 80px 90px;gap:0;padding:9px 16px;background:var(--bg3);font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;border-bottom:1px solid var(--border)">
+      <div>Rule</div><div>Trigger</div><div>Action</div><div style="text-align:center">Fires</div><div style="text-align:center">Status</div><div></div>
     </div>
-    ${AUTOMATION_RULES.map(r=>`
-    <div style="display:grid;grid-template-columns:1fr 180px 140px 100px 80px 90px;gap:0;padding:13px 16px;border-bottom:1px solid var(--border);align-items:center;${r.enabled?'':'opacity:.55'}">
+    ${_autoRulesCache.map(r=>{
+      const stats=autoStatsFor(r.id);
+      const conds=(r.conditions||[]).map(c=>`${c.field} ${AUTO_OP_LABELS[c.operator]||c.operator} ${c.value}`).join(', ');
+      return`
+    <div style="display:grid;grid-template-columns:1fr 200px 140px 80px 80px 90px;gap:0;padding:13px 16px;border-bottom:1px solid var(--border);align-items:center;${r.enabled?'':'opacity:.55'}">
       <div>
         <div style="font-size:12px;font-weight:700;margin-bottom:3px">${r.name}</div>
-        <div style="display:flex;gap:6px;align-items:center">
-          <span style="font-size:9px;font-weight:700;padding:2px 7px;border-radius:4px;background:${r.tagCol}18;color:${r.tagCol};border:1px solid ${r.tagCol}30">${r.tag}</span>
-          <span style="font-size:10px;color:var(--muted)">Last: ${r.lastFired}</span>
-        </div>
+        <div style="font-size:10px;color:var(--muted)">Last: ${stats.lastFired}</div>
       </div>
-      <div style="font-size:11px;font-family:var(--mono);color:var(--accent2)">${r.trigger} ${r.operator} ${r.value}${r.trigger==='Budget Used'?'%':r.trigger==='CTR'||r.trigger==='ROAS'?'×':''}</div>
-      <div>
-        <div style="font-size:11px;font-weight:600">${r.action}</div>
-        ${r.actParam?`<div style="font-size:10px;color:var(--muted);font-family:var(--mono)">${r.actParam}</div>`:''}
-      </div>
-      <div style="text-align:center;font-size:13px;font-weight:700;font-family:var(--mono);color:var(--yellow)">${r.fires}</div>
+      <div style="font-size:11px;font-family:var(--mono);color:var(--accent2)">${triggerLabel(r.triggerType)}${conds?`<div style="font-size:10px;color:var(--muted)">if ${conds}</div>`:''}</div>
+      <div style="font-size:11px;font-weight:600">${actionLabel(r.action)}</div>
+      <div style="text-align:center;font-size:13px;font-weight:700;font-family:var(--mono);color:var(--yellow)">${stats.fires}</div>
       <div style="text-align:center">
         <button class="acc-toggle${r.enabled?' on':''}" onclick="autoToggle('${r.id}')"></button>
       </div>
       <div style="display:flex;gap:6px;justify-content:flex-end">
-        <button class="btn btn-ghost btn-xs" onclick="toast('Edit Rule','Rule editor coming soon.','info')">Edit</button>
         <button class="btn btn-ghost btn-xs" style="color:var(--red)" onclick="autoDelete('${r.id}')">✕</button>
       </div>
-    </div>`).join('')}
+    </div>`;}).join('')}
   </div>
 </div>`;
 }
 function _autoTemplates(){
-  return`<div class="g2">
+  return`${demoBanner('These templates are illustrative — "Apply Template" doesn\'t create a real rule yet. Use the Rule Builder tab for rules that actually run.')}
+<div class="g2">
   ${AUTO_TEMPLATES.map(t=>`
   <div class="card" style="position:relative">
     <div style="display:flex;align-items:flex-start;gap:12px;margin-bottom:12px">
@@ -3465,49 +3481,25 @@ function _autoTemplates(){
 </div>`;
 }
 function _autoBuilder(){
-  const triggers=['CPA','ROAS','CTR','CVR','Spend','Revenue','Profit','Budget Used','CPC','Impressions'];
-  const operators=['>','<','>=','<=','='];
-  const actions=['Pause Campaign','Resume Campaign','Increase Budget','Decrease Budget','Decrease CPC','Increase CPC','Send Alert','Apply Bid Rule','Tag Campaign'];
+  const operators=[['gt','&gt;'],['gte','&ge;'],['lt','&lt;'],['lte','&le;'],['eq','='],['neq','&ne;']];
   return`<div class="g2">
   <div class="card">
     <div class="card-hdr"><div class="card-title">🔧 Rule Builder</div><div class="card-desc">Define a custom automation rule</div></div>
     <div class="card-body">
-      <div class="field"><label>Rule Name</label><div class="input-wrap"><input type="text" placeholder="e.g. CPA Guard v2" id="rb-name"></div></div>
-      <div class="field"><label>Campaign Scope</label>
-        <select id="rb-scope"><option>All Campaigns</option><option>Active Campaigns Only</option><option>Specific Campaign…</option></select>
-      </div>
-      <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);margin:14px 0 8px">Trigger Condition</div>
+      <div class="field"><label>Rule Name</label><div class="input-wrap"><input type="text" placeholder="e.g. Auto-pause new campaigns" id="rb-name" oninput="rbUpdatePreview()"></div></div>
+      <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);margin:14px 0 8px">Trigger</div>
+      <div class="field"><label>When this happens</label><select id="rb-trigger" oninput="rbUpdatePreview()">${AUTO_TRIGGER_TYPES.map(([k,l])=>`<option value="${k}">${l}</option>`).join('')}</select></div>
+      <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);margin:14px 0 8px">Condition <span style="color:var(--dim);font-weight:400;text-transform:none">(optional — leave field blank to always run)</span></div>
       <div style="display:grid;grid-template-columns:1fr auto 1fr;gap:8px;align-items:end;margin-bottom:14px">
-        <div class="field" style="margin:0"><label>Metric</label><select id="rb-trigger">${triggers.map(t=>`<option>${t}</option>`).join('')}</select></div>
-        <div class="field" style="margin:0"><label>Is</label><select id="rb-op">${operators.map(o=>`<option>${o}</option>`).join('')}</select></div>
-        <div class="field" style="margin:0"><label>Value</label><div class="input-wrap"><input type="number" id="rb-val" placeholder="0" value="45"></div></div>
-      </div>
-      <div class="field">
-        <label>Duration (apply only if true for…)</label>
-        <select><option>Immediately</option><option>1 hour</option><option>2 hours</option><option>3 hours</option><option>6 hours</option></select>
+        <div class="field" style="margin:0"><label>Payload field</label><div class="input-wrap"><input type="text" id="rb-cond-field" placeholder="e.g. revenue" oninput="rbUpdatePreview()"></div></div>
+        <div class="field" style="margin:0"><label>Is</label><select id="rb-cond-op" oninput="rbUpdatePreview()">${operators.map(([k,l])=>`<option value="${k}">${l}</option>`).join('')}</select></div>
+        <div class="field" style="margin:0"><label>Value</label><div class="input-wrap"><input type="text" id="rb-cond-val" placeholder="0" oninput="rbUpdatePreview()"></div></div>
       </div>
       <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);margin:14px 0 8px">Action</div>
-      <div class="field"><label>Action Type</label><select id="rb-action">${actions.map(a=>`<option>${a}</option>`).join('')}</select></div>
-      <div class="field"><label>Action Parameter (optional)</label><div class="input-wrap"><input type="text" id="rb-param" placeholder="+15% or slack-channel-name"></div></div>
-      <div class="field">
-        <label>Cooldown (don't re-trigger within…)</label>
-        <select><option>No cooldown</option><option>30 minutes</option><option>1 hour</option><option>4 hours</option><option>24 hours</option></select>
-      </div>
+      <div class="field"><label>Then do this</label><select id="rb-action" oninput="rbUpdatePreview()">${AUTO_ACTIONS.map(([k,l])=>`<option value="${k}">${l}</option>`).join('')}</select></div>
+      <div class="field" id="rb-msg-field"><label>Slack Message (optional — default message used if blank)</label><div class="input-wrap"><input type="text" id="rb-msg" placeholder="e.g. New campaign needs review" oninput="rbUpdatePreview()"></div></div>
       <div style="display:flex;gap:10px;margin-top:8px">
-        <button class="btn btn-primary btn-sm" onclick="(function(){
-          const name=$('rb-name')?.value?.trim()||'New Rule';
-          const trigger=$('rb-trigger')?.value||'CPA';
-          const op=$('rb-op')?.value||'>';
-          const val=parseFloat($('rb-val')?.value)||0;
-          const action=$('rb-action')?.value||'Pause Campaign';
-          const param=$('rb-param')?.value||'';
-          const tagMap={'Pause Campaign':'Protection','Resume Campaign':'Scheduling','Increase Budget':'Scaling','Decrease Budget':'Protection','Decrease CPC':'Bidding','Increase CPC':'Bidding','Send Alert':'Alerts','Apply Bid Rule':'Bidding','Tag Campaign':'Alerts'};
-          const colMap={'Protection':'var(--red)','Scaling':'var(--green)','Alerts':'var(--accent2)','Bidding':'var(--yellow)','Scheduling':'var(--muted)'};
-          const tag=tagMap[action]||'Custom';
-          AUTOMATION_RULES.push({id:'r'+Date.now(),name,enabled:true,trigger,operator:op,value:val,action,actParam:param,fires:0,lastFired:'Never',tag,tagCol:colMap[tag]||'var(--muted)'});
-          _autoTab='rules';renderAutomation($('page-automation'));
-          toast('✓ Rule Created',name+' is now active.','success',3000);
-        })()">✓ Create Rule</button>
+        <button class="btn btn-primary btn-sm" onclick="rbCreateRule()">✓ Create Rule</button>
         <button class="btn btn-outline btn-sm" onclick="_autoTab='rules';renderAutomation($('page-automation'))">Cancel</button>
       </div>
     </div>
@@ -3515,54 +3507,82 @@ function _autoBuilder(){
   <div class="card">
     <div class="card-hdr"><div class="card-title">Rule Preview</div><div class="card-desc">How your rule will behave</div></div>
     <div class="card-body">
-      <div style="background:var(--bg3);border-radius:10px;padding:16px;margin-bottom:16px;font-size:12px;line-height:1.9">
-        <div style="color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Rule Logic</div>
-        <div><span style="color:var(--accent2);font-weight:700">IF</span> <span style="font-family:var(--mono);color:var(--text)">CPA &gt; 45</span></div>
-        <div><span style="color:var(--accent2);font-weight:700">AND</span> campaign is <span style="font-family:var(--mono)">active</span></div>
-        <div><span style="color:var(--green);font-weight:700">THEN</span> pause campaign</div>
-        <div><span style="color:var(--muted);font-weight:700">WITH</span> 1h cooldown</div>
-      </div>
-      <div style="font-size:11px;font-weight:700;color:var(--muted);margin-bottom:8px">Evaluation Frequency</div>
-      <div style="display:flex;gap:8px;flex-wrap:wrap">
-        ${['Every 5 min','Every 15 min','Every 1h','Every 6h','Daily'].map((f,i)=>`<div style="padding:5px 12px;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;${i===0?'background:var(--accent2);color:#fff':'background:var(--bg3);color:var(--muted);border:1px solid var(--border)'}">${f}</div>`).join('')}
-      </div>
-      <div style="margin-top:16px;padding:12px;border-radius:8px;background:rgba(15,186,129,.07);border:1px solid rgba(15,186,129,.2)">
-        <div style="font-size:11px;font-weight:700;color:var(--green);margin-bottom:6px">✦ AI Recommendation</div>
-        <div style="font-size:11px;color:var(--muted);line-height:1.6">Based on your campaign data, a CPA threshold of <strong style="color:var(--text)">$42–$48</strong> would have triggered 127 times this month, saving an estimated <strong style="color:var(--green)">$1,240</strong>.</div>
+      <div id="rb-preview" style="background:var(--bg3);border-radius:10px;padding:16px;font-size:12px;line-height:1.9"></div>
+      <div style="margin-top:16px;padding:12px;border-radius:8px;background:rgba(79,110,247,.07);border:1px solid rgba(79,110,247,.2);font-size:11px;color:var(--muted);line-height:1.6">
+        Rules run the instant their trigger event happens — there's no polling interval to configure. ${getAccessToken()?'':'<strong style="color:var(--yellow)">You are not logged in, so this would only run locally.</strong>'}
       </div>
     </div>
   </div>
 </div>`;
 }
+function rbUpdatePreview(){
+  const el=$('rb-preview');if(!el)return;
+  const name=$('rb-name')?.value?.trim()||'(unnamed rule)';
+  const trigger=$('rb-trigger')?.value||AUTO_TRIGGER_TYPES[0][0];
+  const triggerLabel=(AUTO_TRIGGER_TYPES.find(x=>x[0]===trigger)||[])[1]||trigger;
+  const field=$('rb-cond-field')?.value?.trim()||'';
+  const op=$('rb-cond-op')?.value||'gt';
+  const val=$('rb-cond-val')?.value?.trim()||'';
+  const action=$('rb-action')?.value||AUTO_ACTIONS[0][0];
+  const actionLabel=(AUTO_ACTIONS.find(x=>x[0]===action)||[])[1]||action;
+  const msgField=$('rb-msg-field');if(msgField)msgField.style.display=action==='notify_slack'?'':'none';
+  el.innerHTML=`
+    <div style="color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">${name}</div>
+    <div><span style="color:var(--accent2);font-weight:700">WHEN</span> <span style="font-family:var(--mono);color:var(--text)">${triggerLabel}</span></div>
+    ${field?`<div><span style="color:var(--accent2);font-weight:700">IF</span> <span style="font-family:var(--mono)">${field} ${AUTO_OP_LABELS[op]||op} ${val||'?'}</span></div>`:`<div style="color:var(--dim)">no condition — always runs</div>`}
+    <div><span style="color:var(--green);font-weight:700">THEN</span> ${actionLabel}</div>`;
+}
+async function rbCreateRule(){
+  const name=$('rb-name')?.value?.trim();
+  if(!name){toast('Name required','Give this rule a name first.','warning',3000);return;}
+  const triggerType=$('rb-trigger')?.value;
+  const action=$('rb-action')?.value;
+  const field=$('rb-cond-field')?.value?.trim();
+  const op=$('rb-cond-op')?.value;
+  const valRaw=$('rb-cond-val')?.value?.trim();
+  const conditions=field?[{field,operator:op,value:isNaN(Number(valRaw))?valRaw:Number(valRaw)}]:[];
+  const msg=$('rb-msg')?.value?.trim();
+  const actionParams=action==='notify_slack'&&msg?{message:msg}:undefined;
+  try{
+    await apiFetch('/automation/rules',{method:'POST',body:JSON.stringify({name,triggerType,action,conditions,actionParams})});
+    await autoLoadAll();
+    _autoTab='rules';renderAutomation($('page-automation'));
+    toast('✓ Rule Created',name+' is now active.','success',3000);
+  }catch(err){toast('Could not create rule',err.message,'error',4000);}
+}
 function _autoLog(){
+  if(!_autoLoaded) return`<div class="card" style="text-align:center;padding:40px;color:var(--muted)">Loading…</div>`;
+  if(!_autoExecCache.length) return`<div class="card" style="text-align:center;padding:40px;color:var(--muted)"><div style="font-size:32px;margin-bottom:12px">📋</div><div style="font-size:14px;font-weight:600">No Executions Yet</div><div class="text-xs mt8">Once a rule's trigger fires, runs show up here.</div></div>`;
+  const badge={SUCCESS:['✓ Done','rgba(15,186,129,.15)','var(--green)'],SKIPPED:['— Skip','rgba(92,92,133,.15)','var(--muted)'],FAILED:['✕ Fail','rgba(240,82,82,.15)','var(--red)']};
   return`<div class="card">
   <div class="card-hdr">
     <div class="card-title">📋 Execution Log</div>
-    <div class="card-desc">${AUTO_LOG.length} events today</div>
-    <div style="display:flex;gap:6px;margin-left:auto">
-      ${['All','Success','Skipped'].map((f,i)=>`<button class="btn btn-${i===0?'outline':'ghost'} btn-xs">${f}</button>`).join('')}
-    </div>
+    <div class="card-desc">${_autoExecCache.length} most recent</div>
   </div>
   <div style="overflow:hidden">
-    <div style="display:grid;grid-template-columns:80px 1fr 160px 120px 100px 70px;gap:0;padding:9px 16px;background:var(--bg3);font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;border-bottom:1px solid var(--border)">
-      <div>Time</div><div>Rule</div><div>Campaign</div><div>Action</div><div>Metric</div><div>Result</div>
+    <div style="display:grid;grid-template-columns:130px 1fr 160px 130px 1fr 70px;gap:0;padding:9px 16px;background:var(--bg3);font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;border-bottom:1px solid var(--border)">
+      <div>Time</div><div>Rule</div><div>Trigger</div><div>Action</div><div>Detail</div><div>Result</div>
     </div>
-    ${AUTO_LOG.map(e=>`
-    <div style="display:grid;grid-template-columns:80px 1fr 160px 120px 100px 70px;gap:0;padding:11px 16px;border-bottom:1px solid var(--border);align-items:center">
-      <div style="font-size:10px;color:var(--muted);font-family:var(--mono)">${e.time}</div>
-      <div style="font-size:11px;font-weight:600">${e.rule}</div>
-      <div style="font-size:11px;color:var(--muted)">${e.camp}</div>
-      <div style="font-size:11px;font-family:var(--mono);color:var(--accent2)">${e.action}</div>
-      <div style="font-size:11px;font-family:var(--mono)">${e.metric}</div>
-      <div><span style="font-size:9px;font-weight:700;padding:2px 7px;border-radius:4px;background:${e.result==='success'?'rgba(15,186,129,.15)':e.result==='skip'?'rgba(92,92,133,.15)':'rgba(240,82,82,.15)'};color:${e.result==='success'?'var(--green)':e.result==='skip'?'var(--muted)':'var(--red)'}">${e.result==='success'?'✓ Done':e.result==='skip'?'— Skip':'✕ Fail'}</span></div>
-    </div>`).join('')}
+    ${_autoExecCache.map(e=>{
+      const [label,bg,col]=badge[e.status]||badge.FAILED;
+      const detail=e.status==='FAILED'?(e.error||''):e.status==='SUCCESS'?(e.actionResult?.message||JSON.stringify(e.actionResult||{})):'condition not met';
+      return`
+    <div style="display:grid;grid-template-columns:130px 1fr 160px 130px 1fr 70px;gap:0;padding:11px 16px;border-bottom:1px solid var(--border);align-items:center">
+      <div style="font-size:10px;color:var(--muted);font-family:var(--mono)">${new Date(e.executedAt).toLocaleString()}</div>
+      <div style="font-size:11px;font-weight:600">${e.rule?.name||e.ruleId}</div>
+      <div style="font-size:11px;font-family:var(--mono);color:var(--accent2)">${e.event?.type||''}</div>
+      <div style="font-size:11px;font-family:var(--mono)">${e.rule?.action||''}</div>
+      <div style="font-size:10px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${(detail||'').replace(/"/g,'&quot;')}">${detail}</div>
+      <div><span style="font-size:9px;font-weight:700;padding:2px 7px;border-radius:4px;background:${bg};color:${col}">${label}</span></div>
+    </div>`;}).join('')}
   </div>
 </div>`;
 }
 function _autoSchedule(){
   const days=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
   const hours=Array.from({length:24},(_,i)=>i);
-  return`<div class="card mb16">
+  return`${demoBanner('Day-parting isn\'t wired to the automation engine yet — toggling hours below doesn\'t pause/resume anything.')}
+<div class="card mb16">
   <div class="card-hdr"><div class="card-title">🕐 Day-Parting Schedule</div><div class="card-desc">Set active hours for your campaigns</div></div>
   <div class="card-body">
     <div style="overflow-x:auto">

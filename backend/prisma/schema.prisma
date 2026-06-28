@@ -17,6 +17,8 @@ model Organization {
   campaigns Campaign[]
   integrationAccounts IntegrationAccount[]
   auditLogs AuditLog[]
+  events    Event[]
+  automationRules AutomationRule[]
 }
 
 model User {
@@ -142,6 +144,7 @@ model Campaign {
   aiPredictions AiPrediction[]
   forecasts     Forecast[]
   alerts        Alert[]
+  events        Event[]
 }
 
 model AdSet {
@@ -279,6 +282,74 @@ model Alert {
   message    String
   resolved   Boolean  @default(false)
   createdAt  DateTime @default(now())
+}
+
+// ── Automation / Event Engine ──
+//
+// Minimal event-driven automation loop: things that already happen in the
+// app (campaign created/paused, a conversion landing) emit an Event row.
+// The automation-evaluation worker picks it up, finds enabled
+// AutomationRules matching that org+event type, evaluates each rule's
+// conditions against the event payload, and executes the matched action
+// (logged as an AutomationExecution either way — matched-and-ran,
+// matched-but-skipped, or failed). No scheduler, visual builder, AI
+// decision node, or marketplace yet — this proves the trigger->rule->action
+// pipeline end to end before any of that gets layered on.
+
+model Event {
+  id             String   @id @default(cuid())
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id])
+  campaignId     String?
+  campaign       Campaign? @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  type           String   // 'campaign.created' | 'campaign.paused' | 'conversion.received' | ...
+  payload        Json
+  createdAt      DateTime @default(now())
+
+  executions AutomationExecution[]
+
+  @@index([organizationId, type])
+}
+
+model AutomationRule {
+  id             String   @id @default(cuid())
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id])
+  name           String
+  enabled        Boolean  @default(true)
+  triggerType    String   // matches Event.type
+  // Array of { field: string, operator: 'gt'|'gte'|'lt'|'lte'|'eq'|'neq', value: number|string },
+  // evaluated against the triggering Event's payload. Empty array = always matches.
+  conditions     Json     @default("[]")
+  action         String   // 'pause_campaign' | 'resume_campaign' | 'notify_slack'
+  actionParams   Json?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  executions AutomationExecution[]
+
+  @@index([organizationId, triggerType, enabled])
+}
+
+model AutomationExecution {
+  id            String   @id @default(cuid())
+  ruleId        String
+  rule          AutomationRule @relation(fields: [ruleId], references: [id], onDelete: Cascade)
+  eventId       String
+  event         Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  status        AutomationExecutionStatus
+  conditionsMet Boolean
+  actionResult  Json?
+  error         String?
+  executedAt    DateTime @default(now())
+
+  @@index([ruleId])
+}
+
+enum AutomationExecutionStatus {
+  SUCCESS
+  SKIPPED
+  FAILED
 }
 
 // ── Webhooks / Postbacks / Audit ──
