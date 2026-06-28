@@ -1536,6 +1536,7 @@ async function authDemo(){
 }
 function authLogout(){
   openConfirm('Log Out','Are you sure you want to log out of GoGo Bid?','Log Out',()=>{
+    if(getAccessToken())apiFetch('/auth/logout',{method:'POST'}).catch(err=>console.warn('authLogout: backend revoke failed',err));
     localStorage.removeItem('gb_user');
     clearTokens();
     _authUser=null;

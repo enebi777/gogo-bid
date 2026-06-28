@@ -8,6 +8,7 @@ import { GoogleAdsAdapter } from '../integrations/adapters/google-ads.adapter';
 import { TikTokAdsAdapter } from '../integrations/adapters/tiktok-ads.adapter';
 import { EncryptionService } from '../common/encryption.service';
 import { SyncContext } from '../integrations/adapter.interface';
+import { processPostbackEvent } from './handlers/postback-processor';
 
 /**
  * Runs as its own process (`npm run worker`), separate from the API server,
@@ -88,9 +89,7 @@ new Worker(
   async (job) => {
     const event = await prisma.webhookEvent.findUnique({ where: { id: job.data.webhookEventId } });
     if (!event) return;
-    // TODO: resolve campaignExternalId -> Campaign, then upsert Click/Conversion
-    // rows using the normalized payload captured at receive time.
-    await prisma.webhookEvent.update({ where: { id: event.id }, data: { status: 'PROCESSED', processedAt: new Date() } });
+    await processPostbackEvent(event, prisma);
   },
   { connection: redisConnection },
 );

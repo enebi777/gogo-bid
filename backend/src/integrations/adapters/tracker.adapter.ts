@@ -27,10 +27,14 @@ export class GenericTrackerAdapter implements PostbackAdapter {
     return safeEqual(String(payload['secret'] ?? ''), secret);
   }
 
-  normalize(payload: Record<string, unknown>) {
+  normalize(tracker: string, payload: Record<string, unknown>) {
+    const fields = TRACKER_FIELD_MAP[tracker];
+    const clickIdRaw = (fields && payload[fields.clickId]) ?? payload['clickid'] ?? payload['click_id'];
+    const conversionIdRaw =
+      (fields && payload[fields.conversionId]) ?? payload['txid'] ?? payload['transaction_id'] ?? payload['conversion_id'];
     return {
-      clickId: String(payload['clickid'] ?? payload['click_id'] ?? ''),
-      conversionId: String(payload['txid'] ?? payload['transaction_id'] ?? payload['conversion_id'] ?? ''),
+      clickId: String(clickIdRaw ?? ''),
+      conversionId: String(conversionIdRaw ?? ''),
       revenue: payload['revenue'] != null ? Number(payload['revenue']) : undefined,
       payout: payload['payout'] != null ? Number(payload['payout']) : undefined,
       campaignExternalId: payload['campaign_id'] != null ? String(payload['campaign_id']) : undefined,
