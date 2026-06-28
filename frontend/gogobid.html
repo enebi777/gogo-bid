@@ -1660,6 +1660,17 @@ function seedRand(seed){
 function tip(title,desc,when){
   return `<span class="tt" style="display:inline-block;margin-left:6px;vertical-align:middle"><span style="display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;border-radius:50%;background:rgba(79,110,247,.15);color:var(--accent2);font-size:10px;font-weight:700;cursor:help">i</span><span class="tt-box"><span class="tt-title">${title}</span><span class="tt-desc">${desc}</span>${when?`<span class="tt-when">⊙ ${when}</span>`:''}</span></span></span>`;
 }
+// These pages present scores/forecasts/recommendations that are seeded
+// demo content or one-off LLM calls — none of it round-trips through the
+// backend's AiPrediction/Forecast/Alert tables (those exist in the schema
+// but nothing writes to them yet). Surface that honestly instead of
+// implying it's live, persisted intelligence.
+function demoBanner(detail){
+  return `<div class="alert alert-blue mb16" style="display:flex;gap:10px;align-items:flex-start">
+    <span style="font-size:15px;line-height:1.4">🧪</span>
+    <div><div class="alert-title">Preview — not saved to your account</div><div class="alert-text">${detail}</div></div>
+  </div>`;
+}
 const PE = {meta:'📘',google:'🔍',tiktok:'🎵',native:'📰',push:'🔔'};
 const DAYS = ['Mon','Tue','Wed','Thu','Fri','Sat','Today'];
 
@@ -2846,6 +2857,7 @@ function renderOffer(el,c){
   <div><div class="page-title">Offer Analyzer${tip('Offer Analyzer','Scores affiliate offers using EPC, conversion rate, payout quality, and historical trends.','Use when deciding whether to keep, scale, or drop an offer.')}</div><div class="page-sub">AI Offer Forensics · linked to <strong style="color:var(--text)">${c.name}</strong></div></div>
   <button class="btn btn-outline btn-sm" onclick="openQS()">Switch ⌘J</button>
 </div>
+${demoBanner('Analysis runs live against Claude when you supply an API key, but results aren\'t saved to your account — they\'re lost on refresh.')}
 <div class="card mb16">
   <div class="card-hdr"><div class="card-title">🔬 AI Offer Forensics</div><div class="card-desc">Paste any offer URL — AI extracts payout, funnel, CVR, risk, traffic compatibility and keyword intelligence</div></div>
   <div class="card-body">
@@ -3059,6 +3071,7 @@ function renderAnomaly(el,c){
   <div><div class="page-title">Anomaly Detection${tip('Anomaly Detection','Automatically identifies unusual changes in campaign performance.','Use to catch problems before they drain budget.')}</div><div class="page-sub">AI monitors ${all.length} campaigns in real-time · ${allAnom.length} active alerts</div></div>
   <button class="btn btn-outline btn-sm" onclick="openQS()">Switch ⌘J</button>
 </div>
+${demoBanner('These anomalies are seeded preview data, not output from a live detection pipeline — wiring this up to your real Click/Cost/Revenue history is on the roadmap.')}
 <div class="g4 mb16">
   <div class="card kpi"><div class="kpi-label">Critical</div><div class="kpi-val" style="color:var(--red)">${allAnom.filter(a=>a.sev==='critical').length}</div></div>
   <div class="card kpi"><div class="kpi-label">Warning</div><div class="kpi-val" style="color:var(--yellow)">${allAnom.filter(a=>a.sev==='warning').length}</div></div>
@@ -3154,6 +3167,7 @@ function renderCopilot(el,c){
   <div><div class="page-title">AI Copilot${tip('AI Copilot','A conversational assistant that answers questions and explains recommendations using your live campaign data.','Use whenever you want a plain-language answer instead of digging through reports.')}</div><div class="page-sub">Context: <strong style="color:var(--text)">${c.name}</strong> · Health ${c.ai.healthScore}/100</div></div>
   <button class="btn btn-outline btn-sm" onclick="openQS()">Switch ⌘J</button>
 </div>
+${demoBanner('Chats run live against Claude when you supply an API key, but the conversation isn\'t saved to your account — it resets on reload.')}
 <div class="g31">
   <div class="card" style="display:flex;flex-direction:column">
     <div class="card-hdr"><div class="card-title">✦ Campaign AI Assistant</div><div class="card-desc">Contextualised to ${c.name} — powered by Claude</div></div>
@@ -3219,6 +3233,7 @@ function renderForecasting(el,c){
   <div><div class="page-title">AI Forecasting${tip('AI Forecasting','Projects future spend, revenue, and ROAS based on recent trends.','Use to plan budget ahead of time and spot trajectory changes early.')}</div><div class="page-sub">7-day projection — <strong style="color:var(--text)">${c.name}</strong> · ${c.ai.forecastConfidence}% confidence</div></div>
   <button class="btn btn-outline btn-sm" onclick="openQS()">Switch ⌘J</button>
 </div>
+${demoBanner('This forecast is seeded preview data, not output from a real predictive model — a live forecasting pipeline is on the roadmap.')}
 <div class="g4 mb16">
   <div class="card kpi"><div class="kpi-label">7d Proj. Revenue</div><div class="kpi-val pos">$${projRev.reduce((a,b)=>a+b,0).toLocaleString()}</div></div>
   <div class="card kpi"><div class="kpi-label">7d Proj. Profit</div><div class="kpi-val pos">$${projSp.reduce((a,s,i)=>a+(projRev[i]-s),0).toLocaleString()}</div></div>
@@ -3243,6 +3258,7 @@ function renderScaling(el,c){
   <div><div class="page-title">Scaling Engine${tip('Scaling Engine','Uses AI to recommend profitable budget increases.','Use once a campaign is stable and you want to grow spend without losing ROAS.')}</div><div class="page-sub">Budget scaling calculator — <strong style="color:var(--text)">${c.name}</strong></div></div>
   <button class="btn btn-outline btn-sm" onclick="openQS()">Switch ⌘J</button>
 </div>
+${demoBanner('The budget projection below is a live calculator, but the "Ready to Scale" verdict comes from seeded preview data, not a real scaling-readiness model.')}
 ${pendBudget.length?`<div class="mb16" id="sc-bsc"></div>`:''}
 <div class="g13">
   <div class="card">
@@ -5005,6 +5021,7 @@ function renderGeo(el,c){
   <div><div class="page-title">GEO Analysis${tip('GEO Analysis','Breaks down spend, ROAS, and conversion rate by country to find your strongest markets.','Use to reallocate budget toward winning geos.')}</div><div class="page-sub">Country-level performance — <strong style="color:var(--text)">${c.name}</strong></div></div>
   <button class="btn btn-outline btn-sm" onclick="exportCSV()">⬇ Export CSV</button>
 </div>
+${demoBanner('This country breakdown is fixed sample data — it doesn\'t yet reflect this campaign\'s real geo-level Click/Conversion history.')}
 <div class="g4 mb16">
   ${[['Top GEO','🇺🇸 US','$6,752 profit'],['Total GEOs',geos.length,'active countries'],['Best ROAS','🇺🇸 US','2.40×'],['Worst CPA','🇩🇪 DE','$15.00']].map(([l,v,s])=>`
   <div class="card kpi"><div class="kpi-label">${l}</div><div class="kpi-val" style="font-size:16px">${v}</div><div class="kpi-change neu">${s}</div></div>`).join('')}
