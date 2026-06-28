@@ -127,6 +127,25 @@ describe('evaluateEvent', () => {
     });
   });
 
+  it('skips a campaign-scoped rule when the event belongs to a different campaign', async () => {
+    const prisma = makePrisma();
+    prisma.automationRule.findMany.mockResolvedValue([]); // simulates the DB-level OR filter excluding it
+    await evaluateEvent(makeEvent({ campaignId: 'campaign-2' }), prisma as any);
+    expect(prisma.automationRule.findMany).toHaveBeenCalledWith({
+      where: expect.objectContaining({ OR: [{ campaignId: null }, { campaignId: 'campaign-2' }] }),
+    });
+    expect(prisma.automationExecution.create).not.toHaveBeenCalled();
+  });
+
+  it('runs an org-wide rule (campaignId null) regardless of which campaign fired the event', async () => {
+    const prisma = makePrisma();
+    prisma.automationRule.findMany.mockResolvedValue([
+      { id: 'rule-1', campaignId: null, action: 'pause_campaign', conditions: [], actionParams: null },
+    ]);
+    await evaluateEvent(makeEvent({ campaignId: 'campaign-99' }), prisma as any);
+    expect(prisma.campaign.update).toHaveBeenCalledWith({ where: { id: 'campaign-99' }, data: { status: 'paused' } });
+  });
+
   it('evaluates multiple rules independently for the same event', async () => {
     const prisma = makePrisma();
     prisma.automationRule.findMany.mockResolvedValue([

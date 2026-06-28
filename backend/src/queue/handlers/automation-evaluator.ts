@@ -73,7 +73,14 @@ const ACTIONS: Record<string, (ctx: ActionContext) => Promise<Record<string, unk
  */
 export async function evaluateEvent(event: Event, prisma: PrismaClient): Promise<void> {
   const rules = await prisma.automationRule.findMany({
-    where: { organizationId: event.organizationId, triggerType: event.type, enabled: true },
+    where: {
+      organizationId: event.organizationId,
+      triggerType: event.type,
+      enabled: true,
+      // A rule with no campaignId applies org-wide; a scoped rule only
+      // matches events for that exact campaign.
+      OR: [{ campaignId: null }, { campaignId: event.campaignId }],
+    },
   });
 
   for (const rule of rules) {

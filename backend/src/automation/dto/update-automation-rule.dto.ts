@@ -15,6 +15,10 @@ export class UpdateAutomationRuleDto {
   enabled?: boolean;
 
   @IsOptional()
+  @IsString()
+  campaignId?: string;
+
+  @IsOptional()
   @IsIn(TRIGGER_TYPES)
   triggerType?: TriggerType;
 

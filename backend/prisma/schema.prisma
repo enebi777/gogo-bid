@@ -145,6 +145,7 @@ model Campaign {
   forecasts     Forecast[]
   alerts        Alert[]
   events        Event[]
+  automationRules AutomationRule[]
 }
 
 model AdSet {
@@ -315,6 +316,12 @@ model AutomationRule {
   id             String   @id @default(cuid())
   organizationId String
   organization   Organization @relation(fields: [organizationId], references: [id])
+  // Null = applies to every campaign in the org (matched against the
+  // triggering Event's campaignId at evaluation time). Set = scoped to one
+  // campaign only, matching how rules are created from the Automation page
+  // today (always in the context of the currently-selected campaign).
+  campaignId     String?
+  campaign       Campaign? @relation(fields: [campaignId], references: [id], onDelete: Cascade)
   name           String
   enabled        Boolean  @default(true)
   triggerType    String   // matches Event.type
@@ -329,6 +336,7 @@ model AutomationRule {
   executions AutomationExecution[]
 
   @@index([organizationId, triggerType, enabled])
+  @@index([campaignId])
 }
 
 model AutomationExecution {
