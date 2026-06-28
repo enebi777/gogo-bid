@@ -27,6 +27,11 @@ model User {
   role           Role     @default(MEMBER)
   organizationId String
   organization   Organization @relation(fields: [organizationId], references: [id])
+  // SHA-256 of the single currently-valid refresh token (rotated on every
+  // POST /auth/refresh). Null means no active session. A refresh request
+  // whose token doesn't hash to this value is either stale (already
+  // rotated) or stolen — treated as reuse and the session is killed.
+  refreshTokenHash String?
   createdAt      DateTime @default(now())
   auditLogs      AuditLog[]
 }

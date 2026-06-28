@@ -22,7 +22,7 @@ export class ClickBankAdapter implements PostbackAdapter, SyncAdapter {
     return expected === String(payload['cbReceipt'] ?? '');
   }
 
-  normalize(payload: Record<string, unknown>) {
+  normalize(_tracker: string, payload: Record<string, unknown>) {
     return {
       clickId: String(payload['trackingId'] ?? payload['affiliate'] ?? ''),
       conversionId: String(payload['receipt'] ?? ''),

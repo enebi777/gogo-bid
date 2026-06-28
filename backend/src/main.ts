@@ -1,5 +1,6 @@
 import 'reflect-metadata';
 import { NestFactory } from '@nestjs/core';
+import { ValidationPipe } from '@nestjs/common';
 import helmet from 'helmet';
 import { AppModule } from './app.module';
 
@@ -8,6 +9,9 @@ async function bootstrap() {
   app.use(helmet());
   app.enableCors({ origin: process.env.FRONTEND_URL ?? true, credentials: true });
   app.setGlobalPrefix('api');
+  app.useGlobalPipes(
+    new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true, transform: true }),
+  );
   const port = process.env.PORT ?? 4000;
   await app.listen(port);
   console.log(`GoGo Bid backend listening on :${port}`);

@@ -2,11 +2,13 @@ import { Body, Controller, Get, Param, Patch, Query, Req, Res, UseGuards, BadReq
 import type { Response } from 'express';
 import { randomBytes } from 'crypto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { RolesGuard, Roles } from '../auth/roles.guard';
 import { PrismaService } from '../prisma/prisma.service';
 import { EncryptionService } from '../common/encryption.service';
 import { MetaAdapter } from './adapters/meta.adapter';
 import { GoogleAdsAdapter } from './adapters/google-ads.adapter';
 import { TikTokAdsAdapter } from './adapters/tiktok-ads.adapter';
+import { SelectAccountDto } from './dto/select-account.dto';
 
 const ADAPTERS: Record<string, any> = {
   meta: { adapter: MetaAdapter, provider: 'META_ADS' },
@@ -84,13 +86,14 @@ export class IntegrationsController {
   }
 
   /** Google Ads / Meta Ads: switch which ad account this connection syncs. */
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('OWNER', 'ADMIN')
   @Patch(':provider/:integrationAccountId/select-account')
   async selectAccount(
     @Req() req: any,
     @Param('provider') provider: string,
     @Param('integrationAccountId') integrationAccountId: string,
-    @Body() body: { accountId: string },
+    @Body() body: SelectAccountDto,
   ) {
     const entry = ADAPTERS[provider];
     if (!entry) throw new BadRequestException(`Unknown provider "${provider}"`);

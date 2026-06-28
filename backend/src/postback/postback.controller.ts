@@ -40,7 +40,7 @@ export class PostbackController {
       throw new BadRequestException('Invalid or missing postback secret.');
     }
 
-    const normalized = this.tracker.normalize(payload);
+    const normalized = this.tracker.normalize(tracker, payload);
     if (!normalized.conversionId && !normalized.clickId) {
       throw new BadRequestException('Postback missing both clickId and conversionId — nothing to record.');
     }

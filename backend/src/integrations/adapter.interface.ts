@@ -40,8 +40,13 @@ export interface SyncAdapter {
 export interface PostbackAdapter {
   /** Validate the inbound postback's signature/secret before trusting it. */
   verifySignature(payload: Record<string, unknown>, headers: Record<string, string>): boolean;
-  /** Map the provider's raw postback shape into our normalized Click/Conversion model. */
-  normalize(payload: Record<string, unknown>): {
+  /**
+   * Map the provider's raw postback shape into our normalized Click/Conversion
+   * model. `tracker` is the lowercase slug (e.g. "voluum") used to look up
+   * that tracker's field names — different trackers use different query-param
+   * names for the same concept (see TRACKER_FIELD_MAP).
+   */
+  normalize(tracker: string, payload: Record<string, unknown>): {
     clickId: string;
     conversionId?: string;
     revenue?: number;
