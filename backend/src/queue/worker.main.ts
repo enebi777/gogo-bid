@@ -1,5 +1,5 @@
 import 'reflect-metadata';
-import { Worker, QueueEvents } from 'bullmq';
+import { Worker, Queue, QueueEvents } from 'bullmq';
 import { PrismaClient } from '@prisma/client';
 import { redisConnection } from './redis-connection';
 import { QUEUE_NAMES } from './queue.service';
@@ -9,6 +9,7 @@ import { TikTokAdsAdapter } from '../integrations/adapters/tiktok-ads.adapter';
 import { EncryptionService } from '../common/encryption.service';
 import { SyncContext } from '../integrations/adapter.interface';
 import { processPostbackEvent } from './handlers/postback-processor';
+import { evaluateEvent } from './handlers/automation-evaluator';
 
 /**
  * Runs as its own process (`npm run worker`), separate from the API server,
@@ -29,6 +30,7 @@ const adapters: Record<string, any> = {
   GOOGLE_ADS: new GoogleAdsAdapter(),
   TIKTOK_ADS: new TikTokAdsAdapter(),
 };
+const automationQueue = new Queue(QUEUE_NAMES.AUTOMATION_EVALUATION, { connection: redisConnection });
 
 new Worker(
   QUEUE_NAMES.SYNC,
@@ -89,7 +91,17 @@ new Worker(
   async (job) => {
     const event = await prisma.webhookEvent.findUnique({ where: { id: job.data.webhookEventId } });
     if (!event) return;
-    await processPostbackEvent(event, prisma);
+    await processPostbackEvent(event, prisma, automationQueue);
+  },
+  { connection: redisConnection },
+);
+
+new Worker(
+  QUEUE_NAMES.AUTOMATION_EVALUATION,
+  async (job) => {
+    const event = await prisma.event.findUnique({ where: { id: job.data.eventId } });
+    if (!event) return;
+    await evaluateEvent(event, prisma);
   },
   { connection: redisConnection },
 );

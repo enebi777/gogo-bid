@@ -9,6 +9,7 @@ import { IntegrationsModule } from './integrations/integrations.module';
 import { PostbackModule } from './postback/postback.module';
 import { WebhooksModule } from './webhooks/webhooks.module';
 import { HealthModule } from './health/health.module';
+import { AutomationModule } from './automation/automation.module';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { HealthModule } from './health/health.module';
     PostbackModule,
     WebhooksModule,
     HealthModule,
+    AutomationModule,
   ],
   providers: [{ provide: APP_GUARD, useClass: ThrottlerGuard }],
 })

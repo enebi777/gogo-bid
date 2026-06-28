@@ -1,9 +1,13 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { EventsService } from '../events/events.service';
 
 @Injectable()
 export class CampaignsService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly events: EventsService,
+  ) {}
 
   list(organizationId: string) {
     return this.prisma.campaign.findMany({
@@ -55,13 +59,31 @@ export class CampaignsService {
     };
   }
 
-  create(organizationId: string, data: { name: string; offerId?: string; dailyBudget?: number; integrationAccountId?: string; status?: string; data?: any }) {
-    return this.prisma.campaign.create({ data: { organizationId, ...data } });
+  async create(organizationId: string, data: { name: string; offerId?: string; dailyBudget?: number; integrationAccountId?: string; status?: string; data?: any }) {
+    const campaign = await this.prisma.campaign.create({ data: { organizationId, ...data } });
+    await this.events.emit({
+      organizationId,
+      type: 'campaign.created',
+      campaignId: campaign.id,
+      payload: { name: campaign.name, status: campaign.status, dailyBudget: campaign.dailyBudget },
+    });
+    return campaign;
   }
 
   async update(organizationId: string, id: string, data: Partial<{ name: string; status: string; dailyBudget: number; data: any }>) {
-    await this.getOrThrow(organizationId, id); // throws 404 if this org doesn't own the campaign
-    return this.prisma.campaign.update({ where: { id }, data });
+    const before = await this.getOrThrow(organizationId, id); // throws 404 if this org doesn't own the campaign
+    const campaign = await this.prisma.campaign.update({ where: { id }, data });
+
+    if (data.status === 'paused' && before.status !== 'paused') {
+      await this.events.emit({
+        organizationId,
+        type: 'campaign.paused',
+        campaignId: campaign.id,
+        payload: { name: campaign.name, previousStatus: before.status },
+      });
+    }
+
+    return campaign;
   }
 
   async archive(organizationId: string, id: string) {
