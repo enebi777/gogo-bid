@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, UseGuards, Req } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Query, UseGuards, Req } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { RolesGuard, Roles } from '../auth/roles.guard';
 import { CampaignsService } from './campaigns.service';
@@ -23,6 +23,11 @@ export class CampaignsController {
   @Get(':id/performance')
   performance(@Req() req: any, @Param('id') id: string) {
     return this.campaigns.performance(req.user.organizationId, id);
+  }
+
+  @Get(':id/metrics')
+  metrics(@Req() req: any, @Param('id') id: string, @Query('range') range?: string) {
+    return this.campaigns.metrics(req.user.organizationId, id, range);
   }
 
   @Post()
