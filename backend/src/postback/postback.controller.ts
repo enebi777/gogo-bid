@@ -1,9 +1,11 @@
 import { Controller, Get, Post, Param, Query, Body, BadRequestException, Logger } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { GenericTrackerAdapter, TRACKER_FIELD_MAP } from '../integrations/adapters/tracker.adapter';
+import { GenericTrackerAdapter } from '../integrations/adapters/tracker.adapter';
 import { QueueService } from '../queue/queue.service';
+import { connectorsByType, getConnector } from '../connectors/connector-registry';
 
-const SUPPORTED_TRACKERS = Object.keys(TRACKER_FIELD_MAP);
+// Supported tracker slugs come from the connector registry (single source of truth).
+const SUPPORTED_TRACKERS = connectorsByType('tracking').map((c) => c.id);
 
 /**
  * Universal postback receiver: /postback/{tracker}
@@ -70,6 +72,8 @@ export class PostbackController {
   }
 
   private providerEnum(tracker: string) {
-    return tracker.toUpperCase() as any; // matches IntegrationProvider enum values (VOLUUM, REDTRACK, ...)
+    // Resolve via the registry so the enum value is authoritative rather than
+    // relying on the slug happening to uppercase to the enum member.
+    return (getConnector(tracker)?.provider ?? tracker.toUpperCase()) as any;
   }
 }
