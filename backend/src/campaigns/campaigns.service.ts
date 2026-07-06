@@ -1,6 +1,9 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { EventsService } from '../events/events.service';
+import { computeCampaignMetrics, resolveRange, MetricsRange } from './campaign-metrics';
+
+const VALID_RANGES: MetricsRange[] = ['today', '7d', '30d', 'all'];
 
 @Injectable()
 export class CampaignsService {
@@ -57,6 +60,29 @@ export class CampaignsService {
       cvr: clicks > 0 ? (conversionCount / clicks) * 100 : null,
       cpa: conversionCount > 0 ? spend / conversionCount : null,
     };
+  }
+
+  /**
+   * Range-aware live metrics computed from real tracking rows. Unlike
+   * performance() (lifetime totals), this powers the campaign-scoped views
+   * that need windowed KPIs + a daily series, and flags `source: 'empty'`
+   * so the frontend can fall back to seeded preview numbers on a campaign
+   * with no tracking data yet rather than showing a misleading all-zero card.
+   */
+  async metrics(organizationId: string, id: string, rangeParam?: string) {
+    await this.getOrThrow(organizationId, id);
+    const range: MetricsRange = VALID_RANGES.includes(rangeParam as MetricsRange) ? (rangeParam as MetricsRange) : '7d';
+    const { from } = resolveRange(range);
+    // Only pull rows inside the window (or all, for range='all') so a
+    // long-running campaign doesn't load its full history every request.
+    const dateFilter = from ? { gte: from } : undefined;
+    const [costs, revenues, clicks, conversions] = await Promise.all([
+      this.prisma.cost.findMany({ where: { campaignId: id, ...(dateFilter ? { date: dateFilter } : {}) } }),
+      this.prisma.revenue.findMany({ where: { campaignId: id, ...(dateFilter ? { date: dateFilter } : {}) } }),
+      this.prisma.click.findMany({ where: { campaignId: id, ...(dateFilter ? { createdAt: dateFilter } : {}) } }),
+      this.prisma.conversion.findMany({ where: { campaignId: id, ...(dateFilter ? { createdAt: dateFilter } : {}) } }),
+    ]);
+    return computeCampaignMetrics({ costs, revenues, clicks, conversions }, range);
   }
 
   async create(organizationId: string, data: { name: string; offerId?: string; dailyBudget?: number; integrationAccountId?: string; status?: string; data?: any }) {

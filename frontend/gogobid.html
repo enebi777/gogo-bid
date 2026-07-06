@@ -2571,6 +2571,9 @@ function renderCampaignHub(el){
   </div>
 </div>
 
+<!-- Live tracking data (real Click/Conversion/Cost/Revenue rows from the backend) -->
+<div id="hub-live-metrics" class="mb20"></div>
+
 <!-- Hub sections grid -->
 <div class="hub-sections mb20">
   <div class="hub-section" onclick="nav('cpc',document.querySelector('.nav-item[onclick*=cpc]'))">
@@ -2644,6 +2647,65 @@ function renderCampaignHub(el){
       <div style="font-size:12px;color:var(--text);line-height:1.5">${r}</div>
     </div>`).join('')}
   </div>
+</div>`;
+  hubLoadLiveMetrics(c.id);
+}
+
+// ── LIVE TRACKING METRICS (real Click/Conversion/Cost/Revenue rows) ──
+// Fetches GET /campaigns/:id/metrics and renders into #hub-live-metrics.
+// Cached per campaign+range so re-rendering the hub (e.g. after a campaign
+// switch and back) doesn't refetch every time; call with force=true to bust.
+const _hubMetricsCache={};
+async function hubLoadLiveMetrics(campId,range='7d',force){
+  const host=$('hub-live-metrics');if(!host)return;
+  const key=campId+':'+range;
+  if(_hubMetricsCache[key]&&!force){host.innerHTML=hubMetricsCard(_hubMetricsCache[key],range,campId);return;}
+  if(!getAccessToken()){host.innerHTML=hubMetricsCard({source:'nologin'},range,campId);return;}
+  host.innerHTML=`<div class="card" style="padding:18px;color:var(--muted);font-size:12px">Loading live tracking data…</div>`;
+  try{
+    const m=await apiFetch('/campaigns/'+campId+'/metrics?range='+range);
+    _hubMetricsCache[key]=m;
+    // Only paint if the user is still on this campaign (guards against a
+    // slow response landing after they've switched away).
+    if(CS.active.id===campId&&_page==='hub')host.innerHTML=hubMetricsCard(m,range,campId);
+  }catch(err){
+    if(CS.active.id===campId&&_page==='hub')host.innerHTML=`<div class="card" style="padding:18px;color:var(--red);font-size:12px">Couldn't load live metrics: ${err.message}</div>`;
+  }
+}
+function hubMetricsCard(m,range,campId){
+  const ranges=[['today','Today'],['7d','7 Days'],['30d','30 Days'],['all','All Time']];
+  const tabs=ranges.map(([k,l])=>`<button class="btn btn-${k===range?'primary':'ghost'} btn-xs" onclick="hubLoadLiveMetrics('${campId}','${k}')">${l}</button>`).join('');
+  let badge,body;
+  if(m.source==='nologin'){
+    badge=`<span class="badge badge-yellow" style="font-size:9px">Offline</span>`;
+    body=`<div style="padding:20px;text-align:center;color:var(--muted);font-size:12px">Log in to load live tracking data from the backend.</div>`;
+  }else if(m.source==='empty'){
+    badge=`<span class="badge badge-yellow" style="font-size:9px">No tracking data yet</span>`;
+    body=`<div style="padding:20px;text-align:center;color:var(--muted);font-size:12px">No clicks, conversions, or cost/revenue recorded for this campaign in this window yet.<br>KPIs shown elsewhere are <strong>seeded preview data</strong> until real postbacks and platform syncs land here.</div>`;
+  }else{
+    badge=`<span class="badge badge-green" style="font-size:9px">● Live</span>`;
+    const fmt=(v,pre='',suf='',dec=2)=>v==null?'—':pre+Number(v).toLocaleString(undefined,{maximumFractionDigits:dec})+suf;
+    const kpis=[
+      ['Spend',fmt(m.spend,'$'),'var(--accent2)'],
+      ['Revenue',fmt(m.revenue,'$'),'var(--green)'],
+      ['Profit',(m.profit>=0?'+':'')+fmt(Math.abs(m.profit),'$'),m.profit>=0?'var(--green)':'var(--red)'],
+      ['ROAS',fmt(m.roas,'','×',2),m.roas>=1.5?'var(--green)':'var(--yellow)'],
+      ['Clicks',fmt(m.clicks,'','',0),'var(--text)'],
+      ['Conversions',fmt(m.conversions,'','',0),'var(--text)'],
+      ['CVR',fmt(m.cvr,'','%',1),'var(--text)'],
+      ['CPA',fmt(m.cpa,'$'),'var(--text)'],
+      ['CPC',fmt(m.cpc,'$'),'var(--text)'],
+    ];
+    body=`<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(90px,1fr));gap:14px;padding:16px">
+      ${kpis.map(([l,v,col])=>`<div><div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-bottom:3px">${l}</div><div style="font-size:17px;font-weight:800;font-family:var(--mono);color:${col}">${v}</div></div>`).join('')}
+    </div>`;
+  }
+  return`<div class="card">
+  <div class="card-hdr" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
+    <div style="display:flex;align-items:center;gap:8px"><div class="card-title">📊 Live Tracking Data</div>${badge}</div>
+    <div class="flex gap4">${tabs}</div>
+  </div>
+  ${body}
 </div>`;
 }
 
