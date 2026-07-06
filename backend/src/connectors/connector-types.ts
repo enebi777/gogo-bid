@@ -58,6 +58,11 @@ export interface ConnectorProfile {
   payoutParam?: string;
   statusParam?: string;
   currencyParam?: string;
+  // 'verified' = field names confirmed from the provider's docs / the codebase's
+  // authoritative tracker map. 'generic' = a sensible scaffold the user should
+  // confirm against their account. Surfaced in the UI so a generated postback
+  // URL never silently presents an unverified mapping as gospel.
+  confidence?: 'verified' | 'generic';
 }
 
 export interface ConnectorDefinition {
