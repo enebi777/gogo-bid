@@ -1,0 +1,116 @@
+// The connector registry — the single catalog every part of the app reads to
+// answer "what is this provider and how do I connect to it?". Replaces the
+// scattered, duplicated provider maps (integrations controller, worker,
+// tracker field-map, frontend INT_CONNECTED) with one source of truth.
+//
+// Adding a provider = adding one entry here. No new branching elsewhere.
+
+import { ConnectorDefinition, ConnectorCapabilities, ConnectionType } from './connector-types';
+
+// Capability presets keep definitions terse and consistent per connection type.
+const OAUTH_ADS: ConnectorCapabilities = { multiAccount: true, assetDiscovery: true, campaignImport: true, webhooks: true, postbacks: false, automation: true, ai: true };
+const API_ADS: ConnectorCapabilities = { multiAccount: true, assetDiscovery: false, campaignImport: true, webhooks: false, postbacks: false, automation: true, ai: true };
+const TRACKING: ConnectorCapabilities = { multiAccount: true, assetDiscovery: false, campaignImport: true, webhooks: true, postbacks: true, automation: true, ai: true };
+const AFFILIATE: ConnectorCapabilities = { multiAccount: true, assetDiscovery: false, campaignImport: false, webhooks: true, postbacks: true, automation: true, ai: true };
+const ANALYTICS: ConnectorCapabilities = { multiAccount: true, assetDiscovery: false, campaignImport: false, webhooks: false, postbacks: false, automation: false, ai: true };
+const DESTINATION: ConnectorCapabilities = { multiAccount: true, assetDiscovery: false, campaignImport: false, webhooks: false, postbacks: false, automation: false, ai: false };
+
+const def = (
+  id: string,
+  provider: string | null,
+  name: string,
+  category: ConnectorDefinition['category'],
+  connectionType: ConnectionType,
+  authProvider: string,
+  capabilities: ConnectorCapabilities,
+  priority: number,
+  profile?: ConnectorDefinition['profile'],
+): ConnectorDefinition => ({ id, provider, name, category, connectionType, authProvider, capabilities, priority, profile });
+
+export const CONNECTORS: ConnectorDefinition[] = [
+  // ── OAuth traffic sources ──
+  def('meta_ads', 'META_ADS', 'Meta Ads', 'Traffic Source', 'oauth', 'facebook_login_business', OAUTH_ADS, 1),
+  def('google_ads', 'GOOGLE_ADS', 'Google Ads', 'Traffic Source', 'oauth', 'google_oauth', OAUTH_ADS, 2),
+  def('tiktok_ads', 'TIKTOK_ADS', 'TikTok Ads', 'Traffic Source', 'oauth', 'tiktok_business_oauth', OAUTH_ADS, 3),
+
+  // ── API-key native / push traffic sources ──
+  def('taboola', 'TABOOLA', 'Taboola', 'Traffic Source', 'api', 'api_key', API_ADS, 10),
+  def('outbrain', 'OUTBRAIN', 'Outbrain', 'Traffic Source', 'api', 'api_key', API_ADS, 11),
+  def('mgid', 'MGID', 'MGID', 'Traffic Source', 'api', 'api_key', API_ADS, 12),
+  def('propellerads', 'PROPELLERADS', 'PropellerAds', 'Traffic Source', 'api', 'api_key', API_ADS, 13),
+
+  // ── Trackers (postback profiles carried verbatim from the codebase's
+  //    authoritative TRACKER_FIELD_MAP — this is now the source of truth) ──
+  def('voluum', 'VOLUUM', 'Voluum', 'Tracker', 'tracking', 'postback_secret', TRACKING, 20, { clickIdParam: 'cid', conversionIdParam: 'txid', revenueParam: 'revenue', payoutParam: 'payout' }),
+  def('redtrack', 'REDTRACK', 'RedTrack', 'Tracker', 'tracking', 'postback_secret', TRACKING, 21, { clickIdParam: 'clickid', conversionIdParam: 'conversion_id', revenueParam: 'revenue', payoutParam: 'payout' }),
+  def('binom', 'BINOM', 'Binom', 'Tracker', 'tracking', 'postback_secret', TRACKING, 22, { clickIdParam: 'click_id', conversionIdParam: 'tx_id', revenueParam: 'revenue', payoutParam: 'payout' }),
+  def('bemob', 'BEMOB', 'BeMob', 'Tracker', 'tracking', 'postback_secret', TRACKING, 23, { clickIdParam: 'click_id', conversionIdParam: 'payout_id', revenueParam: 'revenue', payoutParam: 'payout' }),
+  def('keitaro', 'KEITARO', 'Keitaro', 'Tracker', 'tracking', 'postback_secret', TRACKING, 24, { clickIdParam: 'subid', conversionIdParam: 'tid', revenueParam: 'revenue', payoutParam: 'payout' }),
+  def('hyros', 'HYROS', 'Hyros', 'Tracker', 'tracking', 'postback_secret', TRACKING, 25, { clickIdParam: 'click_id', conversionIdParam: 'order_id', revenueParam: 'revenue', payoutParam: 'payout' }),
+
+  // ── Affiliate networks / marketplaces. ClickBank's profile is known (per
+  //    its documented postback params); the rest carry no profile yet →
+  //    Phase 2 (Smart Profiles) fills them. `profile: undefined` is honest:
+  //    "connector recognized, field mapping not yet verified". ──
+  def('clickbank', 'CLICKBANK', 'ClickBank', 'Affiliate Network', 'affiliate', 'api_key', AFFILIATE, 30, { clickIdParam: 'tid', conversionIdParam: 'cbreceipt', revenueParam: 'amount' }),
+  def('buygoods', 'BUYGOODS', 'BuyGoods', 'Affiliate Network', 'affiliate', 'api_key', AFFILIATE, 31),
+  def('digistore24', 'DIGISTORE24', 'Digistore24', 'Affiliate Network', 'affiliate', 'api_key', AFFILIATE, 32),
+  def('maxweb', 'MAXWEB', 'MaxWeb', 'Affiliate Network', 'affiliate', 'api_key', AFFILIATE, 33),
+  def('gurumedia', 'GURUMEDIA', 'GuruMedia', 'Affiliate Network', 'affiliate', 'api_key', AFFILIATE, 34),
+  def('terraleads', 'TERRALEADS', 'TerraLeads', 'Affiliate Network', 'affiliate', 'api_key', AFFILIATE, 35),
+  def('leadrock', 'LEADROCK', 'LeadRock', 'Affiliate Network', 'affiliate', 'api_key', AFFILIATE, 36),
+  def('cpahouse', 'CPAHOUSE', 'CPA House', 'Affiliate Network', 'affiliate', 'api_key', AFFILIATE, 37),
+  def('monetizze', 'MONETIZZE', 'Monetizze', 'Affiliate Network', 'affiliate', 'api_key', AFFILIATE, 38),
+  def('braip', 'BRAIP', 'Braip', 'Affiliate Network', 'affiliate', 'api_key', AFFILIATE, 39),
+  def('kiwify', 'KIWIFY', 'Kiwify', 'Affiliate Network', 'affiliate', 'api_key', AFFILIATE, 40),
+  def('perfectpay', 'PERFECTPAY', 'PerfectPay', 'Affiliate Network', 'affiliate', 'api_key', AFFILIATE, 41),
+  def('cartpanda', 'CARTPANDA', 'CartPanda', 'Affiliate Network', 'affiliate', 'api_key', AFFILIATE, 42),
+  def('hubla', 'HUBLA', 'Hubla', 'Affiliate Network', 'affiliate', 'api_key', AFFILIATE, 43),
+
+  // ── Analytics (API data sources) ──
+  def('ga4', 'GA4', 'Google Analytics 4', 'Analytics', 'api', 'google_oauth', ANALYTICS, 50),
+  def('mixpanel', 'MIXPANEL', 'Mixpanel', 'Analytics', 'api', 'api_key', ANALYTICS, 51),
+  def('amplitude', 'AMPLITUDE', 'Amplitude', 'Analytics', 'api', 'api_key', ANALYTICS, 52),
+
+  // ── Destinations (outbound export) ──
+  def('google_sheets', 'GOOGLE_SHEETS', 'Google Sheets', 'Destination', 'destination', 'google_oauth', DESTINATION, 60),
+  def('looker_studio', 'LOOKER_STUDIO', 'Looker Studio', 'Destination', 'destination', 'google_oauth', DESTINATION, 61),
+  def('power_bi', 'POWER_BI', 'Power BI', 'Destination', 'destination', 'microsoft_oauth', DESTINATION, 62),
+];
+
+// Fast lookups (built once at module load).
+const BY_ID = new Map(CONNECTORS.map((c) => [c.id, c]));
+const BY_PROVIDER = new Map(CONNECTORS.filter((c) => c.provider).map((c) => [c.provider as string, c]));
+
+export function listConnectors(type?: ConnectionType): ConnectorDefinition[] {
+  const list = type ? CONNECTORS.filter((c) => c.connectionType === type) : CONNECTORS;
+  return [...list].sort((a, b) => a.priority - b.priority);
+}
+
+export function getConnector(id: string): ConnectorDefinition | undefined {
+  return BY_ID.get(id);
+}
+
+/** Look up by the Prisma IntegrationProvider enum member (e.g. 'META_ADS'). */
+export function getConnectorByProvider(provider: string): ConnectorDefinition | undefined {
+  return BY_PROVIDER.get(provider);
+}
+
+export function connectorsByType(type: ConnectionType): ConnectorDefinition[] {
+  return listConnectors(type);
+}
+
+export function getProfile(id: string): ConnectorDefinition['profile'] | undefined {
+  return BY_ID.get(id)?.profile;
+}
+
+/**
+ * Tracker postback field names for a tracker slug (e.g. 'voluum' → {clickId:
+ * 'cid', conversionId: 'txid'}). Back-compat shape for the postback adapter,
+ * now sourced from the registry instead of a separate map.
+ */
+export function getTrackerFields(trackerSlug: string): { clickId: string; conversionId: string } | undefined {
+  const p = BY_ID.get(trackerSlug)?.profile;
+  if (!p) return undefined;
+  return { clickId: p.clickIdParam, conversionId: p.conversionIdParam };
+}

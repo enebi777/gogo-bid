@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { timingSafeEqual } from 'crypto';
 import { PostbackAdapter } from '../adapter.interface';
+import { getTrackerFields } from '../../connectors/connector-registry';
 
 function safeEqual(a: string, b: string): boolean {
   const bufA = Buffer.from(a);
@@ -28,7 +29,9 @@ export class GenericTrackerAdapter implements PostbackAdapter {
   }
 
   normalize(tracker: string, payload: Record<string, unknown>) {
-    const fields = TRACKER_FIELD_MAP[tracker];
+    // Field mappings now come from the connector registry (single source of
+    // truth) rather than a local map — see connectors/connector-registry.ts.
+    const fields = getTrackerFields(tracker);
     const clickIdRaw = (fields && payload[fields.clickId]) ?? payload['clickid'] ?? payload['click_id'];
     const conversionIdRaw =
       (fields && payload[fields.conversionId]) ?? payload['txid'] ?? payload['transaction_id'] ?? payload['conversion_id'];
@@ -41,13 +44,3 @@ export class GenericTrackerAdapter implements PostbackAdapter {
     };
   }
 }
-
-/** Provider-specific tweaks layer on top of the generic shape above. */
-export const TRACKER_FIELD_MAP: Record<string, { clickId: string; conversionId: string }> = {
-  voluum: { clickId: 'cid', conversionId: 'txid' },
-  redtrack: { clickId: 'clickid', conversionId: 'conversion_id' },
-  binom: { clickId: 'click_id', conversionId: 'tx_id' },
-  bemob: { clickId: 'click_id', conversionId: 'payout_id' },
-  keitaro: { clickId: 'subid', conversionId: 'tid' },
-  hyros: { clickId: 'click_id', conversionId: 'order_id' },
-};
