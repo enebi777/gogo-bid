@@ -1542,6 +1542,7 @@ function authLogout(){
     clearTokens();
     _authUser=null;
     _autoRulesCache=[];_autoExecCache=[];_autoLoaded=false;
+    for(const k in _aiCache)delete _aiCache[k];
     showAuthOverlay('login');
     toast('Logged out','See you next time!','info',3000);
   },'var(--red)');
@@ -2749,6 +2750,73 @@ function hubMetricsCard(m,range,campId){
 </div>`;
 }
 
+// ── REAL AI ANALYSIS (forecast + anomaly scan on live tracking rows) ──
+// Backs the Anomaly Detection & AI Forecasting pages. GET endpoints read the
+// latest persisted output; POST /analyze runs both handlers on demand (same
+// code the AI worker runs). Cached per campaign so re-rendering a page doesn't
+// refetch; aiAnalyze busts it.
+const _aiCache={};
+function aiEnsure(campId){
+  if(!getAccessToken()||_aiCache[campId])return;
+  _aiCache[campId]={loading:true,forecast:null,alerts:[]};
+  Promise.all([
+    apiFetch('/campaigns/'+campId+'/forecast').catch(()=>null),
+    apiFetch('/campaigns/'+campId+'/alerts').catch(()=>[]),
+  ]).then(([forecast,alerts])=>{
+    _aiCache[campId]={loading:false,forecast,alerts:alerts||[]};
+    if(CS.active.id===campId&&(_page==='anomaly'||_page==='forecasting'))renderPage(_page);
+  });
+}
+async function aiAnalyze(campId){
+  if(!getAccessToken()){toast('Log in required','Connect to the backend to run live analysis.','warning',3000);return;}
+  toast('Analyzing…','Running forecast + anomaly scan on real tracking data.','info',2000);
+  try{
+    const r=await apiFetch('/campaigns/'+campId+'/analyze',{method:'POST'});
+    _aiCache[campId]={loading:false,forecast:r.forecast,alerts:r.alerts||[]};
+    if(CS.active.id===campId)renderPage(_page);
+    toast('✓ Analysis complete',(r.alerts?.length||0)+' open alert(s) · forecast '+(r.forecast?'ready':'needs ≥2 days of data'),'success',3500);
+  }catch(err){toast('Analysis failed',err.message,'error',4000);}
+}
+// Live card shown at the top of both AI pages for the active campaign.
+function aiLiveCard(c,kind){
+  const st=_aiCache[c.id];
+  const analyzeBtn=`<button class="btn btn-primary btn-xs" onclick="aiAnalyze('${c.id}')">⟳ Analyze Now</button>`;
+  if(!getAccessToken()) return `<div class="card mb16" style="padding:16px"><div style="display:flex;justify-content:space-between;align-items:center;gap:8px"><div style="font-size:12px;color:var(--muted)">🔌 Log in to run real ${kind} on this campaign's tracking data.</div></div></div>`;
+  if(!st||st.loading) return `<div class="card mb16" style="padding:16px;color:var(--muted);font-size:12px">Loading live ${kind}…</div>`;
+  if(kind==='anomaly detection'){
+    const a=st.alerts||[];
+    const sevCol={critical:'var(--red)',warning:'var(--yellow)',info:'var(--accent2)'};
+    return `<div class="card mb16">
+      <div class="card-hdr" style="display:flex;align-items:center;justify-content:space-between;gap:8px">
+        <div style="display:flex;align-items:center;gap:8px"><div class="card-title">🔴 Live Alerts — ${c.name}</div>${a.length?`<span class="badge badge-green" style="font-size:9px">● Live</span>`:`<span class="badge badge-green" style="font-size:9px">✓ Healthy</span>`}</div>
+        ${analyzeBtn}
+      </div>
+      <div class="card-body">
+        ${a.length?a.map(x=>`<div style="display:flex;gap:10px;align-items:flex-start;padding:10px 0;border-bottom:1px solid var(--border)">
+          <span class="badge badge-${x.severity==='critical'?'red':x.severity==='warning'?'yellow':'blue'}" style="font-size:9px;flex-shrink:0">${x.severity.toUpperCase()}</span>
+          <div style="font-size:12px;color:var(--text);line-height:1.5">${x.message}</div>
+        </div>`).join(''):`<div style="padding:8px 0;color:var(--green);font-size:12px">✓ No anomalies detected on real tracking data for this campaign.</div>`}
+      </div>
+    </div>`;
+  }
+  // forecasting
+  const f=st.forecast&&st.forecast.metrics;
+  if(!f) return `<div class="card mb16"><div class="card-hdr" style="display:flex;justify-content:space-between;align-items:center"><div class="card-title">📈 Live Forecast — ${c.name}</div>${analyzeBtn}</div><div class="card-body" style="color:var(--muted);font-size:12px">No forecast yet. Click <strong>Analyze Now</strong> — needs at least 2 days of tracking data.</div></div>`;
+  const fmt=(v,pre='')=>v==null?'—':pre+Number(v).toLocaleString(undefined,{maximumFractionDigits:2});
+  const kc=[['7d Proj. Revenue',fmt(f.totalRevenue,'$'),'var(--green)'],['7d Proj. Profit',(f.totalProfit>=0?'+':'')+fmt(Math.abs(f.totalProfit),'$'),f.totalProfit>=0?'var(--green)':'var(--red)'],['Proj. ROAS',fmt(f.roas,'')+(f.roas!=null?'×':''),f.roas>=1.5?'var(--green)':'var(--yellow)'],['Confidence',f.confidence+'%',f.confidence>=60?'var(--green)':'var(--yellow)']];
+  return `<div class="card mb16">
+    <div class="card-hdr" style="display:flex;align-items:center;justify-content:space-between;gap:8px">
+      <div style="display:flex;align-items:center;gap:8px"><div class="card-title">📈 Live Forecast — ${c.name}</div><span class="badge badge-green" style="font-size:9px">● Live</span><span style="font-size:10px;color:var(--muted)">linear trend · ${st.forecast.metrics.pointsUsed}d history</span></div>
+      ${analyzeBtn}
+    </div>
+    <div class="card-body">
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:16px">
+        ${kc.map(([l,v,col])=>`<div><div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-bottom:3px">${l}</div><div style="font-size:19px;font-weight:800;font-family:var(--mono);color:${col}">${v}</div></div>`).join('')}
+      </div>
+    </div>
+  </div>`;
+}
+
 function renderCampaigns(el){
   const all=CS.camps,c=CS.active;
   if(!all.length){el.innerHTML=`<div class="empty-state"><div class="empty-icon">📭</div><div class="empty-title">No Campaigns Yet</div><div class="empty-desc">Create your first campaign to start tracking performance, bids, and AI recommendations.</div><div class="empty-actions"><button class="btn btn-primary" onclick="openCreateCamp()">+ New Campaign</button></div></div>`;return;}
@@ -3174,7 +3242,8 @@ function renderAnomaly(el,c){
   <div><div class="page-title">Anomaly Detection${tip('Anomaly Detection','Automatically identifies unusual changes in campaign performance.','Use to catch problems before they drain budget.')}</div><div class="page-sub">AI monitors ${all.length} campaigns in real-time · ${allAnom.length} active alerts</div></div>
   <button class="btn btn-outline btn-sm" onclick="openQS()">Switch ⌘J</button>
 </div>
-${demoBanner('These anomalies are seeded preview data, not output from a live detection pipeline — wiring this up to your real Click/Cost/Revenue history is on the roadmap.')}
+${aiLiveCard(c,'anomaly detection')}
+${demoBanner('The portfolio table and charts below are seeded preview data across all campaigns. The <strong>Live Alerts</strong> card above runs real anomaly detection on the selected campaign\'s tracking rows.')}
 <div class="g4 mb16">
   <div class="card kpi"><div class="kpi-label">Critical</div><div class="kpi-val" style="color:var(--red)">${allAnom.filter(a=>a.sev==='critical').length}</div></div>
   <div class="card kpi"><div class="kpi-label">Warning</div><div class="kpi-val" style="color:var(--yellow)">${allAnom.filter(a=>a.sev==='warning').length}</div></div>
@@ -3205,6 +3274,7 @@ ${allAnom.length?`<div class="card mb16"><div style="overflow-x:auto"><table>
     mkChart('chart-anom-h',{type:'bar',data:{labels,datasets:[{label:'Health Score',data:all.map(x=>x.ai.healthScore),backgroundColor:all.map(x=>x.ai.healthScore>75?'rgba(15,186,129,.75)':x.ai.healthScore>50?'rgba(245,166,35,.75)':'rgba(240,82,82,.75)'),borderRadius:6}]},options:{...CD,plugins:{legend:{display:false}}}});
     mkChart('chart-anom-r',{type:'bar',data:{labels,datasets:[{label:'Anomaly Risk',data:all.map(x=>x.ai.anomalyScore),backgroundColor:all.map(x=>x.ai.anomalyScore<30?'rgba(15,186,129,.75)':x.ai.anomalyScore<60?'rgba(245,166,35,.75)':'rgba(240,82,82,.75)'),borderRadius:6}]},options:{...CD,plugins:{legend:{display:false}}}});
   },60);
+  aiEnsure(c.id);
 }
 
 function renderBenchmarks(el,c){
@@ -3336,7 +3406,8 @@ function renderForecasting(el,c){
   <div><div class="page-title">AI Forecasting${tip('AI Forecasting','Projects future spend, revenue, and ROAS based on recent trends.','Use to plan budget ahead of time and spot trajectory changes early.')}</div><div class="page-sub">7-day projection — <strong style="color:var(--text)">${c.name}</strong> · ${c.ai.forecastConfidence}% confidence</div></div>
   <button class="btn btn-outline btn-sm" onclick="openQS()">Switch ⌘J</button>
 </div>
-${demoBanner('This forecast is seeded preview data, not output from a real predictive model — a live forecasting pipeline is on the roadmap.')}
+${aiLiveCard(c,'forecast')}
+${demoBanner('The charts and KPI cards below are a seeded illustrative projection. The <strong>Live Forecast</strong> card above is a real linear-trend projection over this campaign\'s actual tracking history.')}
 <div class="g4 mb16">
   <div class="card kpi"><div class="kpi-label">7d Proj. Revenue</div><div class="kpi-val pos">$${projRev.reduce((a,b)=>a+b,0).toLocaleString()}</div></div>
   <div class="card kpi"><div class="kpi-label">7d Proj. Profit</div><div class="kpi-val pos">$${projSp.reduce((a,s,i)=>a+(projRev[i]-s),0).toLocaleString()}</div></div>
@@ -3351,6 +3422,7 @@ ${demoBanner('This forecast is seeded preview data, not output from a real predi
     mkChart('chart-fc1',{type:'line',data:{labels:DAYS,datasets:[{label:'Spend',data:projSp,borderColor:'#4f6ef7',backgroundColor:'rgba(79,110,247,.07)',fill:true,tension:.45,borderWidth:2,pointRadius:2},{label:'Revenue',data:projRev,borderColor:'#0fba81',backgroundColor:'rgba(15,186,129,.06)',fill:true,tension:.45,borderWidth:2,pointRadius:2}]},options:{...CD}});
     mkChart('chart-fc2',{type:'line',data:{labels:DAYS,datasets:[{label:'Conservative',data:DAYS.map((_,i)=>Math.round(b*Math.pow(1.1,i))),borderColor:'#4f6ef7',tension:.45,borderWidth:2,borderDash:[4,3]},{label:'Moderate',data:DAYS.map((_,i)=>Math.round(b*Math.pow(1.2,i))),borderColor:'#f5a623',tension:.45,borderWidth:2},{label:'Aggressive',data:DAYS.map((_,i)=>Math.round(b*Math.pow(1.3,i))),borderColor:'#f05252',tension:.45,borderWidth:2}]},options:{...CD}});
   },60);
+  aiEnsure(c.id);
 }
 
 function renderScaling(el,c){

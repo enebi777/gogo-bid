@@ -10,6 +10,8 @@ import { EncryptionService } from '../common/encryption.service';
 import { SyncContext } from '../integrations/adapter.interface';
 import { processPostbackEvent } from './handlers/postback-processor';
 import { evaluateEvent } from './handlers/automation-evaluator';
+import { runForecast } from './handlers/forecast-runner';
+import { runAnomalyScan } from './handlers/anomaly-scanner';
 
 /**
  * Runs as its own process (`npm run worker`), separate from the API server,
@@ -110,12 +112,10 @@ new Worker(
   QUEUE_NAMES.AI,
   async (job) => {
     if (job.name === 'forecast') {
-      // TODO: call the AI forecasting service for job.data.campaignId and
-      // write a Forecast row.
+      await runForecast(job.data.campaignId, prisma);
     }
     if (job.name === 'anomaly-scan') {
-      // TODO: run anomaly detection rules against recent Cost/Revenue/Click
-      // rows for job.data.campaignId and create Alert rows for hits.
+      await runAnomalyScan(job.data.campaignId, prisma);
     }
   },
   { connection: redisConnection },

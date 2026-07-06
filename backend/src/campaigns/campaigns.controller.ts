@@ -30,6 +30,22 @@ export class CampaignsController {
     return this.campaigns.metrics(req.user.organizationId, id, range);
   }
 
+  @Get(':id/forecast')
+  forecast(@Req() req: any, @Param('id') id: string) {
+    return this.campaigns.latestForecast(req.user.organizationId, id);
+  }
+
+  @Get(':id/alerts')
+  alerts(@Req() req: any, @Param('id') id: string) {
+    return this.campaigns.openAlerts(req.user.organizationId, id);
+  }
+
+  // Runs forecast + anomaly-scan on demand (same handlers as the AI worker).
+  @Post(':id/analyze')
+  analyze(@Req() req: any, @Param('id') id: string) {
+    return this.campaigns.analyze(req.user.organizationId, id);
+  }
+
   @Post()
   create(@Req() req: any, @Body() body: CreateCampaignDto) {
     return this.campaigns.create(req.user.organizationId, body);

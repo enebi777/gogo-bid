@@ -2,6 +2,8 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { EventsService } from '../events/events.service';
 import { computeCampaignMetrics, resolveRange, MetricsRange } from './campaign-metrics';
+import { runForecast } from '../queue/handlers/forecast-runner';
+import { runAnomalyScan } from '../queue/handlers/anomaly-scanner';
 
 const VALID_RANGES: MetricsRange[] = ['today', '7d', '30d', 'all'];
 
@@ -83,6 +85,33 @@ export class CampaignsService {
       this.prisma.conversion.findMany({ where: { campaignId: id, ...(dateFilter ? { createdAt: dateFilter } : {}) } }),
     ]);
     return computeCampaignMetrics({ costs, revenues, clicks, conversions }, range);
+  }
+
+  /** Latest persisted forecast for a campaign (null if none generated yet). */
+  async latestForecast(organizationId: string, id: string) {
+    await this.getOrThrow(organizationId, id);
+    return this.prisma.forecast.findFirst({ where: { campaignId: id }, orderBy: { generatedAt: 'desc' } });
+  }
+
+  /** Currently-open (unresolved) alerts for a campaign, newest first. */
+  async openAlerts(organizationId: string, id: string) {
+    await this.getOrThrow(organizationId, id);
+    return this.prisma.alert.findMany({ where: { campaignId: id, resolved: false }, orderBy: { createdAt: 'desc' } });
+  }
+
+  /**
+   * Runs the forecast + anomaly-scan handlers inline (the same code the BullMQ
+   * AI worker runs) and returns fresh results. On-demand so the frontend AI
+   * pages can trigger analysis and immediately show real output rather than
+   * waiting for a scheduled job.
+   */
+  async analyze(organizationId: string, id: string) {
+    await this.getOrThrow(organizationId, id);
+    const [forecast, alerts] = await Promise.all([
+      runForecast(id, this.prisma as any),
+      runAnomalyScan(id, this.prisma as any),
+    ]);
+    return { forecast, alerts };
   }
 
   async create(organizationId: string, data: { name: string; offerId?: string; dailyBudget?: number; integrationAccountId?: string; status?: string; data?: any }) {
