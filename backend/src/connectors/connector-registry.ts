@@ -15,6 +15,11 @@ const AFFILIATE: ConnectorCapabilities = { multiAccount: true, assetDiscovery: f
 const ANALYTICS: ConnectorCapabilities = { multiAccount: true, assetDiscovery: false, campaignImport: false, webhooks: false, postbacks: false, automation: false, ai: true };
 const DESTINATION: ConnectorCapabilities = { multiAccount: true, assetDiscovery: false, campaignImport: false, webhooks: false, postbacks: false, automation: false, ai: false };
 
+// Scaffold profile for affiliate networks whose exact params we haven't
+// verified — common defaults (subid / txid / amount) marked 'generic' so the
+// UI prompts the user to confirm rather than presenting them as authoritative.
+const GENERIC_AFFILIATE_PROFILE = { clickIdParam: 'subid', conversionIdParam: 'txid', revenueParam: 'amount', confidence: 'generic' as const };
+
 const def = (
   id: string,
   provider: string | null,
@@ -41,31 +46,31 @@ export const CONNECTORS: ConnectorDefinition[] = [
 
   // ── Trackers (postback profiles carried verbatim from the codebase's
   //    authoritative TRACKER_FIELD_MAP — this is now the source of truth) ──
-  def('voluum', 'VOLUUM', 'Voluum', 'Tracker', 'tracking', 'postback_secret', TRACKING, 20, { clickIdParam: 'cid', conversionIdParam: 'txid', revenueParam: 'revenue', payoutParam: 'payout' }),
-  def('redtrack', 'REDTRACK', 'RedTrack', 'Tracker', 'tracking', 'postback_secret', TRACKING, 21, { clickIdParam: 'clickid', conversionIdParam: 'conversion_id', revenueParam: 'revenue', payoutParam: 'payout' }),
-  def('binom', 'BINOM', 'Binom', 'Tracker', 'tracking', 'postback_secret', TRACKING, 22, { clickIdParam: 'click_id', conversionIdParam: 'tx_id', revenueParam: 'revenue', payoutParam: 'payout' }),
-  def('bemob', 'BEMOB', 'BeMob', 'Tracker', 'tracking', 'postback_secret', TRACKING, 23, { clickIdParam: 'click_id', conversionIdParam: 'payout_id', revenueParam: 'revenue', payoutParam: 'payout' }),
-  def('keitaro', 'KEITARO', 'Keitaro', 'Tracker', 'tracking', 'postback_secret', TRACKING, 24, { clickIdParam: 'subid', conversionIdParam: 'tid', revenueParam: 'revenue', payoutParam: 'payout' }),
-  def('hyros', 'HYROS', 'Hyros', 'Tracker', 'tracking', 'postback_secret', TRACKING, 25, { clickIdParam: 'click_id', conversionIdParam: 'order_id', revenueParam: 'revenue', payoutParam: 'payout' }),
+  def('voluum', 'VOLUUM', 'Voluum', 'Tracker', 'tracking', 'postback_secret', TRACKING, 20, { clickIdParam: 'cid', conversionIdParam: 'txid', revenueParam: 'revenue', payoutParam: 'payout', confidence: 'verified' }),
+  def('redtrack', 'REDTRACK', 'RedTrack', 'Tracker', 'tracking', 'postback_secret', TRACKING, 21, { clickIdParam: 'clickid', conversionIdParam: 'conversion_id', revenueParam: 'revenue', payoutParam: 'payout', confidence: 'verified' }),
+  def('binom', 'BINOM', 'Binom', 'Tracker', 'tracking', 'postback_secret', TRACKING, 22, { clickIdParam: 'click_id', conversionIdParam: 'tx_id', revenueParam: 'revenue', payoutParam: 'payout', confidence: 'verified' }),
+  def('bemob', 'BEMOB', 'BeMob', 'Tracker', 'tracking', 'postback_secret', TRACKING, 23, { clickIdParam: 'click_id', conversionIdParam: 'payout_id', revenueParam: 'revenue', payoutParam: 'payout', confidence: 'verified' }),
+  def('keitaro', 'KEITARO', 'Keitaro', 'Tracker', 'tracking', 'postback_secret', TRACKING, 24, { clickIdParam: 'subid', conversionIdParam: 'tid', revenueParam: 'revenue', payoutParam: 'payout', confidence: 'verified' }),
+  def('hyros', 'HYROS', 'Hyros', 'Tracker', 'tracking', 'postback_secret', TRACKING, 25, { clickIdParam: 'click_id', conversionIdParam: 'order_id', revenueParam: 'revenue', payoutParam: 'payout', confidence: 'verified' }),
 
   // ── Affiliate networks / marketplaces. ClickBank's profile is known (per
   //    its documented postback params); the rest carry no profile yet →
   //    Phase 2 (Smart Profiles) fills them. `profile: undefined` is honest:
   //    "connector recognized, field mapping not yet verified". ──
-  def('clickbank', 'CLICKBANK', 'ClickBank', 'Affiliate Network', 'affiliate', 'api_key', AFFILIATE, 30, { clickIdParam: 'tid', conversionIdParam: 'cbreceipt', revenueParam: 'amount' }),
-  def('buygoods', 'BUYGOODS', 'BuyGoods', 'Affiliate Network', 'affiliate', 'api_key', AFFILIATE, 31),
-  def('digistore24', 'DIGISTORE24', 'Digistore24', 'Affiliate Network', 'affiliate', 'api_key', AFFILIATE, 32),
-  def('maxweb', 'MAXWEB', 'MaxWeb', 'Affiliate Network', 'affiliate', 'api_key', AFFILIATE, 33),
-  def('gurumedia', 'GURUMEDIA', 'GuruMedia', 'Affiliate Network', 'affiliate', 'api_key', AFFILIATE, 34),
-  def('terraleads', 'TERRALEADS', 'TerraLeads', 'Affiliate Network', 'affiliate', 'api_key', AFFILIATE, 35),
-  def('leadrock', 'LEADROCK', 'LeadRock', 'Affiliate Network', 'affiliate', 'api_key', AFFILIATE, 36),
-  def('cpahouse', 'CPAHOUSE', 'CPA House', 'Affiliate Network', 'affiliate', 'api_key', AFFILIATE, 37),
-  def('monetizze', 'MONETIZZE', 'Monetizze', 'Affiliate Network', 'affiliate', 'api_key', AFFILIATE, 38),
-  def('braip', 'BRAIP', 'Braip', 'Affiliate Network', 'affiliate', 'api_key', AFFILIATE, 39),
-  def('kiwify', 'KIWIFY', 'Kiwify', 'Affiliate Network', 'affiliate', 'api_key', AFFILIATE, 40),
-  def('perfectpay', 'PERFECTPAY', 'PerfectPay', 'Affiliate Network', 'affiliate', 'api_key', AFFILIATE, 41),
-  def('cartpanda', 'CARTPANDA', 'CartPanda', 'Affiliate Network', 'affiliate', 'api_key', AFFILIATE, 42),
-  def('hubla', 'HUBLA', 'Hubla', 'Affiliate Network', 'affiliate', 'api_key', AFFILIATE, 43),
+  def('clickbank', 'CLICKBANK', 'ClickBank', 'Affiliate Network', 'affiliate', 'api_key', AFFILIATE, 30, { clickIdParam: 'tid', conversionIdParam: 'cbreceipt', revenueParam: 'amount', confidence: 'verified' }),
+  def('buygoods', 'BUYGOODS', 'BuyGoods', 'Affiliate Network', 'affiliate', 'api_key', AFFILIATE, 31, GENERIC_AFFILIATE_PROFILE),
+  def('digistore24', 'DIGISTORE24', 'Digistore24', 'Affiliate Network', 'affiliate', 'api_key', AFFILIATE, 32, GENERIC_AFFILIATE_PROFILE),
+  def('maxweb', 'MAXWEB', 'MaxWeb', 'Affiliate Network', 'affiliate', 'api_key', AFFILIATE, 33, GENERIC_AFFILIATE_PROFILE),
+  def('gurumedia', 'GURUMEDIA', 'GuruMedia', 'Affiliate Network', 'affiliate', 'api_key', AFFILIATE, 34, GENERIC_AFFILIATE_PROFILE),
+  def('terraleads', 'TERRALEADS', 'TerraLeads', 'Affiliate Network', 'affiliate', 'api_key', AFFILIATE, 35, GENERIC_AFFILIATE_PROFILE),
+  def('leadrock', 'LEADROCK', 'LeadRock', 'Affiliate Network', 'affiliate', 'api_key', AFFILIATE, 36, GENERIC_AFFILIATE_PROFILE),
+  def('cpahouse', 'CPAHOUSE', 'CPA House', 'Affiliate Network', 'affiliate', 'api_key', AFFILIATE, 37, GENERIC_AFFILIATE_PROFILE),
+  def('monetizze', 'MONETIZZE', 'Monetizze', 'Affiliate Network', 'affiliate', 'api_key', AFFILIATE, 38, GENERIC_AFFILIATE_PROFILE),
+  def('braip', 'BRAIP', 'Braip', 'Affiliate Network', 'affiliate', 'api_key', AFFILIATE, 39, GENERIC_AFFILIATE_PROFILE),
+  def('kiwify', 'KIWIFY', 'Kiwify', 'Affiliate Network', 'affiliate', 'api_key', AFFILIATE, 40, GENERIC_AFFILIATE_PROFILE),
+  def('perfectpay', 'PERFECTPAY', 'PerfectPay', 'Affiliate Network', 'affiliate', 'api_key', AFFILIATE, 41, GENERIC_AFFILIATE_PROFILE),
+  def('cartpanda', 'CARTPANDA', 'CartPanda', 'Affiliate Network', 'affiliate', 'api_key', AFFILIATE, 42, GENERIC_AFFILIATE_PROFILE),
+  def('hubla', 'HUBLA', 'Hubla', 'Affiliate Network', 'affiliate', 'api_key', AFFILIATE, 43, GENERIC_AFFILIATE_PROFILE),
 
   // ── Analytics (API data sources) ──
   def('ga4', 'GA4', 'Google Analytics 4', 'Analytics', 'api', 'google_oauth', ANALYTICS, 50),

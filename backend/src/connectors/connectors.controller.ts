@@ -2,6 +2,7 @@ import { Controller, Get, Param, Query, NotFoundException, UseGuards } from '@ne
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { listConnectors, getConnector } from './connector-registry';
 import { ConnectionType } from './connector-types';
+import { buildPostbackConfig } from './auto-config';
 
 const VALID_TYPES: ConnectionType[] = ['oauth', 'api', 'tracking', 'affiliate', 'webhook', 'destination', 'ai'];
 
@@ -24,5 +25,18 @@ export class ConnectorsController {
     const connector = getConnector(id);
     if (!connector) throw new NotFoundException(`Unknown connector "${id}"`);
     return connector;
+  }
+
+  /**
+   * Auto-generated, ready-to-paste postback configuration for a connector.
+   * The public base URL comes from POSTBACK_PUBLIC_URL (falls back to a
+   * documented placeholder in dev) so the generated URL is copy-paste correct.
+   */
+  @Get(':id/postback-config')
+  postbackConfig(@Param('id') id: string) {
+    const connector = getConnector(id);
+    if (!connector) throw new NotFoundException(`Unknown connector "${id}"`);
+    const baseUrl = process.env.POSTBACK_PUBLIC_URL || 'https://api.your-gogobid-domain.com';
+    return buildPostbackConfig(connector, { baseUrl });
   }
 }

@@ -1543,6 +1543,7 @@ function authLogout(){
     _authUser=null;
     _autoRulesCache=[];_autoExecCache=[];_autoLoaded=false;
     for(const k in _aiCache)delete _aiCache[k];
+    for(const k in _pbConfigCache)delete _pbConfigCache[k];
     showAuthOverlay('login');
     toast('Logged out','See you next time!','info',3000);
   },'var(--red)');
@@ -3998,6 +3999,13 @@ function intCard(icon,name,desc,key,bg){
 }
 
 function stIntegrations(area){
+  // The tab/quick-action onclicks pass $('st-content-area'), which only exists
+  // when Integrations is embedded in Settings. On the standalone Integrations
+  // page that's null, so fall back to the page container — otherwise switching
+  // tabs throws and the tab content (incl. the Trackers postback setup) is
+  // unreachable.
+  area=area||document.querySelector('#st-content-area')||document.querySelector('#page-integrations');
+  if(!area)return;
   const tabs=[['overview','⊞ Overview'],['wizard','⚡ Quick Setup'],['accounts','👤 Accounts'],['traffic','📡 Traffic Sources'],['networks','🤝 Affiliate Networks'],['checkout','💳 Checkout & Payments'],['trackers','⊙ Trackers & Attribution'],['analytics','📊 Analytics & Data'],['crm','👥 CRM & Leads'],['ecomm','🛍 E-Commerce'],['email','📧 Email Marketing'],['comms','💬 Comms & Alerts'],['destinations','📤 Destinations'],['templates','🧩 Templates'],['webhooks','🔗 Webhooks & Postbacks'],['ai','✦ AI Integrations'],['marketplace','🏪 Network Marketplace'],['health','❤️ Health Center'],['advanced','⚙ Advanced']];
   const connected=Object.values(INT_CONNECTED).filter(Boolean).length;
   area.innerHTML=`
@@ -4635,21 +4643,58 @@ function intCheckout(){return`
 </div>`;
 }
 
-function intTrackers(){return`
+// Known tracking connectors (display list); the authoritative postback URL +
+// field mapping for each is generated server-side from the connector registry.
+const PB_TRACKERS=[['voluum','Voluum'],['redtrack','RedTrack'],['binom','Binom'],['bemob','BeMob'],['keitaro','Keitaro'],['hyros','Hyros']];
+let _pbConfigCache={};
+async function pbLoad(trackerId){
+  const host=$('pb-config');if(!host)return;
+  if(_pbConfigCache[trackerId]){host.innerHTML=pbCard(_pbConfigCache[trackerId]);return;}
+  if(!getAccessToken()){host.innerHTML='<div style="color:var(--muted);font-size:12px;padding:12px 0">Log in to auto-generate your postback URL.</div>';return;}
+  host.innerHTML='<div style="color:var(--muted);font-size:12px;padding:12px 0">Generating…</div>';
+  try{
+    const cfg=await apiFetch('/connectors/'+trackerId+'/postback-config');
+    _pbConfigCache[trackerId]=cfg;
+    if($('pb-tracker')?.value===trackerId)host.innerHTML=pbCard(cfg);
+  }catch(err){host.innerHTML='<div style="color:var(--red);font-size:12px;padding:12px 0">'+err.message+'</div>';}
+}
+function pbCopy(id){const cfg=_pbConfigCache[id];if(!cfg)return;navigator.clipboard?.writeText(cfg.url).then(()=>toast('Copied','Postback URL copied to clipboard.','success',2000));}
+function pbCard(cfg){
+  if(!cfg.supported)return`<div style="color:var(--muted);font-size:12px;padding:12px 0">${cfg.notes?.[0]||'No postback profile for this connector.'}</div>`;
+  const badge=cfg.confidence==='verified'
+    ?`<span class="badge badge-green" style="font-size:9px">✓ Verified mapping</span>`
+    :`<span class="badge badge-yellow" style="font-size:9px">⚠ Generic — confirm in your account</span>`;
+  return`
+  <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">${badge}</div>
+  <div style="display:flex;gap:8px;align-items:stretch;margin-bottom:12px">
+    <div style="flex:1;font-family:var(--mono);font-size:11px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:10px 12px;word-break:break-all;color:var(--accent2)">${cfg.url}</div>
+    <button class="btn btn-primary btn-sm" onclick="pbCopy('${cfg.connectorId}')" style="flex-shrink:0">Copy</button>
+  </div>
+  <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">Field Mapping</div>
+  ${cfg.fields.map(f=>`<div class="flex items-center gap12" style="padding:6px 0;border-bottom:1px solid var(--border)">
+    <div style="font-family:var(--mono);font-size:11px;color:var(--accent2);width:110px">${f.param}</div>
+    <div style="font-size:10px;color:var(--muted)">←</div>
+    <div style="font-family:var(--mono);font-size:11px;color:var(--green);width:130px">${f.placeholder}</div>
+    <div style="font-size:11px;color:var(--muted);flex:1">${f.description}${f.required?'':' <span style="opacity:.6">(optional)</span>'}</div>
+  </div>`).join('')}
+  ${(cfg.notes||[]).map(n=>`<div style="font-size:10px;color:var(--muted);margin-top:8px;line-height:1.5">• ${n}</div>`).join('')}`;
+}
+function intTrackers(){
+  const activeSlug=(CS.active?.integration?.trackerName||'').toLowerCase();
+  const def=PB_TRACKERS.some(([id])=>id===activeSlug)?activeSlug:'voluum';
+  setTimeout(()=>pbLoad(def),30);
+  return`
 <div class="int-cat-label">Tracking & Attribution Platforms</div>
 <div class="int-grid">
   ${[['📊','Voluum','Cloud-based ad tracking platform','voluum','rgba(15,186,129,.15)'],['🔴','RedTrack','Performance marketing tracker','redtrack','rgba(244,67,54,.1)'],['📈','Binom','Self-hosted click tracker','binom','rgba(33,150,243,.1)'],['🔵','Bemob','Cloud tracker with AI insights','bemob','rgba(63,81,181,.1)'],['⚙','Keitaro','PHP self-hosted tracker','keitaro','rgba(255,152,0,.1)'],['🔮','Hyros','AI-powered attribution','hyros','rgba(156,39,176,.1)'],['🌊','Everflow','Partner marketing platform','everflow','rgba(0,188,212,.1)'],['🔗','ClickMagick','Link tracking & attribution','clickmagick','rgba(255,87,34,.1)'],['📱','Adjust','Mobile attribution platform','adjust','rgba(0,150,136,.1)'],['📱','AppsFlyer','Mobile attribution & analytics','appsflyer','rgba(33,150,243,.1)']].map(([i,n,d,k,bg])=>intCard(i,n,d,k,bg)).join('')}
 </div>
 <div class="card mt16">
-  <div class="card-hdr"><div class="card-title">Token Mapping</div><div class="card-desc">Map tracker tokens to GoGo Bid variables</div></div>
+  <div class="card-hdr"><div class="card-title">⚡ Auto-Configured Postback</div><div class="card-desc">Ready-to-paste — no manual parameter lookup</div></div>
   <div class="card-body">
-    ${[['Click ID','{clickid}','click_id'],['Payout','{payout}','revenue'],['Transaction ID','{txid}','transaction_id'],['Campaign ID','{campid}','campaign_id']].map(([label,token,gvar])=>`
-    <div class="flex items-center gap12" style="padding:8px 0;border-bottom:1px solid var(--border)">
-      <div style="font-size:12px;font-weight:600;width:120px">${label}</div>
-      <div style="font-family:var(--mono);font-size:11px;color:var(--accent2);flex:1">${token}</div>
-      <div style="font-size:10px;color:var(--muted)">→</div>
-      <div style="font-family:var(--mono);font-size:11px;color:var(--green);flex:1">${gvar}</div>
-    </div>`).join('')}
+    <div class="field" style="max-width:240px"><label>Tracker</label>
+      <select id="pb-tracker" onchange="pbLoad(this.value)">${PB_TRACKERS.map(([id,n])=>`<option value="${id}"${id===def?' selected':''}>${n}</option>`).join('')}</select>
+    </div>
+    <div id="pb-config"></div>
   </div>
 </div>`;
 }
