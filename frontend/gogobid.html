@@ -1544,6 +1544,7 @@ function authLogout(){
     _autoRulesCache=[];_autoExecCache=[];_autoLoaded=false;
     for(const k in _aiCache)delete _aiCache[k];
     for(const k in _pbConfigCache)delete _pbConfigCache[k];
+    for(const k in _wsSnippetCache)delete _wsSnippetCache[k];
     showAuthOverlay('login');
     toast('Logged out','See you next time!','info',3000);
   },'var(--red)');
@@ -4682,7 +4683,7 @@ function pbCard(cfg){
 function intTrackers(){
   const activeSlug=(CS.active?.integration?.trackerName||'').toLowerCase();
   const def=PB_TRACKERS.some(([id])=>id===activeSlug)?activeSlug:'voluum';
-  setTimeout(()=>pbLoad(def),30);
+  setTimeout(()=>{pbLoad(def);if(CS.active)wsSnippetLoad(CS.active.id);},30);
   return`
 <div class="int-cat-label">Tracking & Attribution Platforms</div>
 <div class="int-grid">
@@ -4696,7 +4697,37 @@ function intTrackers(){
     </div>
     <div id="pb-config"></div>
   </div>
+</div>
+<div class="card mt16">
+  <div class="card-hdr"><div class="card-title">🌐 Website / Landing Page Tracking</div><div class="card-desc">Paste this snippet on ${CS.active?.name||'your campaign'}'s landing & thank-you pages</div></div>
+  <div class="card-body"><div id="ws-snippet"></div></div>
 </div>`;
+}
+// Website tracking snippet (campaign-scoped) — fetched from the backend, which
+// generates it from the campaign's tracker profile (single source of truth).
+let _wsSnippetCache={};
+function wsSnippetLoad(campId){
+  const host=$('ws-snippet');if(!host)return;
+  if(_wsSnippetCache[campId]){host.innerHTML=wsSnippetCard(_wsSnippetCache[campId]);return;}
+  if(!getAccessToken()){host.innerHTML='<div style="color:var(--muted);font-size:12px;padding:8px 0">Log in to generate your tracking snippet.</div>';return;}
+  host.innerHTML='<div style="color:var(--muted);font-size:12px;padding:8px 0">Generating…</div>';
+  apiFetch('/campaigns/'+campId+'/tracking-snippet').then(cfg=>{
+    _wsSnippetCache[campId]=cfg;
+    if(CS.active?.id===campId&&$('ws-snippet'))host.innerHTML=wsSnippetCard(cfg);
+  }).catch(err=>{host.innerHTML='<div style="color:var(--red);font-size:12px;padding:8px 0">'+err.message+'</div>';});
+}
+function wsSnippetCopy(campId){const cfg=_wsSnippetCache[campId];if(!cfg)return;navigator.clipboard?.writeText(cfg.snippet).then(()=>toast('Copied','Tracking snippet copied to clipboard.','success',2000));}
+function wsSnippetCard(cfg){
+  const esc=s=>s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  return`
+  <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px">
+    ${cfg.capabilities.map(c=>`<span class="badge badge-green" style="font-size:9px">✓ ${c}</span>`).join('')}
+  </div>
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+    <div style="font-size:11px;color:var(--muted)">Reports conversions via <span style="font-family:var(--mono);color:var(--accent2)">${cfg.tracker.name}</span> S2S postback. Fire <span style="font-family:var(--mono)">GoGoBid.conversionUrl()</span> from your server / thank-you page.</div>
+    <button class="btn btn-primary btn-sm" onclick="wsSnippetCopy('${cfg.campaignId}')" style="flex-shrink:0;margin-left:8px">Copy Snippet</button>
+  </div>
+  <pre style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:12px;font-family:var(--mono);font-size:10px;line-height:1.5;color:var(--text);overflow:auto;max-height:280px;white-space:pre-wrap;word-break:break-word">${esc(cfg.snippet)}</pre>`;
 }
 
 function intAnalytics(){return`

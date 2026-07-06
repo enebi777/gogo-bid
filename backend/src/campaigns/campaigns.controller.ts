@@ -46,6 +46,12 @@ export class CampaignsController {
     return this.campaigns.analyze(req.user.organizationId, id);
   }
 
+  // Copy-paste website/landing-page tracking snippet for this campaign.
+  @Get(':id/tracking-snippet')
+  trackingSnippet(@Req() req: any, @Param('id') id: string) {
+    return this.campaigns.trackingSnippet(req.user.organizationId, id);
+  }
+
   @Post()
   create(@Req() req: any, @Body() body: CreateCampaignDto) {
     return this.campaigns.create(req.user.organizationId, body);

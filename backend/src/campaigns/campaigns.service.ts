@@ -4,6 +4,9 @@ import { EventsService } from '../events/events.service';
 import { computeCampaignMetrics, resolveRange, MetricsRange } from './campaign-metrics';
 import { runForecast } from '../queue/handlers/forecast-runner';
 import { runAnomalyScan } from '../queue/handlers/anomaly-scanner';
+import { getConnector, getConnectorByProvider } from '../connectors/connector-registry';
+import { buildPostbackConfig } from '../connectors/auto-config';
+import { buildTrackingSnippet } from '../connectors/tracking-snippet';
 
 const VALID_RANGES: MetricsRange[] = ['today', '7d', '30d', 'all'];
 
@@ -112,6 +115,39 @@ export class CampaignsService {
       runAnomalyScan(id, this.prisma as any),
     ]);
     return { forecast, alerts };
+  }
+
+  /**
+   * Copy-paste website/landing-page tracking snippet for a campaign. Resolves
+   * the campaign's tracker (from data.integration.trackerName, else the linked
+   * integration account, defaulting to Voluum's shape) to build the conversion
+   * postback template the snippet reports through — reusing the existing
+   * /postback/:tracker pipeline, so no new ingest endpoint or schema is needed.
+   */
+  async trackingSnippet(organizationId: string, id: string) {
+    const campaign = await this.getOrThrow(organizationId, id);
+
+    // Resolve which tracker this campaign posts back through.
+    const trackerName = ((campaign.data as any)?.integration?.trackerName ?? '').toString().toLowerCase();
+    let connector = trackerName ? getConnector(trackerName) : undefined;
+    if (!connector && campaign.integrationAccount) connector = getConnectorByProvider((campaign.integrationAccount as any).provider);
+    // Fall back to a generic tracker shape so the snippet is always usable.
+    const trackerConnector = connector?.capabilities.postbacks && connector.profile ? connector : getConnector('voluum')!;
+
+    const baseUrl = process.env.POSTBACK_PUBLIC_URL || 'https://api.your-gogobid-domain.com';
+    const postback = buildPostbackConfig(trackerConnector, { baseUrl });
+    const snippet = buildTrackingSnippet(id, postback.url, {
+      extraClickParams: trackerConnector.profile ? [trackerConnector.profile.clickIdParam] : [],
+    });
+
+    return {
+      campaignId: id,
+      tracker: { id: trackerConnector.id, name: trackerConnector.name, confidence: trackerConnector.profile?.confidence ?? 'generic' },
+      capabilities: snippet.capabilities,
+      clickIdParams: snippet.clickIdParams,
+      snippet: snippet.js,
+      conversionPostbackUrl: `${postback.url}&campaign_id=${id}`,
+    };
   }
 
   async create(organizationId: string, data: { name: string; offerId?: string; dailyBudget?: number; integrationAccountId?: string; status?: string; data?: any }) {
