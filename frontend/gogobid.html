@@ -1160,6 +1160,7 @@ canvas{max-width:100%}
   <div id="ctx-bar">
     <span class="ctx-camp-name" id="ctx-name">—</span>
     <span class="ctx-status-badge status-active" id="ctx-status">Active</span>
+    <span id="ctx-source" title="Whether these KPIs come from real tracking data or seeded preview values" style="font-size:9px;font-weight:700;padding:2px 7px;border-radius:4px;white-space:nowrap"></span>
     <span class="ctx-sep">·</span>
     <div class="ctx-metric" onclick="nav('cpc',qs('.nav-item[onclick*=cpc]'))">
       <div><div class="ctx-metric-label">CPC</div><div class="ctx-metric-val" id="ctx-cpc" style="color:var(--accent2)">—</div></div>
@@ -1835,6 +1836,7 @@ async function campaignsBoot(){
     }
     CS._activeId=_CAMPS[0]?.id||'';
     syncCtxBar();renderDrop('');updateBadges();renderPage(_page);
+    if(CS._activeId)CS.hydrate(CS._activeId);
   }catch(err){
     console.warn('campaignsBoot: could not reach backend, using local demo data',err);
     toast('Offline mode','Could not reach the GoGo Bid API — showing local demo data.','warning',5000);
@@ -1848,9 +1850,42 @@ const CS = {
   _camps:_CAMPS, _activeId:'c1',
   get camps(){return this._camps},
   get active(){return this._camps.find(c=>c.id===this._activeId)||this._camps[0]},
-  select(id){if(this._activeId===id)return;this._activeId=id;syncCtxBar();renderPage(_page);renderDrop('');updateBadges()},
+  select(id){if(this._activeId===id)return;this._activeId=id;syncCtxBar();renderPage(_page);renderDrop('');updateBadges();this.hydrate(id)},
   update(id,p){const c=this._camps.find(x=>x.id===id);if(c){Object.assign(c,p);persistSave();if(id===this._activeId){syncCtxBar();renderPage(_page)}}},
   getById(id){return this._camps.find(c=>c.id===id)},
+  // ── Single source of truth: overlay REAL backend metrics onto the mock
+  // campaign object. Where tracking rows exist, the computed KPIs replace the
+  // seeded ones in metrics.today/week/month, so every existing read site
+  // (context bar, Campaign Hub strip, CPC/CPA pages…) shows live numbers with
+  // no per-page changes. Fields the endpoint doesn't compute (impressions,
+  // ctr, frequency…) keep their seeded values. c._live reflects whether the
+  // TODAY bucket — what the context bar shows — is backed by real data.
+  async hydrate(id,{force}={}){
+    if(!getAccessToken())return;               // offline/demo → keep seeded metrics
+    const c=this.getById(id);if(!c)return;
+    if(c._hydrating)return;
+    if(c._hydratedAt&&!force&&Date.now()-c._hydratedAt<60000)return; // 60s TTL
+    c._hydrating=true;
+    const KPI=['spend','revenue','profit','roas','clicks','conversions','cvr','cpa','cpc'];
+    const overlay=(bucket,m)=>{if(!bucket||!m||m.source!=='live')return false;for(const k of KPI){if(m[k]!=null)bucket[k]=m[k];}return true;};
+    try{
+      const [today,week,month]=await Promise.all([
+        apiFetch('/campaigns/'+id+'/metrics?range=today'),
+        apiFetch('/campaigns/'+id+'/metrics?range=7d'),
+        apiFetch('/campaigns/'+id+'/metrics?range=30d'),
+      ]);
+      c.metrics=c.metrics||{};
+      const todayLive=overlay(c.metrics.today,today);
+      overlay(c.metrics.week,week);
+      overlay(c.metrics.month,month);
+      c._live=todayLive;
+      c._hydratedAt=Date.now();
+      // Repaint only if this is still the visible campaign.
+      if(this._activeId===id){syncCtxBar();renderPage(_page);}
+    }catch(err){
+      console.warn('CS.hydrate: metrics fetch failed for',id,err);
+    }finally{c._hydrating=false;}
+  },
   acceptBid(cid,sid){
     const c=this._camps.find(x=>x.id===cid);if(!c)return;
     const s=c.ai.bidSuggestions.find(x=>x.id===sid);if(!s)return;
@@ -2046,6 +2081,11 @@ function syncCtxBar(){
   const st=$(('ctx-status'));if(st){st.textContent=c.status.charAt(0).toUpperCase()+c.status.slice(1);st.className='ctx-status-badge '+smap[c.status]}
   const dot=$(('cs-dot'));if(dot)dot.style.background=dotColor[c.status];
   const pb=$(('ctx-pause-btn'));if(pb)pb.textContent=c.status==='active'?'⏸ Pause':'▶ Resume';
+  const src=$('ctx-source');
+  if(src){
+    if(c._live){src.textContent='● Live';src.style.background='rgba(15,186,129,.15)';src.style.color='var(--green)';}
+    else{src.textContent='Preview';src.style.background='rgba(245,166,35,.12)';src.style.color='var(--yellow)';}
+  }
 }
 function togglePause(){
   const c=CS.active;CS.update(c.id,{status:c.status==='active'?'paused':'active'});
@@ -2541,7 +2581,7 @@ function renderCampaignHub(el){
 
 <!-- Campaign selector strip -->
 <div style="display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;margin-bottom:20px">
-  ${all.map(camp=>`<div onclick="CS.setActive(camp.id);renderPage('hub')" style="flex-shrink:0;padding:8px 14px;border-radius:10px;border:1px solid ${camp.id===c.id?'var(--accent)':'var(--border)'};background:${camp.id===c.id?'rgba(79,110,247,.1)':'var(--bg2)'};cursor:pointer;white-space:nowrap;font-size:12px;font-weight:${camp.id===c.id?700:500};color:${camp.id===c.id?'var(--accent2)':'var(--text)'};display:flex;align-items:center;gap:7px"><span style="width:7px;height:7px;border-radius:50%;background:${camp.color};flex-shrink:0"></span>${camp.name}</div>`).join('')}
+  ${all.map(camp=>`<div onclick="CS.select(camp.id)" style="flex-shrink:0;padding:8px 14px;border-radius:10px;border:1px solid ${camp.id===c.id?'var(--accent)':'var(--border)'};background:${camp.id===c.id?'rgba(79,110,247,.1)':'var(--bg2)'};cursor:pointer;white-space:nowrap;font-size:12px;font-weight:${camp.id===c.id?700:500};color:${camp.id===c.id?'var(--accent2)':'var(--text)'};display:flex;align-items:center;gap:7px"><span style="width:7px;height:7px;border-radius:50%;background:${camp.color};flex-shrink:0"></span>${camp.name}</div>`).join('')}
 </div>
 
 <!-- Hub header -->
