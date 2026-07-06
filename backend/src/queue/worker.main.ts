@@ -12,6 +12,7 @@ import { processPostbackEvent } from './handlers/postback-processor';
 import { evaluateEvent } from './handlers/automation-evaluator';
 import { runForecast } from './handlers/forecast-runner';
 import { runAnomalyScan } from './handlers/anomaly-scanner';
+import { processWebhookEvent } from './handlers/webhook-processor';
 
 /**
  * Runs as its own process (`npm run worker`), separate from the API server,
@@ -81,9 +82,7 @@ new Worker(
   async (job) => {
     const event = await prisma.webhookEvent.findUnique({ where: { id: job.data.webhookEventId } });
     if (!event) return;
-    // TODO: route by event.provider to provider-specific handlers that
-    // upsert Campaign/AdSet/Ad rows from the webhook payload.
-    await prisma.webhookEvent.update({ where: { id: event.id }, data: { status: 'PROCESSED', processedAt: new Date() } });
+    await processWebhookEvent(event, prisma);
   },
   { connection: redisConnection },
 );
