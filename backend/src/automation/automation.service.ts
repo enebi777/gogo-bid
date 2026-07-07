@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateAutomationRuleDto } from './dto/create-automation-rule.dto';
 import { UpdateAutomationRuleDto } from './dto/update-automation-rule.dto';
@@ -20,10 +20,18 @@ export class AutomationService {
     return rule;
   }
 
-  createRule(organizationId: string, data: CreateAutomationRuleDto) {
+  /** A rule's campaignId must belong to the caller's org — otherwise a rule could be scoped to (and silently never fire for, or worse leak existence of) another org's campaign. */
+  private async assertCampaignInOrg(organizationId: string, campaignId: string) {
+    const campaign = await this.prisma.campaign.findFirst({ where: { id: campaignId, organizationId } });
+    if (!campaign) throw new BadRequestException('campaignId does not belong to your organization.');
+  }
+
+  async createRule(organizationId: string, data: CreateAutomationRuleDto) {
+    if (data.campaignId) await this.assertCampaignInOrg(organizationId, data.campaignId);
     return this.prisma.automationRule.create({
       data: {
         organizationId,
+        campaignId: data.campaignId ?? null,
         name: data.name,
         enabled: data.enabled ?? true,
         triggerType: data.triggerType,
@@ -36,6 +44,7 @@ export class AutomationService {
 
   async updateRule(organizationId: string, id: string, data: UpdateAutomationRuleDto) {
     await this.getRuleOrThrow(organizationId, id);
+    if (data.campaignId) await this.assertCampaignInOrg(organizationId, data.campaignId);
     return this.prisma.automationRule.update({
       where: { id },
       data: { ...data, conditions: data.conditions as any, actionParams: data.actionParams as any },

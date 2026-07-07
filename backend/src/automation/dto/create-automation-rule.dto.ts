@@ -13,6 +13,12 @@ export class CreateAutomationRuleDto {
   @IsBoolean()
   enabled?: boolean;
 
+  // Null/omitted = applies to every campaign in the org. Set = scoped to one
+  // campaign (validated against the caller's org in the service layer).
+  @IsOptional()
+  @IsString()
+  campaignId?: string;
+
   @IsIn(TRIGGER_TYPES)
   triggerType: TriggerType;
 

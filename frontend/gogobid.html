@@ -3617,7 +3617,7 @@ function _autoRules(){
     <div style="display:grid;grid-template-columns:1fr 200px 140px 80px 80px 90px;gap:0;padding:13px 16px;border-bottom:1px solid var(--border);align-items:center;${r.enabled?'':'opacity:.55'}">
       <div>
         <div style="font-size:12px;font-weight:700;margin-bottom:3px">${r.name}</div>
-        <div style="font-size:10px;color:var(--muted)">Last: ${stats.lastFired}</div>
+        <div style="font-size:10px;color:var(--muted)">${r.campaignId?(CS.getById(r.campaignId)?.name||'Unknown campaign'):'All Campaigns'} · Last: ${stats.lastFired}</div>
       </div>
       <div style="font-size:11px;font-family:var(--mono);color:var(--accent2)">${triggerLabel(r.triggerType)}${conds?`<div style="font-size:10px;color:var(--muted)">if ${conds}</div>`:''}</div>
       <div style="font-size:11px;font-weight:600">${actionLabel(r.action)}</div>
@@ -3663,6 +3663,12 @@ function _autoBuilder(){
     <div class="card-hdr"><div class="card-title">🔧 Rule Builder</div><div class="card-desc">Define a custom automation rule</div></div>
     <div class="card-body">
       <div class="field"><label>Rule Name</label><div class="input-wrap"><input type="text" placeholder="e.g. Auto-pause new campaigns" id="rb-name" oninput="rbUpdatePreview()"></div></div>
+      <div class="field"><label>Campaign Scope</label>
+        <select id="rb-scope" oninput="rbUpdatePreview()">
+          <option value="${CS.active.id}">Only "${CS.active.name}" (current campaign)</option>
+          <option value="">All Campaigns</option>
+        </select>
+      </div>
       <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);margin:14px 0 8px">Trigger</div>
       <div class="field"><label>When this happens</label><select id="rb-trigger" oninput="rbUpdatePreview()">${AUTO_TRIGGER_TYPES.map(([k,l])=>`<option value="${k}">${l}</option>`).join('')}</select></div>
       <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);margin:14px 0 8px">Condition <span style="color:var(--dim);font-weight:400;text-transform:none">(optional — leave field blank to always run)</span></div>
@@ -3702,9 +3708,11 @@ function rbUpdatePreview(){
   const action=$('rb-action')?.value||AUTO_ACTIONS[0][0];
   const actionLabel=(AUTO_ACTIONS.find(x=>x[0]===action)||[])[1]||action;
   const msgField=$('rb-msg-field');if(msgField)msgField.style.display=action==='notify_slack'?'':'none';
+  const scope=$('rb-scope')?.value;
+  const scopeLabel=scope?`only "${CS.active.name}"`:'all campaigns';
   el.innerHTML=`
     <div style="color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">${name}</div>
-    <div><span style="color:var(--accent2);font-weight:700">WHEN</span> <span style="font-family:var(--mono);color:var(--text)">${triggerLabel}</span></div>
+    <div><span style="color:var(--accent2);font-weight:700">WHEN</span> <span style="font-family:var(--mono);color:var(--text)">${triggerLabel}</span> <span style="color:var(--muted)">(${scopeLabel})</span></div>
     ${field?`<div><span style="color:var(--accent2);font-weight:700">IF</span> <span style="font-family:var(--mono)">${field} ${AUTO_OP_LABELS[op]||op} ${val||'?'}</span></div>`:`<div style="color:var(--dim)">no condition — always runs</div>`}
     <div><span style="color:var(--green);font-weight:700">THEN</span> ${actionLabel}</div>`;
 }
@@ -3719,8 +3727,9 @@ async function rbCreateRule(){
   const conditions=field?[{field,operator:op,value:isNaN(Number(valRaw))?valRaw:Number(valRaw)}]:[];
   const msg=$('rb-msg')?.value?.trim();
   const actionParams=action==='notify_slack'&&msg?{message:msg}:undefined;
+  const campaignId=$('rb-scope')?.value||undefined;
   try{
-    await apiFetch('/automation/rules',{method:'POST',body:JSON.stringify({name,triggerType,action,conditions,actionParams})});
+    await apiFetch('/automation/rules',{method:'POST',body:JSON.stringify({name,triggerType,action,conditions,actionParams,campaignId})});
     await autoLoadAll();
     _autoTab='rules';renderAutomation($('page-automation'));
     toast('✓ Rule Created',name+' is now active.','success',3000);
