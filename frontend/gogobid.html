@@ -3515,8 +3515,8 @@ function renderReports(el,c){
   setTimeout(()=>{mkChart('chart-rep',{type:'line',data:{labels:DAYS,datasets:[{label:'Revenue',data:c.metrics.hist.spend.map((s,i)=>Math.round(s*(c.metrics.hist.roas?c.metrics.hist.roas[i]||c.metrics.week.roas:c.metrics.week.roas||2))),borderColor:'#0fba81',backgroundColor:'rgba(15,186,129,.07)',fill:true,tension:.45,borderWidth:2,pointRadius:2},{label:'Spend',data:c.metrics.hist.spend,borderColor:'#4f6ef7',backgroundColor:'rgba(79,110,247,.06)',fill:true,tension:.45,borderWidth:2,pointRadius:2}]},options:{...CD}})},60);
 }
 
-function renderIntegrations(el){
-  stIntegrations(el);
+function renderIntegrations(el,c){
+  stIntegrations(el,c);
 }
 
 // ═══════════════════════════════════════════════════
@@ -4008,7 +4008,7 @@ function intCard(icon,name,desc,key,bg){
   </div>`;
 }
 
-function stIntegrations(area){
+function stIntegrations(area,c){
   // The tab/quick-action onclicks pass $('st-content-area'), which only exists
   // when Integrations is embedded in Settings. On the standalone Integrations
   // page that's null, so fall back to the page container — otherwise switching
@@ -4016,6 +4016,7 @@ function stIntegrations(area){
   // unreachable.
   area=area||document.querySelector('#st-content-area')||document.querySelector('#page-integrations');
   if(!area)return;
+  c=c||CS.active;
   const tabs=[['overview','⊞ Overview'],['wizard','⚡ Quick Setup'],['accounts','👤 Accounts'],['traffic','📡 Traffic Sources'],['networks','🤝 Affiliate Networks'],['checkout','💳 Checkout & Payments'],['trackers','⊙ Trackers & Attribution'],['analytics','📊 Analytics & Data'],['crm','👥 CRM & Leads'],['ecomm','🛍 E-Commerce'],['email','📧 Email Marketing'],['comms','💬 Comms & Alerts'],['destinations','📤 Destinations'],['templates','🧩 Templates'],['webhooks','🔗 Webhooks & Postbacks'],['ai','✦ AI Integrations'],['marketplace','🏪 Network Marketplace'],['health','❤️ Health Center'],['advanced','⚙ Advanced']];
   const connected=Object.values(INT_CONNECTED).filter(Boolean).length;
   area.innerHTML=`
@@ -4026,7 +4027,7 @@ function stIntegrations(area){
 <div class="int-tab-bar">${tabs.map(([k,l])=>`<div class="int-tab${_intTab===k?' active':''}" onclick="_intTab='${k}';stIntegrations($('st-content-area'))">${l}</div>`).join('')}</div>
 <div id="int-body"></div>`;
   const body=$('int-body');
-  if(_intTab==='overview') body.innerHTML=intOverview(connected);
+  if(_intTab==='overview') body.innerHTML=intOverview(connected,c);
   else if(_intTab==='wizard') body.innerHTML=intWizard();
   else if(_intTab==='accounts') body.innerHTML=intAccounts();
   else if(_intTab==='templates') body.innerHTML=intTemplates();
@@ -4047,11 +4048,44 @@ function stIntegrations(area){
   else if(_intTab==='advanced') body.innerHTML=intAdvanced();
 }
 
-function intOverview(connected){
+// Maps a campaign's own traffic/offer/tracker field values to the global
+// INT_CONNECTED registry key for that platform, where one exists — used so
+// the Connected Platforms grid below reflects what THIS campaign actually
+// uses rather than a fixed org-wide list.
+const PLATFORM_NAME_TO_KEY={'meta ads':'meta','facebook ads':'meta','google ads':'google','tiktok ads':'tiktok','taboola':'taboola','outbrain':'outbrain','propellerads':'propellerads','clickbank':'clickbank','voluum':'voluum','binom':'binom','redtrack':'redtrack','bemob':'bemob','keitaro':'keitaro','google sheets':'sheets','stripe':'stripe'};
+const PLATFORM_ICONS={meta:'📘',google:'🔍',tiktok:'🎵',taboola:'📰',outbrain:'📰',propellerads:'🔔',clickbank:'🛒',voluum:'📊',binom:'📈',redtrack:'📈',bemob:'📈',keitaro:'📈',sheets:'📋',stripe:'💳'};
+function intPlatformCard(name,role,bg,explicitKey){
+  const key=explicitKey||PLATFORM_NAME_TO_KEY[(name||'').toLowerCase()];
+  if(key&&key in INT_CONNECTED) return intCard(PLATFORM_ICONS[key]||'🔌',name,role,key,bg);
+  // No global on/off registry entry for this one (e.g. a niche offer
+  // network) — show it as in-use by this campaign without a toggle, since
+  // there's no real connection state to flip.
+  return `<div class="int-card">
+    <div class="int-card-top"><div class="int-card-icon" style="background:${bg||'rgba(79,110,247,.12)'}">🔌</div></div>
+    <div class="int-card-name">${name}</div>
+    <div class="int-card-desc">${role}</div>
+    <div class="int-card-footer"><div class="int-status-text"><span class="int-status-dot" style="background:var(--yellow)"></span><span style="color:var(--yellow)">Used by this campaign</span></div></div>
+  </div>`;
+}
+function intMissingTrackerCard(){
+  return `<div class="int-card">
+    <div class="int-card-top"><div class="int-card-icon" style="background:rgba(240,82,82,.12)">⊙</div></div>
+    <div class="int-card-name">No Tracker Configured</div>
+    <div class="int-card-desc">Tracker</div>
+    <div class="int-card-footer"><div class="int-status-text"><span class="int-status-dot" style="background:var(--red)"></span><span style="color:var(--red)">Not connected</span></div></div>
+  </div>`;
+}
+function intOverview(connected,c){
+  c=c||CS.active;
   const total=Object.keys(INT_CONNECTED).length;
+  const platformCards=[
+    intPlatformCard(c.traffic.source,'Traffic Source','rgba(24,119,242,.15)',c.traffic.sourceKey),
+    c.offer?.network?intPlatformCard(c.offer.network,'Affiliate Network','rgba(255,87,34,.15)'):'',
+    c.integration?.trackerName?intPlatformCard(c.integration.trackerName,'Tracker','rgba(15,186,129,.15)'):intMissingTrackerCard(),
+  ].filter(Boolean);
   return`
 <div class="g4 mb20">
-  ${[['Connected Platforms',connected,'var(--green)'],['Total Available',total,'var(--accent2)'],['Active Campaigns',5,'var(--yellow)'],['Sync Health','98%','var(--green)']].map(([l,v,col])=>`<div class="int-overview-stat"><div class="int-overview-num" style="color:${col}">${v}</div><div class="int-overview-label">${l}</div></div>`).join('')}
+  ${[['Connected Platforms (org)',connected,'var(--green)'],['Total Available',total,'var(--accent2)'],['Active Campaigns',CS.camps.length,'var(--yellow)'],['Sync Health','98%','var(--green)']].map(([l,v,col])=>`<div class="int-overview-stat"><div class="int-overview-num" style="color:${col}">${v}</div><div class="int-overview-label">${l}</div></div>`).join('')}
 </div>
 <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">Data Flow Architecture</div>
 <div class="int-flow mb20">
@@ -4064,9 +4098,9 @@ function intOverview(connected){
 <div class="flex gap8 mb20" style="font-size:11px;color:var(--muted)">
   <span>Last sync: 2 min ago</span><span>•</span><span>Next sync: in 13 min</span><span>•</span><span style="color:var(--green)">3 syncs healthy</span><span>•</span><span style="color:var(--yellow)">1 enriching</span>
 </div>
-<div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">Connected Platforms</div>
+<div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">Connected Platforms — ${c.name}</div>
 <div class="int-grid">
-  ${[['📘','Meta Ads','meta','rgba(24,119,242,.15)'],['🔍','Google Ads','google','rgba(66,133,244,.15)'],['🛒','ClickBank','clickbank','rgba(255,87,34,.15)'],['📊','Voluum','voluum','rgba(15,186,129,.15)'],['📋','Google Sheets','sheets','rgba(52,168,83,.15)'],['💳','Stripe','stripe','rgba(99,91,255,.15)']].map(([icon,name,key,bg])=>intCard(icon,name,'',key,bg)).join('')}
+  ${platformCards.join('')}
 </div>
 <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">Quick Actions</div>
 <div class="flex gap8 flex-wrap">
