@@ -1,4 +1,4 @@
-import { CONNECTORS, listConnectors, getConnector, getConnectorByProvider, connectorsByType, getProfile, getTrackerFields, getBudgetGuidance, getConnectorBySourceKey } from './connector-registry';
+import { CONNECTORS, listConnectors, getConnector, getConnectorByProvider, connectorsByType, getProfile, getTrackerFields, getBudgetGuidance, getConnectorBySourceKey, getStrategyHint } from './connector-registry';
 import { ConnectionType } from './connector-types';
 
 const VALID_TYPES: ConnectionType[] = ['oauth', 'api', 'tracking', 'affiliate', 'webhook', 'destination', 'ai'];
@@ -97,6 +97,13 @@ describe('connector registry — lookups', () => {
     expect(getConnectorBySourceKey('push')?.id).toBe('propellerads');
     expect(getConnectorBySourceKey('native')).toBeUndefined(); // ambiguous → no match
     expect(getConnectorBySourceKey('')).toBeUndefined();
+  });
+
+  it('getStrategyHint returns guidance for ad platforms and undefined otherwise', () => {
+    expect(getStrategyHint('google_ads')).toMatch(/high-intent search/i);
+    expect(getStrategyHint('meta_ads')).toMatch(/awareness/i);
+    expect(getStrategyHint('voluum')).toBeUndefined(); // tracker, not an ad platform
+    expect(getStrategyHint('clickbank')).toBeUndefined();
   });
 });
 

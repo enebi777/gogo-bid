@@ -85,6 +85,12 @@ export interface ConnectorDefinition {
    * Absent for connectors that don't carry an ad budget (trackers, networks, …).
    */
   budgetGuidance?: { minDaily: number; recommendedDaily: number };
+  /**
+   * One-line "best for" guidance shown in the integration directory to help
+   * users pick the right platform for their goal (e.g. Google = high-intent
+   * search, Meta = awareness/retargeting). Present for ad-platform connectors.
+   */
+  strategyHint?: string;
   /** Lower = higher up the directory. */
   priority: number;
 }

@@ -91,6 +91,23 @@ export const CONNECTORS: ConnectorDefinition[] = [
   def('power_bi', 'POWER_BI', 'Power BI', 'Destination', 'destination', 'microsoft_oauth', DESTINATION, 62),
 ];
 
+// Multi-platform strategy guidance (best-practice "which platform for which
+// goal"). Attached post-hoc so the CONNECTORS block above stays readable and
+// the def() signature doesn't grow another positional arg.
+const STRATEGY_HINTS: Record<string, string> = {
+  google_ads: 'High-intent search — capture people actively searching for the offer.',
+  meta_ads: 'Awareness & retargeting — visual, interest- and lookalike-based audiences.',
+  tiktok_ads: 'Younger demographics & brand awareness — video-first, trend-driven.',
+  taboola: 'Native content discovery — top-of-funnel scale on premium publishers.',
+  outbrain: 'Native content discovery — top-of-funnel scale on premium publishers.',
+  mgid: 'Native content discovery — cost-efficient top-of-funnel reach.',
+  propellerads: 'Push & pop volume — cheap top-of-funnel testing at scale.',
+};
+for (const c of CONNECTORS) {
+  const hint = STRATEGY_HINTS[c.id];
+  if (hint) c.strategyHint = hint;
+}
+
 // Fast lookups (built once at module load).
 const BY_ID = new Map(CONNECTORS.map((c) => [c.id, c]));
 const BY_PROVIDER = new Map(CONNECTORS.filter((c) => c.provider).map((c) => [c.provider as string, c]));
@@ -119,6 +136,10 @@ export function getProfile(id: string): ConnectorDefinition['profile'] | undefin
 
 export function getBudgetGuidance(id: string): ConnectorDefinition['budgetGuidance'] | undefined {
   return BY_ID.get(id)?.budgetGuidance;
+}
+
+export function getStrategyHint(id: string): string | undefined {
+  return BY_ID.get(id)?.strategyHint;
 }
 
 // Maps the frontend campaign's traffic sourceKey (e.g. 'meta', 'google',
