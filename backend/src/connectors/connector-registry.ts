@@ -30,19 +30,27 @@ const def = (
   capabilities: ConnectorCapabilities,
   priority: number,
   profile?: ConnectorDefinition['profile'],
-): ConnectorDefinition => ({ id, provider, name, category, connectionType, authProvider, capabilities, priority, profile });
+  budgetGuidance?: ConnectorDefinition['budgetGuidance'],
+): ConnectorDefinition => ({ id, provider, name, category, connectionType, authProvider, capabilities, priority, profile, budgetGuidance });
+
+// Rough daily-budget floors per platform (configurable defaults, not rate
+// cards). Search/managed OAuth platforms need more per day to gather signal;
+// native/push run leaner. Tune these once real account data is available.
+const B_OAUTH_SEARCH = { minDaily: 30, recommendedDaily: 100 }; // Google-style search auctions
+const B_OAUTH_SOCIAL = { minDaily: 20, recommendedDaily: 50 }; // Meta / TikTok
+const B_NATIVE = { minDaily: 25, recommendedDaily: 50 }; // Taboola / Outbrain / MGID / push
 
 export const CONNECTORS: ConnectorDefinition[] = [
   // ── OAuth traffic sources ──
-  def('meta_ads', 'META_ADS', 'Meta Ads', 'Traffic Source', 'oauth', 'facebook_login_business', OAUTH_ADS, 1),
-  def('google_ads', 'GOOGLE_ADS', 'Google Ads', 'Traffic Source', 'oauth', 'google_oauth', OAUTH_ADS, 2),
-  def('tiktok_ads', 'TIKTOK_ADS', 'TikTok Ads', 'Traffic Source', 'oauth', 'tiktok_business_oauth', OAUTH_ADS, 3),
+  def('meta_ads', 'META_ADS', 'Meta Ads', 'Traffic Source', 'oauth', 'facebook_login_business', OAUTH_ADS, 1, undefined, B_OAUTH_SOCIAL),
+  def('google_ads', 'GOOGLE_ADS', 'Google Ads', 'Traffic Source', 'oauth', 'google_oauth', OAUTH_ADS, 2, undefined, B_OAUTH_SEARCH),
+  def('tiktok_ads', 'TIKTOK_ADS', 'TikTok Ads', 'Traffic Source', 'oauth', 'tiktok_business_oauth', OAUTH_ADS, 3, undefined, B_OAUTH_SOCIAL),
 
   // ── API-key native / push traffic sources ──
-  def('taboola', 'TABOOLA', 'Taboola', 'Traffic Source', 'api', 'api_key', API_ADS, 10),
-  def('outbrain', 'OUTBRAIN', 'Outbrain', 'Traffic Source', 'api', 'api_key', API_ADS, 11),
-  def('mgid', 'MGID', 'MGID', 'Traffic Source', 'api', 'api_key', API_ADS, 12),
-  def('propellerads', 'PROPELLERADS', 'PropellerAds', 'Traffic Source', 'api', 'api_key', API_ADS, 13),
+  def('taboola', 'TABOOLA', 'Taboola', 'Traffic Source', 'api', 'api_key', API_ADS, 10, undefined, B_NATIVE),
+  def('outbrain', 'OUTBRAIN', 'Outbrain', 'Traffic Source', 'api', 'api_key', API_ADS, 11, undefined, B_NATIVE),
+  def('mgid', 'MGID', 'MGID', 'Traffic Source', 'api', 'api_key', API_ADS, 12, undefined, B_NATIVE),
+  def('propellerads', 'PROPELLERADS', 'PropellerAds', 'Traffic Source', 'api', 'api_key', API_ADS, 13, undefined, B_NATIVE),
 
   // ── Trackers (postback profiles carried verbatim from the codebase's
   //    authoritative TRACKER_FIELD_MAP — this is now the source of truth) ──
@@ -107,6 +115,31 @@ export function connectorsByType(type: ConnectionType): ConnectorDefinition[] {
 
 export function getProfile(id: string): ConnectorDefinition['profile'] | undefined {
   return BY_ID.get(id)?.profile;
+}
+
+export function getBudgetGuidance(id: string): ConnectorDefinition['budgetGuidance'] | undefined {
+  return BY_ID.get(id)?.budgetGuidance;
+}
+
+// Maps the frontend campaign's traffic sourceKey (e.g. 'meta', 'google',
+// 'push') to a connector id. Kept here so the one place that classifies
+// providers also owns this aliasing.
+const SOURCE_KEY_TO_CONNECTOR: Record<string, string> = {
+  meta: 'meta_ads',
+  facebook: 'meta_ads',
+  google: 'google_ads',
+  tiktok: 'tiktok_ads',
+  taboola: 'taboola',
+  outbrain: 'outbrain',
+  mgid: 'mgid',
+  propellerads: 'propellerads',
+  push: 'propellerads',
+};
+
+/** Resolve a connector from a frontend traffic sourceKey (returns undefined for unknown/ambiguous e.g. generic 'native'). */
+export function getConnectorBySourceKey(sourceKey: string): ConnectorDefinition | undefined {
+  const id = SOURCE_KEY_TO_CONNECTOR[(sourceKey || '').toLowerCase()];
+  return id ? BY_ID.get(id) : undefined;
 }
 
 /**

@@ -78,6 +78,13 @@ export interface ConnectorDefinition {
   capabilities: ConnectorCapabilities;
   /** Present for tracking/affiliate connectors whose field mapping is known. */
   profile?: ConnectorProfile;
+  /**
+   * Recommended daily-budget floor for ad-platform connectors, so the app can
+   * warn when a campaign is under-funded to gather meaningful data. Values are
+   * configurable defaults (rough platform norms), not authoritative rate cards.
+   * Absent for connectors that don't carry an ad budget (trackers, networks, …).
+   */
+  budgetGuidance?: { minDaily: number; recommendedDaily: number };
   /** Lower = higher up the directory. */
   priority: number;
 }

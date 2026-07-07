@@ -69,4 +69,25 @@ describe('runAnomalyScan', () => {
     expect(res).toEqual([]);
     expect(prisma.alert.create).not.toHaveBeenCalled();
   });
+
+  it('flags under_min_budget by resolving the platform floor from the campaign traffic source', async () => {
+    // Meta floor is $20/day; campaign is set to $5/day with no tracking data.
+    const prisma = makePrisma({
+      rows: { costs: [], revenues: [], clicks: [], conversions: [] },
+      open: [],
+      campaign: { id: 'c1', dailyBudget: 5, data: { traffic: { sourceKey: 'meta' }, optimization: {} } },
+    });
+    await runAnomalyScan('c1', prisma);
+    expect(prisma._created.map((a: any) => a.type)).toContain('under_min_budget');
+  });
+
+  it('does not flag under_min_budget for an ambiguous/unknown traffic source (no floor)', async () => {
+    const prisma = makePrisma({
+      rows: { costs: [], revenues: [], clicks: [], conversions: [] },
+      open: [],
+      campaign: { id: 'c1', dailyBudget: 5, data: { traffic: { sourceKey: 'native' }, optimization: {} } },
+    });
+    await runAnomalyScan('c1', prisma);
+    expect(prisma._created.map((a: any) => a.type)).not.toContain('under_min_budget');
+  });
 });

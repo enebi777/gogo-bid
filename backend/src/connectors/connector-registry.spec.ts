@@ -1,4 +1,4 @@
-import { CONNECTORS, listConnectors, getConnector, getConnectorByProvider, connectorsByType, getProfile, getTrackerFields } from './connector-registry';
+import { CONNECTORS, listConnectors, getConnector, getConnectorByProvider, connectorsByType, getProfile, getTrackerFields, getBudgetGuidance, getConnectorBySourceKey } from './connector-registry';
 import { ConnectionType } from './connector-types';
 
 const VALID_TYPES: ConnectionType[] = ['oauth', 'api', 'tracking', 'affiliate', 'webhook', 'destination', 'ai'];
@@ -51,6 +51,18 @@ describe('connector registry — capability invariants', () => {
       expect(c.profile!.conversionIdParam).toBeTruthy();
     }
   });
+
+  it('ad-platform (traffic-source) connectors carry budget guidance; others do not', () => {
+    for (const c of CONNECTORS) {
+      if (c.category === 'Traffic Source') {
+        expect(c.budgetGuidance).toBeDefined();
+        expect(c.budgetGuidance!.minDaily).toBeGreaterThan(0);
+        expect(c.budgetGuidance!.recommendedDaily).toBeGreaterThanOrEqual(c.budgetGuidance!.minDaily);
+      } else {
+        expect(c.budgetGuidance).toBeUndefined();
+      }
+    }
+  });
 });
 
 describe('connector registry — lookups', () => {
@@ -70,6 +82,21 @@ describe('connector registry — lookups', () => {
   it('getProfile returns the smart profile for a tracker/affiliate', () => {
     expect(getProfile('voluum')).toMatchObject({ clickIdParam: 'cid', conversionIdParam: 'txid' });
     expect(getProfile('clickbank')).toMatchObject({ clickIdParam: 'tid', conversionIdParam: 'cbreceipt', revenueParam: 'amount' });
+  });
+
+  it('getBudgetGuidance returns floors for ad platforms and undefined otherwise', () => {
+    expect(getBudgetGuidance('google_ads')).toMatchObject({ minDaily: 30, recommendedDaily: 100 });
+    expect(getBudgetGuidance('meta_ads')?.minDaily).toBe(20);
+    expect(getBudgetGuidance('voluum')).toBeUndefined(); // tracker, no ad budget
+    expect(getBudgetGuidance('clickbank')).toBeUndefined();
+  });
+
+  it('getConnectorBySourceKey maps frontend traffic keys to connectors', () => {
+    expect(getConnectorBySourceKey('meta')?.id).toBe('meta_ads');
+    expect(getConnectorBySourceKey('google')?.id).toBe('google_ads');
+    expect(getConnectorBySourceKey('push')?.id).toBe('propellerads');
+    expect(getConnectorBySourceKey('native')).toBeUndefined(); // ambiguous → no match
+    expect(getConnectorBySourceKey('')).toBeUndefined();
   });
 });
 

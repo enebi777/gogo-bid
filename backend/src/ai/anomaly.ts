@@ -19,6 +19,10 @@ export interface AnomalyInput {
   targetCpa?: number | null;
   targetRoas?: number | null;
   dailyBudget?: number | null;
+  // The platform's minimum viable daily budget (from the connector registry's
+  // budgetGuidance). Used to flag under-funded campaigns — a config issue that
+  // holds regardless of whether tracking data exists yet.
+  minDailyBudget?: number | null;
 }
 
 export type AnomalySeverity = 'critical' | 'warning' | 'info';
@@ -38,7 +42,21 @@ const x = (v: number) => (Math.round(v * 100) / 100).toFixed(2) + '×';
  */
 export function detectAnomalies(m: AnomalyInput): Anomaly[] {
   const out: Anomaly[] = [];
-  // No real data → nothing to assert. (The caller keeps seeded preview.)
+
+  // 0) Under-funded: configured daily budget below the platform's viable floor.
+  // This is a configuration check, not a performance one, so it's evaluated
+  // regardless of whether live tracking data exists — an under-funded campaign
+  // can't gather meaningful data for the algorithm to optimize on.
+  if (m.minDailyBudget != null && m.minDailyBudget > 0 && m.dailyBudget != null && m.dailyBudget > 0 && m.dailyBudget < m.minDailyBudget) {
+    out.push({
+      type: 'under_min_budget',
+      metric: 'Budget',
+      severity: 'warning',
+      message: `Daily budget ${money(m.dailyBudget)} is below the ~${money(m.minDailyBudget)} minimum this platform needs to gather meaningful data.`,
+    });
+  }
+
+  // No real data → nothing further to assert. (The caller keeps seeded preview.)
   if (m.source !== 'live') return out;
 
   // 1) Unprofitable spend: ROAS below break-even while actually spending.
