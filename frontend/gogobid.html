@@ -1545,6 +1545,7 @@ function authLogout(){
     for(const k in _aiCache)delete _aiCache[k];
     for(const k in _pbConfigCache)delete _pbConfigCache[k];
     for(const k in _wsSnippetCache)delete _wsSnippetCache[k];
+    _connectorsCache=null;
     showAuthOverlay('login');
     toast('Logged out','See you next time!','info',3000);
   },'var(--red)');
@@ -4017,7 +4018,7 @@ function stIntegrations(area,c){
   area=area||document.querySelector('#st-content-area')||document.querySelector('#page-integrations');
   if(!area)return;
   c=c||CS.active;
-  const tabs=[['overview','⊞ Overview'],['wizard','⚡ Quick Setup'],['accounts','👤 Accounts'],['traffic','📡 Traffic Sources'],['networks','🤝 Affiliate Networks'],['checkout','💳 Checkout & Payments'],['trackers','⊙ Trackers & Attribution'],['analytics','📊 Analytics & Data'],['crm','👥 CRM & Leads'],['ecomm','🛍 E-Commerce'],['email','📧 Email Marketing'],['comms','💬 Comms & Alerts'],['destinations','📤 Destinations'],['templates','🧩 Templates'],['webhooks','🔗 Webhooks & Postbacks'],['ai','✦ AI Integrations'],['marketplace','🏪 Network Marketplace'],['health','❤️ Health Center'],['advanced','⚙ Advanced']];
+  const tabs=[['overview','⊞ Overview'],['directory','🗂 Directory'],['wizard','⚡ Quick Setup'],['accounts','👤 Accounts'],['traffic','📡 Traffic Sources'],['networks','🤝 Affiliate Networks'],['checkout','💳 Checkout & Payments'],['trackers','⊙ Trackers & Attribution'],['analytics','📊 Analytics & Data'],['crm','👥 CRM & Leads'],['ecomm','🛍 E-Commerce'],['email','📧 Email Marketing'],['comms','💬 Comms & Alerts'],['destinations','📤 Destinations'],['templates','🧩 Templates'],['webhooks','🔗 Webhooks & Postbacks'],['ai','✦ AI Integrations'],['marketplace','🏪 Network Marketplace'],['health','❤️ Health Center'],['advanced','⚙ Advanced']];
   const connected=Object.values(INT_CONNECTED).filter(Boolean).length;
   area.innerHTML=`
 <div style="font-size:15px;font-weight:800;margin-bottom:14px;letter-spacing:-.2px;display:flex;align-items:center;justify-content:space-between">
@@ -4028,6 +4029,7 @@ function stIntegrations(area,c){
 <div id="int-body"></div>`;
   const body=$('int-body');
   if(_intTab==='overview') body.innerHTML=intOverview(connected,c);
+  else if(_intTab==='directory'){ body.innerHTML=intDirectory(); setTimeout(intDirectoryLoad,30); }
   else if(_intTab==='wizard') body.innerHTML=intWizard();
   else if(_intTab==='accounts') body.innerHTML=intAccounts();
   else if(_intTab==='templates') body.innerHTML=intTemplates();
@@ -4075,6 +4077,52 @@ function intMissingTrackerCard(){
     <div class="int-card-footer"><div class="int-status-text"><span class="int-status-dot" style="background:var(--red)"></span><span style="color:var(--red)">Not connected</span></div></div>
   </div>`;
 }
+// ── CONNECTOR DIRECTORY (registry-driven) ──
+// Renders the full connector catalog from GET /connectors — the single source
+// of truth in backend/src/connectors — instead of hardcoded per-category grids,
+// so new connectors + their metadata (strategy hints, budget guidance,
+// capabilities) appear here automatically.
+let _connectorsCache=null;
+function intDirectory(){
+  return `<div id="int-directory">${_connectorsCache?intDirectoryCards(_connectorsCache):'<div style="color:var(--muted);font-size:12px;padding:16px 0">Loading connector directory…</div>'}</div>`;
+}
+async function intDirectoryLoad(){
+  const host=$('int-directory');if(!host)return;
+  if(_connectorsCache){host.innerHTML=intDirectoryCards(_connectorsCache);return;}
+  if(!getAccessToken()){host.innerHTML='<div style="color:var(--muted);font-size:12px;padding:16px 0">Log in to load the connector directory.</div>';return;}
+  try{
+    _connectorsCache=await apiFetch('/connectors');
+    if($('int-directory'))host.innerHTML=intDirectoryCards(_connectorsCache);
+  }catch(err){host.innerHTML=`<div style="color:var(--red);font-size:12px;padding:16px 0">Couldn't load connectors: ${err.message}</div>`;}
+}
+function intDirectoryCards(list){
+  const CAT_ORDER=['Traffic Source','Affiliate Network','Tracker','Analytics','Destination','AI'];
+  const TYPE_COL={oauth:'var(--accent2)',api:'var(--yellow)',tracking:'var(--green)',affiliate:'#ff7a00',destination:'#8b5cf6',ai:'#e91e8c',webhook:'var(--muted)'};
+  const CAP_LABELS=[['multiAccount','Multi-account'],['assetDiscovery','Asset discovery'],['campaignImport','Campaign import'],['webhooks','Webhooks'],['postbacks','Postbacks'],['automation','Automation'],['ai','AI']];
+  const groups={};
+  list.forEach(c=>{(groups[c.category]=groups[c.category]||[]).push(c);});
+  const cats=CAT_ORDER.filter(x=>groups[x]).concat(Object.keys(groups).filter(x=>!CAT_ORDER.includes(x)));
+  return `<div style="font-size:11px;color:var(--muted);margin-bottom:14px">${list.length} connectors · classified by connection type. This directory is generated from the backend connector registry.</div>`+
+  cats.map(cat=>`
+  <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin:6px 0 10px">${cat} <span style="opacity:.6">(${groups[cat].length})</span></div>
+  <div class="int-grid" style="margin-bottom:20px">
+    ${groups[cat].map(c=>{
+      const col=TYPE_COL[c.connectionType]||'var(--muted)';
+      const caps=CAP_LABELS.filter(([k])=>c.capabilities&&c.capabilities[k]).map(([,l])=>l);
+      return `<div class="int-card">
+        <div class="int-card-top">
+          <div class="int-card-icon" style="background:${col}22">🔌</div>
+          <span class="badge" style="font-size:9px;background:${col}18;color:${col};border:1px solid ${col}40">${c.connectionType}</span>
+        </div>
+        <div class="int-card-name">${c.name}</div>
+        <div class="int-card-desc" style="min-height:auto">${c.strategyHint||('via '+c.authProvider.replace(/_/g,' '))}</div>
+        ${c.budgetGuidance?`<div style="font-size:10px;color:var(--muted);margin-top:6px;font-family:var(--mono)">Budget: min $${c.budgetGuidance.minDaily}/d · rec $${c.budgetGuidance.recommendedDaily}/d</div>`:''}
+        ${caps.length?`<div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:8px">${caps.map(l=>`<span style="font-size:8px;font-weight:600;padding:2px 6px;border-radius:4px;background:var(--bg3);color:var(--muted)">${l}</span>`).join('')}</div>`:''}
+      </div>`;
+    }).join('')}
+  </div>`).join('');
+}
+
 function intOverview(connected,c){
   c=c||CS.active;
   const total=Object.keys(INT_CONNECTED).length;
