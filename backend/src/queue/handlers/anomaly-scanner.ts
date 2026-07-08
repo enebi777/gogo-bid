@@ -1,6 +1,7 @@
 import type { PrismaClient } from '@prisma/client';
 import { computeCampaignMetrics } from '../../campaigns/campaign-metrics';
 import { detectAnomalies } from '../../ai/anomaly';
+import { getConnectorBySourceKey, getConnectorByProvider } from '../../connectors/connector-registry';
 
 /**
  * Scans a campaign's recent (7-day) tracking rows against the anomaly rules
@@ -28,7 +29,16 @@ export async function runAnomalyScan(campaignId: string, prisma: PrismaClient) {
 
   const metrics = computeCampaignMetrics({ costs, revenues, clicks, conversions }, '7d');
   // targetCpa/targetRoas live in the frontend-managed `data` JSON blob.
-  const opt = ((campaign.data as any) || {}).optimization || {};
+  const data = (campaign.data as any) || {};
+  const opt = data.optimization || {};
+  // Resolve the campaign's ad platform → its recommended budget floor, from the
+  // frontend traffic sourceKey (or a provider stored in the data blob).
+  // Unknown/ambiguous sources yield no floor, so the rule is simply skipped.
+  const connector =
+    getConnectorBySourceKey(data.traffic?.sourceKey ?? '') ||
+    (data.integration?.provider ? getConnectorByProvider(data.integration.provider) : undefined);
+  const minDailyBudget = connector?.budgetGuidance?.minDaily ?? null;
+
   const anomalies = detectAnomalies({
     spend: metrics.spend,
     revenue: metrics.revenue,
@@ -41,6 +51,7 @@ export async function runAnomalyScan(campaignId: string, prisma: PrismaClient) {
     targetCpa: opt.targetCPA ?? null,
     targetRoas: opt.targetRoas ?? null,
     dailyBudget: campaign.dailyBudget != null ? Number(campaign.dailyBudget) : null,
+    minDailyBudget,
   });
 
   const open = await prisma.alert.findMany({ where: { campaignId, resolved: false } });

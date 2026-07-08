@@ -78,6 +78,19 @@ export interface ConnectorDefinition {
   capabilities: ConnectorCapabilities;
   /** Present for tracking/affiliate connectors whose field mapping is known. */
   profile?: ConnectorProfile;
+  /**
+   * Recommended daily-budget floor for ad-platform connectors, so the app can
+   * warn when a campaign is under-funded to gather meaningful data. Values are
+   * configurable defaults (rough platform norms), not authoritative rate cards.
+   * Absent for connectors that don't carry an ad budget (trackers, networks, …).
+   */
+  budgetGuidance?: { minDaily: number; recommendedDaily: number };
+  /**
+   * One-line "best for" guidance shown in the integration directory to help
+   * users pick the right platform for their goal (e.g. Google = high-intent
+   * search, Meta = awareness/retargeting). Present for ad-platform connectors.
+   */
+  strategyHint?: string;
   /** Lower = higher up the directory. */
   priority: number;
 }

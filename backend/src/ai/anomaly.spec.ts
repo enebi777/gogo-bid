@@ -63,4 +63,18 @@ describe('detectAnomalies', () => {
     const types = a.map((x) => x.type).sort();
     expect(types).toEqual(['budget_overshoot', 'cpa_over_target', 'roas_below_breakeven']);
   });
+
+  it('flags under_min_budget when daily budget is below the platform floor — even with no live data', () => {
+    const a = detectAnomalies(base({ source: 'empty', dailyBudget: 10, minDailyBudget: 20 }));
+    expect(a).toEqual([expect.objectContaining({ type: 'under_min_budget', severity: 'warning', metric: 'Budget' })]);
+  });
+
+  it('does not flag under_min_budget when budget meets or exceeds the floor', () => {
+    expect(detectAnomalies(base({ dailyBudget: 20, minDailyBudget: 20 })).find((x) => x.type === 'under_min_budget')).toBeUndefined();
+    expect(detectAnomalies(base({ dailyBudget: 50, minDailyBudget: 20 })).find((x) => x.type === 'under_min_budget')).toBeUndefined();
+  });
+
+  it('skips under_min_budget when no platform floor is known', () => {
+    expect(detectAnomalies(base({ dailyBudget: 5, minDailyBudget: null })).find((x) => x.type === 'under_min_budget')).toBeUndefined();
+  });
 });
